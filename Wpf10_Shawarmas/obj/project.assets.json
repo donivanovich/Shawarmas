@@ -8,19 +8,19 @@
     "net8.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\kosoi\\.nuget\\packages\\": {}
+    "C:\\Users\\javij\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kosoi\\Downloads\\Wpf10_Shawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+      "projectUniqueName": "C:\\Users\\javij\\OneDrive\\Documentos\\2B DAM\\WPF\\2 TRIMESTRE\\WPF\\SHAWARMAS\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
       "projectName": "Wpf10_Shawarmas",
-      "projectPath": "C:\\Users\\kosoi\\Downloads\\Wpf10_Shawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
-      "packagesPath": "C:\\Users\\kosoi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kosoi\\Downloads\\Wpf10_Shawarmas\\Wpf10_Shawarmas\\obj\\",
+      "projectPath": "C:\\Users\\javij\\OneDrive\\Documentos\\2B DAM\\WPF\\2 TRIMESTRE\\WPF\\SHAWARMAS\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+      "packagesPath": "C:\\Users\\javij\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\javij\\OneDrive\\Documentos\\2B DAM\\WPF\\2 TRIMESTRE\\WPF\\SHAWARMAS\\Wpf10_Shawarmas\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\kosoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\javij\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -70,7 +70,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

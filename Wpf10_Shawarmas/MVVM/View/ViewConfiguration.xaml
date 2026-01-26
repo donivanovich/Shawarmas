@@ -63,7 +63,6 @@
                 x:Name="ToggleFullScreen"
                 Margin="10,0,0,0"
                 Style="{StaticResource SimpleToggleSwitch}"
-                Click="ToggleFullScreen_Click"
                 Grid.Row="0"
                 Grid.Column="1"
                 Width="100"
