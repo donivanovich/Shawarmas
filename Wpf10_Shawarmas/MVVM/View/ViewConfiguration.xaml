@@ -1,0 +1,128 @@
+﻿<Page x:Class="Wpf10_Shawarmas.MVVM.View.ViewConfiguration"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Wpf10_Shawarmas.MVVM.View"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="ViewConfiguration">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock
+            Grid.Row="0"
+            FontSize="24"
+            FontWeight="Bold"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Text="Configuration Settings"/> <!--Title-->
+
+        <Grid
+            Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                FontSize="16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0"
+                Text="Resolution:"/>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                FontSize="16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0"
+                Text="Mode of Use:"/>
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                FontSize="16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0"
+                Text="Volume:"/>
+            <ToggleButton
+                x:Name="ToggleFullScreen"
+                Margin="10,0,0,0"
+                Style="{StaticResource SimpleToggleSwitch}"
+                Grid.Row="0"
+                Grid.Column="1"
+                Width="100"
+                Height="30"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Content="Full Screen"/>
+            <ComboBox
+                x:Name="ComboBoxModeOfUse"
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource SimpleMonoComboBox}"
+                Margin="10,0,0,0"
+                Width="150"
+                Height="30"
+                HorizontalAlignment="Left">
+                <ComboBoxItem Content="Writter Mode"/>
+                <ComboBoxItem Content="Editor Mode"/>
+                <ComboBoxItem Content="Admin"/>
+            </ComboBox>
+            <Slider
+                x:Name="SliderVolume"
+                Style="{StaticResource SimpleMonoSlider}"
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                Width="150"
+                Height="30"
+                HorizontalAlignment="Left"
+                Minimum="0"
+                Maximum="100"/>
+
+        </Grid>
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Margin="0,10,0,10">
+            <Button
+                x:Name="BtnCancel"
+                FontWeight="Bold"
+                Style="{StaticResource ButtonDefault}"
+                Width="100"
+                Height="30"
+                Margin="10,0,10,0"
+                Content="Cancel"
+                Click="BtnCancel_Click"/>
+            <!--Cancel Button-->
+            <Button
+                x:Name="BtnSave"
+                FontWeight="Bold"
+                Style="{StaticResource ButtonDefault}"
+                Width="100"
+                Height="30"
+                Margin="10,0,10,0"
+                Content="Save"
+                Click="BtnSave_Click"/>
+            <!--Save Button-->
+        </StackPanel>
+    </Grid>
+</Page>

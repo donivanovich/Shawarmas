@@ -1,0 +1,144 @@
+﻿<Window x:Class="Wpf10_Shawarmas.MVVM.View.ViewSignUp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Wpf10_Shawarmas.MVVM.View"
+        mc:Ignorable="d"
+        Icon="/res/favicon2.ico"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Title="Sign Up" Height="300" Width="450">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/> <!--Labels-->
+            <ColumnDefinition Width="2*"/> <!--Input Fields-->
+            <ColumnDefinition Width="0.75*"/> <!--Button-->
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/> <!--Input Fields-->
+            <RowDefinition Height="*"/> <!--Button-->
+        </Grid.RowDefinitions>
+
+        <Button
+            x:Name="BtnSignUp"
+            Grid.Column="2"
+            Grid.Row="3"
+            Width="50"
+            Height="15"
+            FontSize="10"
+            Style="{StaticResource ButtonDefault}"
+            Content="Sign Up" 
+            Click="BtnSignUp_Click"/> <!--Button Sign Up-->
+
+        <Grid
+            Grid.Row="1"
+            Grid.Column="0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock
+                Text="Name:"
+                Grid.Row="0"
+                FontSize="10"
+                FontWeight="Bold"
+                Height="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"/> <!--Label Name-->
+            <TextBlock
+                Text="Surename 1:"
+                Grid.Row="1"
+                FontSize="10"
+                FontWeight="Bold"
+                Height="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"/> <!--Label Surename1-->
+            <TextBlock
+                Text="Surename 2:"
+                Grid.Row="2"
+                FontSize="10"
+                FontWeight="Bold"
+                Height="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"/> <!--Label Surename2-->
+            <TextBlock
+                Text="Email:"
+                Grid.Row="3"
+                FontSize="10"
+                FontWeight="Bold"
+                Height="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"/> <!--Label Email-->
+            <TextBlock
+                Text="Password:"
+                Grid.Row="4"
+                FontSize="10"
+                FontWeight="Bold"
+                Height="15"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"/> <!--Label Password-->
+        </Grid> <!--Labels-->
+
+        <Grid
+            Grid.Row="1"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBox
+                x:Name="TxtName"
+                Grid.Row="0"
+                FontSize="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Width="200"
+                Height="15"/> <!--Input Name-->
+            <TextBox
+                x:Name="TxtSurename1"
+                Grid.Row="1"
+                FontSize="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Width="200"
+                Height="15"/> <!--Input Surename1-->
+            <TextBox
+                x:Name="TxtSurename2"
+                Grid.Row="2"
+                FontSize="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Width="200"
+                Height="15"/> <!--Input Surename2-->
+            <TextBox
+                x:Name="TxtEmail"
+                Grid.Row="3"
+                FontSize="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Width="200"
+                Height="15"/> <!--Input Email-->
+            <PasswordBox
+                x:Name="PwdPassword"
+                Grid.Row="4"
+                FontSize="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Stretch"
+                Width="200"
+                Height="15"/> <!--Input Password-->
+        </Grid> <!--Input Fields-->
+    </Grid>
+</Window>

@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using Wpf10_Shawarmas.MVVM.View;
+
+namespace Wpf10_Shawarmas
+{
+    /// <summary>
+    /// Lógica de interacción para ViewMainMenu.xaml
+    /// </summary>
+    public partial class WindowsMainMenu : Window
+    {
+        public WindowsMainMenu()
+        {
+            InitializeComponent();
+            MainFrame.Navigate(new ViewShopping());
+        }
+
+        private void BtnBuy_Click(object sender, RoutedEventArgs e) // Boton para comprar
+        {
+            MainFrame.Navigate(new ViewShopping());
+        }
+
+        private void BtnConfiguration_Click(object sender, RoutedEventArgs e) // Boton para configuracion
+        {
+            MainFrame.Navigate(new ViewConfiguration());
+        }
+
+        private void BtnAbout_Click(object sender, RoutedEventArgs e) // Boton acerca de
+        {
+            MainFrame.Navigate(new ViewAbout());
+        }
+
+        private void BtnExit_Click(object sender, RoutedEventArgs e) // Boton para salir
+        {
+            MessageBoxResult result = MessageBox.Show(
+                "¿Seguro que quieres salir de Shawarmas?",
+                "Confirmar Salida",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Application.Current.Shutdown();
+            }
+        }
+    }
+}
