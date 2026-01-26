@@ -75,9 +75,19 @@
                     Text="Mute:" 
                     VerticalAlignment="Center" 
                     Margin="10,0,10,0"/>
-                <ToggleButton 
+                <ToggleButton
+                    x:Name="MuteToggle"
+                    Click="MuteToggle_Click"
                     Style="{StaticResource SimpleToggleSwitch}"/>
             </StackPanel>
         </Grid>
+        
+        <MediaElement 
+            x:Name="bgMusic"
+            Source="res/music.mp" 
+            LoadedBehavior="Play"
+            UnloadedBehavior="Stop"
+            Visibility="Hidden"
+            MediaEnded="BgMusic_MediaEnded"/> <!--MusicPlayer--> <!--Cambiar extension a mp3 para escucha-->
     </Grid>
 </Window>

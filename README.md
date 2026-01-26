@@ -35,8 +35,8 @@
   - ✅ Configuración `22/01`
   - ✅ Acerca de/Info `22/01`
   - ✅ Salir `22/01`
-- [ ] Audio de fondo `DD/MM`
-- [ ] Widget mute `DD/MM`
+- ✅ Audio de fondo `26/01`
+- ✅ Widget mute `26/01`
 
 ### 🔧 CRITERIOS TÉCNICOS
 | Complejidad | Concepto | Estado | Fecha |
@@ -52,7 +52,7 @@
 ### ✅ ELEMENTOS FUNCIONALES
 - [ ] Control ventana `DD/MM`
 - [ ] Selector modo `DD/MM`
-- [ ] Slider volumen `DD/MM`
+- ✅ Slider volumen `26/01`
 - [ ] Botón Guardar `DD/MM`
 - [ ] Botón Cancelar `DD/MM`
 
@@ -108,7 +108,7 @@
 | ★★☆ | Animaciones Dinámicas | [ ] | `DD/MM` |
 | ★★★ | Animaciones Complejas | [ ] | `DD/MM` |
 | ★★☆ | Look & Feel | [ ] | `DD/MM` |
-| ★★★★ | Arquitectura MVVM | [ ] | `DD/MM` |
+| ★★★★ | Arquitectura MVVM | ✅ | `26/01` |
 
 ---
 

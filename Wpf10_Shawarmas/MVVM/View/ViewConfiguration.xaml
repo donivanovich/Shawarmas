@@ -63,6 +63,7 @@
                 x:Name="ToggleFullScreen"
                 Margin="10,0,0,0"
                 Style="{StaticResource SimpleToggleSwitch}"
+                Click="ToggleFullScreen_Click"
                 Grid.Row="0"
                 Grid.Column="1"
                 Width="100"
@@ -86,6 +87,7 @@
             <Slider
                 x:Name="SliderVolume"
                 Style="{StaticResource SimpleMonoSlider}"
+                ValueChanged="VolumeSlider_ValueChanged"
                 Grid.Row="2"
                 Grid.Column="1"
                 Margin="10,0,0,0"

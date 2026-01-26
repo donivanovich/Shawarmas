@@ -12,6 +12,7 @@
     <None Remove="res\favicon.ico" />
     <None Remove="res\favicon2.ico" />
     <None Remove="res\logo.png" />
+    <None Remove="res\music.mp3" />
     <None Remove="res\ProfilePictures\donivanovich.jpg" />
     <None Remove="res\ProfilePictures\javierJ-S.png" />
   </ItemGroup>
@@ -26,6 +27,9 @@
     <Resource Include="res\logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Content Include="res\music.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="res\ProfilePictures\donivanovich.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

@@ -20,9 +20,11 @@ namespace Wpf10_Shawarmas
     /// </summary>
     public partial class WindowsMainMenu : Window
     {
+        public static MediaElement BgMusicInstance { get; private set; }
         public WindowsMainMenu()
         {
             InitializeComponent();
+            BgMusicInstance = bgMusic;
             MainFrame.Navigate(new ViewShopping());
         }
 
@@ -52,6 +54,31 @@ namespace Wpf10_Shawarmas
             if (result == MessageBoxResult.Yes)
             {
                 Application.Current.Shutdown();
+            }
+        }
+        private void BgMusic_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            bgMusic.Position = TimeSpan.Zero;
+            bgMusic.Play();
+        }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            bgMusic.Play();  // Inicia al cargar ventana
+            bgMusic.Source = new Uri("res/music.mp3", UriKind.Relative);  // Relativa al exe
+                                                                          // O absoluta al output:
+            bgMusic.Source = new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res/music.mp3"));
+            bgMusic.Play();
+        }
+
+        private void MuteToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (MuteToggle.IsChecked == true)
+            {
+                bgMusic.Volume = 0.0;
+            }
+            else
+            {
+                bgMusic.Volume = 1.0;
             }
         }
     }
