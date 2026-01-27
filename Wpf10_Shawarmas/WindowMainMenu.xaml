@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Icon="/res/favicon.ico"
         WindowStartupLocation="CenterScreen"
-        Title="Main Menu" Height="450" Width="800">
+        Title="Main Menu" Height="500" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/> <!--ToolBar-->
@@ -25,27 +25,27 @@
             </Grid.ColumnDefinitions>
 
             <Button 
-                x:Name="BtnBuy" 
-                Content="Comprar" 
+                x:Name="BtnEfforts" 
+                Content="Efforts" 
                 Width="Auto" 
                 Height="Auto" 
                 Grid.Column="0" 
-                Click="BtnBuy_Click"/>
+                Click="BtnEfforts_Click"/>
             <Button 
                 x:Name="BtnConfiguration" 
-                Content="Configuración" 
+                Content="Configuration" 
                 Width="Auto" 
                 Height="Auto" 
                 Grid.Column="1" 
                 Click="BtnConfiguration_Click"/>
             <Button 
                 x:Name="BtnAbout" 
-                Content="Acerca de" 
+                Content="About Us" 
                 Width="Auto" Height="Auto" 
                 Grid.Column="2" 
                 Click="BtnAbout_Click"/>
             <Button x:Name="BtnExit" 
-                    Content="Salir" 
+                    Content="Exit" 
                     Width="Auto" 
                     Height="Auto"
                     Grid.Column="3" 

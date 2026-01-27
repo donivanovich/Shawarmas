@@ -14,17 +14,23 @@
             <RowDefinition Height="6*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <TextBlock
-            Grid.Row="0"
+
+        <Border
+        CornerRadius="15"
+        VerticalAlignment="Center"
+        Height="45"
+        Width="320"
+        Background="Black">
+            <TextBlock
             FontSize="24"
             FontWeight="Bold"
+            Foreground="White"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Text="Configuration Settings"/> <!--Title-->
+            Text="Configuration Settings"/>
+        </Border>
 
-        <Grid
-            Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
@@ -35,95 +41,111 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock
-                Grid.Row="0"
-                Grid.Column="0"
+            <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            Background="Black"
+            Height="60"
+            Width="120"
+            HorizontalAlignment="Right"
+            Margin="10"
+            CornerRadius="12">
+                <TextBlock
                 FontSize="16"
-                HorizontalAlignment="Right"
+                Foreground="White"
                 VerticalAlignment="Center"
-                Margin="0,0,10,0"
+                HorizontalAlignment="Center"
                 Text="Resolution:"/>
+            </Border>
+
             <TextBlock
-                Grid.Row="1"
-                Grid.Column="0"
-                FontSize="16"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,10,0"
-                Text="Mode of Use:"/>
+            Grid.Row="1"
+            Grid.Column="0"
+            FontSize="16"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Margin="0,0,10,0"
+            Text="Mode of Use:"/>
+
             <TextBlock
-                Grid.Row="2"
-                Grid.Column="0"
-                FontSize="16"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,10,0"
-                Text="Volume:"/>
-            <ToggleButton
+            Grid.Row="2"
+            Grid.Column="0"
+            FontSize="16"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Margin="0,0,10,0"
+            Text="Volume:"/>
+
+            <Border
+            Grid.Row="0"
+            Grid.Column="1"
+            Height="60"
+            Width="140"
+            HorizontalAlignment="Left"
+            CornerRadius="12"
+            Background="Black"
+            Margin="10">
+                <ToggleButton
                 x:Name="ToggleFullScreen"
-                Margin="10,0,0,0"
                 Style="{StaticResource SimpleToggleSwitch}"
-                Grid.Row="0"
-                Grid.Column="1"
                 Width="100"
                 Height="30"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Content="Full Screen"/>
+                Content="Full Screen"
+                Checked="ToggleFullScreen_Checked"
+                Unchecked="ToggleFullScreen_Unchecked"/>
+            </Border>
+
             <ComboBox
-                x:Name="ComboBoxModeOfUse"
-                Grid.Row="1"
-                Grid.Column="1"
-                Style="{StaticResource SimpleMonoComboBox}"
-                Margin="10,0,0,0"
-                Width="150"
-                Height="30"
-                HorizontalAlignment="Left">
+            x:Name="ComboBoxModeOfUse"
+            Grid.Row="1"
+            Grid.Column="1"
+            Style="{StaticResource SimpleMonoComboBox}"
+            Width="150"
+            Height="30"
+            HorizontalAlignment="Left"
+            Margin="10,0,0,0">
                 <ComboBoxItem Content="Writter Mode"/>
                 <ComboBoxItem Content="Editor Mode"/>
                 <ComboBoxItem Content="Admin"/>
             </ComboBox>
-            <Slider
-                x:Name="SliderVolume"
-                Style="{StaticResource SimpleMonoSlider}"
-                ValueChanged="VolumeSlider_ValueChanged"
-                Grid.Row="2"
-                Grid.Column="1"
-                Margin="10,0,0,0"
-                Width="150"
-                Height="30"
-                HorizontalAlignment="Left"
-                Minimum="0"
-                Maximum="100"/>
 
+            <Slider
+            x:Name="SliderVolume"
+            Style="{StaticResource SimpleMonoSlider}"
+            ValueChanged="VolumeSlider_ValueChanged"
+            Grid.Row="2"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Value="50"
+            HorizontalAlignment="Left"
+            Minimum="0"
+            Maximum="100"/>
         </Grid>
 
         <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Margin="0,10,0,10">
+        Grid.Row="2"
+        Orientation="Horizontal"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Margin="0,10">
             <Button
-                x:Name="BtnCancel"
-                FontWeight="Bold"
-                Style="{StaticResource ButtonDefault}"
-                Width="100"
-                Height="30"
-                Margin="10,0,10,0"
-                Content="Cancel"
-                Click="BtnCancel_Click"/>
-            <!--Cancel Button-->
+            x:Name="BtnCancel"
+            Style="{StaticResource ButtonDefault}"
+            Width="100"
+            Height="30"
+            Margin="10,0"
+            Content="Cancel"
+            Click="BtnCancel_Click"/>
             <Button
-                x:Name="BtnSave"
-                FontWeight="Bold"
-                Style="{StaticResource ButtonDefault}"
-                Width="100"
-                Height="30"
-                Margin="10,0,10,0"
-                Content="Save"
-                Click="BtnSave_Click"/>
-            <!--Save Button-->
+            x:Name="BtnSave"
+            Style="{StaticResource ButtonDefault}"
+            Width="100"
+            Height="30"
+            Margin="10,0"
+            Content="Save"
+            Click="BtnSave_Click"/>
         </StackPanel>
     </Grid>
 </Page>

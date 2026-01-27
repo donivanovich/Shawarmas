@@ -1,6 +1,13 @@
-﻿## 📄 INFORMACIÓN DEL PROYECTO
+﻿
+## 📄 POSIBLES IDEAS POR SI VAMOS BIEN DE TIEMPO PARA AÑADIR
+
+- BOTON PARA CAMBIAR EL ESTADO DEL PEDIDO Y QUE SE ACTUALICE ASI MISMO EN LA BASE DE DATOS.
+
+
+
+## 📄 INFORMACIÓN DEL PROYECTO
 👤 Nombre del Proyecto: Shawarmas
-👨‍💻 Autor: Ivan Kosolovskyy Fetsyl & Javier Jimenez Simon
+👨‍💻 Autor: Ivan Kosolovskyy FetsyK & Javier Jimenez Simon
 
 ---
 

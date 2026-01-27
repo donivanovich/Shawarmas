@@ -25,12 +25,12 @@ namespace Wpf10_Shawarmas
         {
             InitializeComponent();
             BgMusicInstance = bgMusic;
-            MainFrame.Navigate(new ViewShopping());
+            MainFrame.Navigate(new ViewEfforts());
         }
 
-        private void BtnBuy_Click(object sender, RoutedEventArgs e) // Boton para comprar
+        private void BtnEfforts_Click(object sender, RoutedEventArgs e) // Boton para comprar
         {
-            MainFrame.Navigate(new ViewShopping());
+            MainFrame.Navigate(new ViewEfforts());
         }
 
         private void BtnConfiguration_Click(object sender, RoutedEventArgs e) // Boton para configuracion

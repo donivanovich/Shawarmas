@@ -18,9 +18,9 @@ namespace Wpf10_Shawarmas.MVVM.View
     /// <summary>
     /// Lógica de interacción para ViewShopping.xaml
     /// </summary>
-    public partial class ViewShopping : Page
+    public partial class ViewEfforts : Page
     {
-        public ViewShopping()
+        public ViewEfforts()
         {
             InitializeComponent();
         }

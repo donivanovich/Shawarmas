@@ -67,7 +67,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+    
+        
         <Style x:Key="StackPanelProfileCard" TargetType="StackPanel">
             <Setter Property="Orientation" Value="Vertical"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -76,7 +77,12 @@
             <Setter Property="Margin" Value="40"/>
             <Setter Property="Background" Value="#F8F9FA"/>
         </Style>
+        
+        <!--............................. -->
+        <!-- PAGINA DE VIEW CONFIGURATION -->
+        <!--............................. -->
 
+        
         <!-- App.xaml - SLIDER ON/OFF SIMPLE (Izquierda OFF | Derecha ON) -->
 
         <Style x:Key="SimpleToggleSwitch" TargetType="ToggleButton">
@@ -87,7 +93,6 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
-                        <!-- 🎨 TRACK GRIS OFF -->
                         <Border x:Name="Track" 
                         Background="#E0E0E0"
                         CornerRadius="13"
@@ -102,7 +107,6 @@
                              VerticalAlignment="Center"/>
                         </Border>
 
-                        <!-- ✅ ON (VERDE DERECHA) -->
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Track" Property="Background" Value="#2D2D2D"/>
@@ -120,8 +124,47 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Foreground" Value="Black"/>
-            <!-- ← CLAVE FUNCIONAL -->
             <Setter Property="Background" Value="White"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Border Background="{TemplateBinding Background}">
+                            <Grid>
+                                <Track x:Name="PART_Track"
+                                       VerticalAlignment="Center"
+                                       Height="20">
+
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton
+                                            Background="#B0B0B0"
+                                            Height="6"
+                                            Command="Slider.DecreaseLarge"
+                                        />
+                                    </Track.DecreaseRepeatButton>
+
+                                    <Track.Thumb>
+                                        <Thumb
+                                            Width="14"
+                                            Height="14"
+                                            Background="#707070"/>
+                                    </Track.Thumb>
+
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton
+                                            Background="#D0D0D0"
+                                            Height="6"
+                                            Command="Slider.IncreaseLarge"
+                                        />
+                                    </Track.IncreaseRepeatButton>
+
+                                </Track>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#F0F0F0"/>

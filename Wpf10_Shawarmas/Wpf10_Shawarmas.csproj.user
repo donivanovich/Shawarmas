@@ -5,7 +5,7 @@
     <Compile Update="MVVM\View\ViewAbout.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MVVM\View\ViewShopping.xaml.cs">
+    <Compile Update="MVVM\View\ViewEfforts.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\View\ViewConfiguration.xaml.cs">
