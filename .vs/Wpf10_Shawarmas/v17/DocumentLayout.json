@@ -3,16 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewabout.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewabout.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewabout.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewabout.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\windowmainmenu.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowmainmenu.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\javier.jimenez.simon\\documents\\2 trimestre\\wpf trabajo\\wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewconfiguration.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,8 +34,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "App.xaml",
+              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\App.xaml",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\App.xaml",
+              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\App.xaml",
+              "RelativeToolTip": "Wpf10_Shawarmas\\App.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-27T17:26:18.857Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
@@ -38,7 +63,56 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ViewAbout.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml.cs",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml.cs",
+              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml.cs",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACAAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T17:54:47.625Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "ViewAbout.xaml",
+              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml",
+              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewAbout.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-28T16:04:35.988Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "WindowMainMenu.xaml",
+              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\WindowMainMenu.xaml",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowMainMenu.xaml",
+              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\WindowMainMenu.xaml",
+              "RelativeToolTip": "Wpf10_Shawarmas\\WindowMainMenu.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-28T16:02:01.683Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ViewConfiguration.xaml",
+              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
+              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-01-23T16:22:12.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "ViewConfiguration.xaml.cs",
               "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml.cs",
               "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml.cs",
@@ -47,30 +121,6 @@
               "ViewState": "AgIAAB4AAAAAAAAAAAAkwF4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-27T18:16:07.498Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "App.xaml",
-              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\App.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\App.xaml",
-              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\App.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\App.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-01-27T17:26:18.857Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ViewConfiguration.xaml",
-              "DocumentMoniker": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
-              "ToolTip": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewConfiguration.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-01-23T16:22:12.549Z",
               "EditorCaption": ""
             }
           ]

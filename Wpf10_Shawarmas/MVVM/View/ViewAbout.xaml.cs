@@ -27,7 +27,10 @@ namespace Wpf10_Shawarmas.MVVM.View
 
         private void BtnReturn_Click(object sender, RoutedEventArgs e)
         {
-
+            if (NavigationService != null && NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+            }
         }
     }
 }

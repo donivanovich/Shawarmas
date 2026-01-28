@@ -62,17 +62,23 @@
         </Grid> <!--Content-->
 
         <Frame
+            Background="#0F0F0F"
             Grid.Row="1"
             x:Name="MainFrame" 
             NavigationUIVisibility="Hidden"/>
 
         <Grid
-            Grid.Row="2">
+            Grid.Row="2"
+            Background="Black"
+            >
 
             <StackPanel 
                 Orientation="Horizontal">
                 <TextBlock 
-                    Text="Mute:" 
+                    Text="Mute:"
+                    Foreground="White"
+                    FontWeight="bold"
+                    FontSize="16"
                     VerticalAlignment="Center" 
                     Margin="10,0,10,0"/>
                 <ToggleButton
