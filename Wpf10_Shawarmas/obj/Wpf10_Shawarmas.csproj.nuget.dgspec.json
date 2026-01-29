@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {}
+    "C:\\Users\\kosoi\\Downloads\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {}
   },
   "projects": {
-    "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {
+    "C:\\Users\\kosoi\\Downloads\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+        "projectUniqueName": "C:\\Users\\kosoi\\Downloads\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
         "projectName": "Wpf10_Shawarmas",
-        "projectPath": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
-        "packagesPath": "C:\\Users\\javier.jimenez.simon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\javier.jimenez.simon\\Documents\\2 TRIMESTRE\\WPF TRABAJO\\Wpf10_Shawarmas\\obj\\",
+        "projectPath": "C:\\Users\\kosoi\\Downloads\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+        "packagesPath": "C:\\Users\\kosoi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kosoi\\Downloads\\WpfShawarmas\\Wpf10_Shawarmas\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\javier.jimenez.simon\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\kosoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -49,6 +45,12 @@
       "frameworks": {
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
+          "dependencies": {
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[9.6.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

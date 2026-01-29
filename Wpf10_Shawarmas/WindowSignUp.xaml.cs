@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Wpf10_Shawarmas.MVVM.Model;
+using Wpf10_Shawarmas.Services;
 
 namespace Wpf10_Shawarmas.MVVM.View
 {
@@ -26,17 +28,51 @@ namespace Wpf10_Shawarmas.MVVM.View
 
         private void BtnSignUp_Click(object sender, RoutedEventArgs e)
         {
-            string username = TxtName.Text;
-            string surename1 = TxtSurename1.Text;
-            string surename2 = TxtSurename2.Text;
-            string email = TxtEmail.Text;
-            string password = PwdPassword.Password;
+            if (string.IsNullOrWhiteSpace(TxtName.Text) ||
+        string.IsNullOrWhiteSpace(TxtSurename1.Text) ||
+        string.IsNullOrWhiteSpace(TxtEmail.Text) ||
+        string.IsNullOrWhiteSpace(PwdPassword.Password))
+            {
+                MessageBox.Show("Rellena todos los campos obligatorios");
+                return;
+            }
 
-            // Logica de registro de usuario
+            var nuevoEmpleado = new Empleado
+            {
+                Nombre = TxtName.Text.Trim(),
+                Apellido1 = TxtSurename1.Text.Trim(),
+                Apellido2 = string.IsNullOrWhiteSpace(TxtSurename2.Text) ? null : TxtSurename2.Text.Trim(),
+                Mail = TxtEmail.Text.Trim(),
+                Passw = PwdPassword.Password,
 
-            ViewLogin loginWindow = new ViewLogin();
-            loginWindow.Show();
-            this.Close();
+                // 🔥 Valores por DEFECTO (configuración después en ViewConfiguration)
+                Fullscreen = false,
+                Mute = false,
+                ModeUse = "writter",  // Empleado básico
+                Volume = 50,          // 50%
+                FkTienda = 1          // Tienda 1
+            };
+
+            var service = new ServiceWorker();
+
+            if (service.MailExiste(nuevoEmpleado.Mail))
+            {
+                MessageBox.Show("❌ Ese email ya está registrado");
+                TxtEmail.Focus();
+                return;
+            }
+
+            if (service.RegistrarEmpleado(nuevoEmpleado))
+            {
+                MessageBox.Show("✅ ¡Empleado registrado! Configura en Ajustes.");
+                ViewLogin loginWindow = new ViewLogin();
+                loginWindow.Show();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("❌ Error al registrar. Revisa los datos.");
+            }
         }
     }
 }

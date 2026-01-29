@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Wpf10_Shawarmas.MVVM.Model;
+using Wpf10_Shawarmas.Services;
 
 namespace Wpf10_Shawarmas.MVVM.View
 {
@@ -18,10 +20,12 @@ namespace Wpf10_Shawarmas.MVVM.View
     public partial class ViewConfiguration : Page
     {
         private Window _parentWindow;
+        private readonly Empleado _usuario;
 
-        public ViewConfiguration()
+        public ViewConfiguration(Empleado usuario = null)
         {
             InitializeComponent();
+            _usuario = usuario ?? new Empleado();
             Loaded += ViewConfiguration_Loaded;
         }
 
@@ -29,6 +33,30 @@ namespace Wpf10_Shawarmas.MVVM.View
         {
             _parentWindow = FindParentWindow(this);
             if (_parentWindow == null) return;
+
+            ToggleFullScreen.IsChecked = _usuario.Fullscreen;
+            SliderVolume.Value = _usuario.Volume;
+
+            switch (_usuario.ModeUse.Trim())
+            {
+                case "writter":
+                    ComboBoxModeOfUse.SelectedIndex = 0;
+                    break;
+                case "editor":
+                    ComboBoxModeOfUse.SelectedIndex = 1;
+                    break;
+                case "admin":
+                    ComboBoxModeOfUse.SelectedIndex = 2;
+                    break;
+                default:
+                    ComboBoxModeOfUse.SelectedIndex = 0;
+                    break;
+            }
+
+            if (_usuario.Fullscreen)
+                ToggleFullScreen_Checked(null, null);
+
+            WindowsMainMenu.BgMusicInstance.Volume = _usuario.Mute ? 0.0 : (_usuario.Volume / 100.0);
 
             if (!WindowStateService.IsInitialized)
             {
@@ -69,6 +97,33 @@ namespace Wpf10_Shawarmas.MVVM.View
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
+            if (_usuario == null || _usuario.Id == 0)
+            {
+                MessageBox.Show("No hay usuario logueado");
+                return;
+            }
+
+            // 🔥 Lee controles actualizados
+            _usuario.Fullscreen = ToggleFullScreen.IsChecked ?? false;
+            //_usuario.Mute = MuteToggle.IsChecked ?? false;  // Tu toggle
+            _usuario.ModeUse = ((ComboBoxItem)ComboBoxModeOfUse.SelectedItem)?.Content?.ToString() ?? "writter";
+            _usuario.Volume = (int)SliderVolume.Value;  // 0.0-1.0 → 0-100
+
+            var service = new ServiceWorker();
+            MessageBox.Show(service.DebugEmpleados());
+
+            if (service.ActualizarConfig(_usuario))
+            {
+                MessageBox.Show("✅ Configuración guardada en DB!");
+
+                // Aplica inmediatamente
+                WindowsMainMenu.BgMusicInstance.Volume = _usuario.Mute ? 0.0 : (SliderVolume.Value);
+                //MuteToggle.IsChecked = _usuario.Mute;
+            }
+            else
+            {
+                MessageBox.Show("❌ Error al guardar");
+            }
         }
 
         private void VolumeSlider_ValueChanged(object sender, RoutedEventArgs e)

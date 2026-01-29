@@ -120,8 +120,8 @@
                     Height="34"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-                        <ComboBoxItem Content="Writter Mode"/>
-                        <ComboBoxItem Content="Editor Mode"/>
+                        <ComboBoxItem Content="Writter"/>
+                        <ComboBoxItem Content="Editor"/>
                         <ComboBoxItem Content="Admin"/>
                     </ComboBox>
                 </Border>

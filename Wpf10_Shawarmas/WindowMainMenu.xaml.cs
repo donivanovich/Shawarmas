@@ -11,7 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Wpf10_Shawarmas.MVVM.Model;
 using Wpf10_Shawarmas.MVVM.View;
+using Wpf10_Shawarmas.Services;
 
 namespace Wpf10_Shawarmas
 {
@@ -21,11 +23,36 @@ namespace Wpf10_Shawarmas
     public partial class WindowsMainMenu : Window
     {
         public static MediaElement BgMusicInstance { get; private set; }
-        public WindowsMainMenu()
+        private readonly Empleado _usuarioLogueado;
+        public WindowsMainMenu(Empleado usuario = null)
         {
             InitializeComponent();
+            _usuarioLogueado = usuario ?? new Empleado();
             BgMusicInstance = bgMusic;
             MainFrame.Navigate(new ViewEfforts());
+            AplicarConfigUsuario();
+        }
+
+        private void AplicarConfigUsuario()
+        {
+            if (_usuarioLogueado.Mute)
+            {
+                bgMusic.Volume = 0.0;
+                MuteToggle.IsChecked = true;
+            }
+            else
+            {
+                bgMusic.Volume = 1.0;
+                MuteToggle.IsChecked = false;
+            }
+
+            bgMusic.Volume = _usuarioLogueado.Volume / 100.0;
+
+            if (_usuarioLogueado.Fullscreen)
+            {
+                WindowState = WindowState.Maximized;
+                WindowStyle = WindowStyle.None;
+            }
         }
 
         private void BtnEfforts_Click(object sender, RoutedEventArgs e) // Boton para comprar
@@ -35,7 +62,7 @@ namespace Wpf10_Shawarmas
 
         private void BtnConfiguration_Click(object sender, RoutedEventArgs e) // Boton para configuracion
         {
-            MainFrame.Navigate(new ViewConfiguration());
+            MainFrame.Navigate(new ViewConfiguration(_usuarioLogueado));
         }
 
         private void BtnAbout_Click(object sender, RoutedEventArgs e) // Boton acerca de
@@ -63,9 +90,9 @@ namespace Wpf10_Shawarmas
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            bgMusic.Play();  // Inicia al cargar ventana
-            bgMusic.Source = new Uri("res/music.mp3", UriKind.Relative);  // Relativa al exe
-                                                                          // O absoluta al output:
+            bgMusic.Play();
+            bgMusic.Source = new Uri("res/music.mp3", UriKind.Relative);
+
             bgMusic.Source = new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res/music.mp3"));
             bgMusic.Play();
         }

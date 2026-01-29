@@ -64,6 +64,10 @@ create table empleados(id_empleado int primary key auto_increment,
                             apellido2 varchar(100),
                             mail varchar(255) not null unique,
                             passw varchar(1024) not null,
+                            fullscreen boolean not null,
+                            mute boolean not null,
+                            mode_use enum('writter', 'editor', 'admin') not null,
+                            volume tinyint unsigned not null,
                             fk_tienda int not null,
 						foreign key (fk_tienda) references tiendas(id_tienda)
 						   );
@@ -95,9 +99,9 @@ insert into tiendas(pais, ciudad, calle, postal) values
  ('Portugal','Oporto','Rua dos Clérigos, 76','4050-205'),
  ('Portugal','Lisboa','Praça dos Restauradores, 50','1250-188');
 
-insert into empleados(nombre,apellido1,apellido2,mail,passw,fk_tienda) values 
- ('Ivan', 'Kosolovskyy', 'Fetsyk','donnie@shawarmas.com','1234','1'),
- ('Javier', 'Jiménez', 'Simón','jaji@shawarmas.com','1234','1');
+insert into empleados(nombre,apellido1,apellido2,mail,passw,fullscreen,mute,mode_use,volume,fk_tienda) values 
+ ('Ivan', 'Kosolovskyy', 'Fetsyk','donnie@shawarmas.com','1234', TRUE,  FALSE, 'writter', 50, 1),
+ ('Javier', 'Jiménez', 'Simón','jaji@shawarmas.com','1234', FALSE, TRUE,  'editor', 75, 1);
     
 insert into clientes(nombre,apellido1,apellido2,mail,passw) values 
  ('Pedro', 'Castro', 'Grimaldo','pedro@gmail.com','1234'),
