@@ -14,7 +14,7 @@ namespace Wpf10_Shawarmas.Services
 
         public ServiceDatabase()
         {
-            _connectionString = "Server=localhost;Database=shawarmas;Uid=root;Pwd=1234;";
+            _connectionString = "Server=localhost;Port=3309;Database=shawarmas;Uid=root;Pwd=1234;";
         }
 
         public DataTable EjecutarQuery(string sql)

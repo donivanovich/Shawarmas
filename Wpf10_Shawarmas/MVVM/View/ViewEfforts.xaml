@@ -8,7 +8,102 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ViewEfforts">
 
-    <Grid
-        Margin="10px">
+    <Grid Background="#1C1C1C">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- IZQUIERDA: Pedidos -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Pedidos}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Command="{Binding DataContext.SeleccionarPedidoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"
+                            Margin="10"
+                            Padding="15"
+                            Width="200"
+                            Height="120"
+                            Background="#2C2C2C"
+                            BorderBrush="#444"
+                            BorderThickness="1"
+                            Cursor="Hand">
+                            <Button.Resources>
+                                <!-- Hover Style -->
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="15">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#444"/>
+                                                        <Setter TargetName="border" Property="BorderBrush" Value="#666"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#555"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Resources>
+
+                            <StackPanel>
+                                <TextBlock Text="Pedido #" Foreground="#CCC" FontWeight="SemiBold" FontSize="14"/>
+                                <TextBlock Text="{Binding IdPedido}" Foreground="#FFF" FontWeight="Bold" FontSize="18"/>
+                                <TextBlock Text="{Binding NombreCliente}" Foreground="#EEE" FontSize="14"/>
+                                <TextBlock Text="{Binding FechaPedido, StringFormat=d}" Foreground="#AAA" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- DERECHA: Detalles del Pedido -->
+        <ContentControl Grid.Column="1" Content="{Binding PedidoSeleccionado}" Margin="10">
+            <ContentControl.ContentTemplate>
+                <DataTemplate>
+                    <Border Background="#2C2C2C" CornerRadius="10" Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="Productos del Pedido" FontWeight="Bold" FontSize="16" Foreground="#FFF" Margin="0,0,0,10"/>
+                            <ItemsControl ItemsSource="{Binding Productos}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#333" CornerRadius="8" Padding="8" Margin="0,5">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Image Source="{Binding Imagen}" Width="50" Height="50" Margin="0,0,10,0"/>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Marca}" FontWeight="Bold" Foreground="#FFF"/>
+                                                    <TextBlock Text="{Binding Modelo}" Foreground="#CCC"/>
+                                                    <TextBlock Text="{Binding Precio, StringFormat=C}" Foreground="#AAA"/>
+                                                    <TextBlock Text="Cantidad: {Binding Cantidad}" Foreground="#AAA"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
     </Grid>
 </Page>

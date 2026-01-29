@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Wpf10_Shawarmas.MVVM.ViewModel;
 
 namespace Wpf10_Shawarmas.MVVM.View
 {
@@ -23,6 +24,7 @@ namespace Wpf10_Shawarmas.MVVM.View
         public ViewEfforts()
         {
             InitializeComponent();
+            DataContext = new ViewEffortsViewModel();
         }
     }
 }
