@@ -44,12 +44,13 @@
                 Width="Auto" Height="Auto" 
                 Grid.Column="2" 
                 Click="BtnAbout_Click"/>
-            <Button x:Name="BtnExit" 
-                    Content="Exit" 
-                    Width="Auto" 
-                    Height="Auto"
-                    Grid.Column="3" 
-                    Click="BtnExit_Click"/>
+            <Button 
+                x:Name="BtnExit" 
+                Content="Exit" 
+                Width="Auto" 
+                Height="Auto"
+                Grid.Column="3" 
+                Click="BtnExit_Click"/>
              
         </Grid> <!--ToolBar-->
 
@@ -69,8 +70,7 @@
 
         <Grid
             Grid.Row="2"
-            Background="Black"
-            >
+            Background="Black">
 
             <StackPanel 
                 Orientation="Horizontal">

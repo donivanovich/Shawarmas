@@ -13,6 +13,9 @@
     <None Remove="res\favicon2.ico" />
     <None Remove="res\logo.png" />
     <None Remove="res\music.mp3" />
+    <None Remove="res\productos\airMax.png" />
+    <None Remove="res\productos\pumaClassic.png" />
+    <None Remove="res\productos\ultraboost.png" />
     <None Remove="res\ProfilePictures\donivanovich.jpg" />
     <None Remove="res\ProfilePictures\javierJ-S.png" />
   </ItemGroup>
@@ -30,6 +33,15 @@
     <Content Include="res\music.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="res\productos\airMax.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="res\productos\pumaClassic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="res\productos\ultraboost.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="res\ProfilePictures\donivanovich.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

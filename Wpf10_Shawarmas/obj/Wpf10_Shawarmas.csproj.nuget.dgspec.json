@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\javier.jimenez.simon\\Documents\\GITHUB\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {}
+    "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {}
   },
   "projects": {
-    "C:\\Users\\javier.jimenez.simon\\Documents\\GITHUB\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {
+    "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\javier.jimenez.simon\\Documents\\GITHUB\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+        "projectUniqueName": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
         "projectName": "Wpf10_Shawarmas",
-        "projectPath": "C:\\Users\\javier.jimenez.simon\\Documents\\GITHUB\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
-        "packagesPath": "C:\\Users\\javier.jimenez.simon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\javier.jimenez.simon\\Documents\\GITHUB\\WpfShawarmas\\Wpf10_Shawarmas\\obj\\",
+        "projectPath": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+        "packagesPath": "C:\\Users\\ivan.kosolovskyy_alu\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\javier.jimenez.simon\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ivan.kosolovskyy_alu\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

@@ -16,43 +16,48 @@
 
         <!-- TITLE CARD -->
         <Border
-        Grid.Row="0"
-        Width="420"
-        Height="60"
-        CornerRadius="20"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Background="#1A1A1A">
+            Grid.Row="0"
+            Width="420"
+            Height="60"
+            CornerRadius="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="#1A1A1A">
+            
             <Border.Effect>
                 <DropShadowEffect
-                BlurRadius="20"
-                ShadowDepth="0"
-                Opacity="0.4"/>
+                    BlurRadius="20"
+                    ShadowDepth="0"
+                    Opacity="0.4"/>
+                
             </Border.Effect>
 
             <TextBlock
-            Text="Configuration Settings"
-            FontSize="26"
-            FontWeight="SemiBold"
-            Foreground="White"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"/>
+                Text="Configuration Settings"
+                FontSize="26"
+                FontWeight="SemiBold"
+                Foreground="White"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+            
         </Border>
 
         <!-- MAIN CARD -->
         <Border
-        Grid.Row="1"
-        Width="520"
-        CornerRadius="26"
-        Background="#141414"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Padding="10">
+            Grid.Row="1"
+            Width="520"
+            CornerRadius="26"
+            Background="#141414"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Padding="10">
+            
             <Border.Effect>
                 <DropShadowEffect
-                BlurRadius="30"
-                ShadowDepth="0"
-                Opacity="0.45"/>
+                    BlurRadius="30"
+                    ShadowDepth="0"
+                    Opacity="0.45"/>
+                
             </Border.Effect>
 
             <Grid>
@@ -68,104 +73,146 @@
                 </Grid.RowDefinitions>
 
                 <!-- LABELS -->
-                <Border Grid.Row="0" Grid.Column="0" CornerRadius="16" Background="#1F1F1F" Margin="20,10">
+                <Border 
+                    Grid.Row="0" 
+                    Grid.Column="0" 
+                    CornerRadius="16" 
+                    Background="#1F1F1F" 
+                    Margin="20,10">
+                    
                     <TextBlock
-                    Text="Resolution:"
-                    Foreground="#EDEDED"
-                    FontSize="16"
-                    FontWeight="Medium"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
+                        Text="Resolution:"
+                        Foreground="#EDEDED"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="0" CornerRadius="16" Background="#1F1F1F" Margin="20,10">
+                <Border 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    CornerRadius="16" 
+                    Background="#1F1F1F" 
+                    Margin="20,10">
+                    
                     <TextBlock
-                    Text="Mode of Use:"
-                    Foreground="#EDEDED"
-                    FontSize="16"
-                    FontWeight="Medium"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
+                        Text="Mode of Use:"
+                        Foreground="#EDEDED"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+                    
                 </Border>
 
-                <Border Grid.Row="2" Grid.Column="0" CornerRadius="16" Background="#1F1F1F" Margin="20,10">
+                <Border 
+                    Grid.Row="2" 
+                    Grid.Column="0" 
+                    CornerRadius="16" 
+                    Background="#1F1F1F" 
+                    Margin="20,10">
+                    
                     <TextBlock
-                    Text="Volume:"
-                    Foreground="#EDEDED"
-                    FontSize="16"
-                    FontWeight="Medium"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
+                        Text="Volume:"
+                        Foreground="#EDEDED"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+                    
                 </Border>
 
                 <!-- CONTROLS -->
-                <Border Grid.Row="0" Grid.Column="1" CornerRadius="16" Background="#1A1A1A" Margin="20,10">
+                <Border 
+                    Grid.Row="0" 
+                    Grid.Column="1" 
+                    CornerRadius="16" 
+                    Background="#1A1A1A" 
+                    Margin="20,10">
+                    
                     <ToggleButton
-                    x:Name="ToggleFullScreen"
-                    Style="{StaticResource SimpleToggleSwitch}"
-                    Width="140"
-                    Height="34"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Content="Full Screen"
-                    Checked="ToggleFullScreen_Checked"
-                    Unchecked="ToggleFullScreen_Unchecked"/>
+                        x:Name="ToggleFullScreen"
+                        Style="{StaticResource SimpleToggleSwitch}"
+                        Width="140"
+                        Height="34"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Content="Full Screen"
+                        Checked="ToggleFullScreen_Checked"
+                        Unchecked="ToggleFullScreen_Unchecked"/>
+                    
                 </Border>
 
-                <Border Grid.Row="1" Grid.Column="1" CornerRadius="16" Background="#1A1A1A" Margin="20,10">
+                <Border 
+                    Grid.Row="1" 
+                    Grid.Column="1" 
+                    CornerRadius="16" 
+                    Background="#1A1A1A" 
+                    Margin="20,10">
+                    
                     <ComboBox
-                    x:Name="ComboBoxModeOfUse"
-                    Style="{StaticResource SimpleMonoComboBox}"
-                    Width="140"
-                    Height="34"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                        x:Name="ComboBoxModeOfUse"
+                        Style="{StaticResource SimpleMonoComboBox}"
+                        Width="140"
+                        Height="34"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        
                         <ComboBoxItem Content="Writter"/>
                         <ComboBoxItem Content="Editor"/>
                         <ComboBoxItem Content="Admin"/>
                     </ComboBox>
                 </Border>
 
-                <Border Grid.Row="2" Grid.Column="1" CornerRadius="16" Background="#1A1A1A" Margin="20,10">
+                <Border 
+                    Grid.Row="2" 
+                    Grid.Column="1" 
+                    CornerRadius="16" 
+                    Background="#1A1A1A" 
+                    Margin="20,10">
+                    
                     <Slider
                         Background="Transparent"
-                    x:Name="SliderVolume"
-                    Style="{StaticResource SimpleMonoSlider}"
-                    Width="140"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Value="50"
-                    Minimum="0"
-                    Maximum="100"
-                    ValueChanged="VolumeSlider_ValueChanged"/>
+                        x:Name="SliderVolume"
+                        Style="{StaticResource SimpleMonoSlider}"
+                        Width="140"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Value="50"
+                        Minimum="0"
+                        Maximum="100"
+                        ValueChanged="VolumeSlider_ValueChanged"/>
                 </Border>
             </Grid>
         </Border>
 
         <!-- ACTION BUTTONS -->
         <StackPanel
-        Grid.Row="2"
-        Orientation="Horizontal"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Margin="0,20">
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Margin="0,20">
+            
             <Button
-            x:Name="BtnCancel"
-            Style="{StaticResource ButtonDefault}"
-            Width="120"
-            Height="36"
-            Margin="14,0"
-            Content="Cancel"
-            Click="BtnCancel_Click"/>
+                x:Name="BtnCancel"
+                Style="{StaticResource ButtonDefault}"
+                Width="120"
+                Height="36"
+                Margin="14,0"
+                Content="Cancel"
+                Click="BtnCancel_Click"/>
 
             <Button
-            x:Name="BtnSave"
-            Style="{StaticResource ButtonDefault}"
-            Width="120"
-            Height="36"
-            Margin="14,0"
-            Content="Save"
-            Click="BtnSave_Click"/>
+                x:Name="BtnSave"
+                Style="{StaticResource ButtonDefault}"
+                Width="120"
+                Height="36"
+                Margin="14,0"
+                Content="Save"
+                Click="BtnSave_Click"/>
+            
         </StackPanel>
     </Grid>
 </Page>
