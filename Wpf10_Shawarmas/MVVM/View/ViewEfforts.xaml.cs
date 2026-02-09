@@ -24,7 +24,7 @@ namespace Wpf10_Shawarmas.MVVM.View
         public ViewEfforts()
         {
             InitializeComponent();
-            DataContext = new ViewEffortsViewModel();
+            DataContext = new ViewModelEfforts();
         }
     }
 }

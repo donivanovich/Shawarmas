@@ -109,7 +109,7 @@
 
 | Complejidad | Concepto | Estado | Fecha |
 |-------------|-------------------------|--------|-------|
-| ★★☆ | Diccionarios Recursos | [ ] | `DD/MM` |
+| ★★☆ | Diccionarios Recursos | ✅ | `29/01` |
 | ★★☆ | Control Templates | [ ] | `DD/MM` |
 | ★☆☆ | Animaciones Estáticas | [ ] | `DD/MM` |
 | ★★☆ | Animaciones Dinámicas | [ ] | `DD/MM` |

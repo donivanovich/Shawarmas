@@ -53,9 +53,6 @@ namespace Wpf10_Shawarmas.MVVM.View
                     break;
             }
 
-            if (_usuario.Fullscreen)
-                ToggleFullScreen_Checked(null, null);
-
             WindowsMainMenu.BgMusicInstance.Volume = _usuario.Mute ? 0.0 : (_usuario.Volume / 100.0);
 
             if (!WindowStateService.IsInitialized)
@@ -66,7 +63,6 @@ namespace Wpf10_Shawarmas.MVVM.View
                 WindowStateService.IsInitialized = true;
             }
 
-            ToggleFullScreen.IsChecked = WindowStateService.IsFullscreen;
         }
 
         private void ToggleFullScreen_Checked(object sender, RoutedEventArgs e)

@@ -29,8 +29,8 @@ namespace Wpf10_Shawarmas
             InitializeComponent();
             _usuarioLogueado = usuario ?? new Empleado();
             BgMusicInstance = bgMusic;
-            MainFrame.Navigate(new ViewEfforts());
             AplicarConfigUsuario();
+            MainFrame.Navigate(new ViewEfforts());
         }
 
         private void AplicarConfigUsuario()
@@ -50,8 +50,10 @@ namespace Wpf10_Shawarmas
 
             if (_usuarioLogueado.Fullscreen)
             {
-                WindowState = WindowState.Maximized;
                 WindowStyle = WindowStyle.None;
+                ResizeMode = ResizeMode.NoResize; 
+                WindowState = WindowState.Maximized;
+                WindowStateService.IsFullscreen = true;
             }
         }
 
