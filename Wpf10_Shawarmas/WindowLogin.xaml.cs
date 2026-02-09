@@ -69,6 +69,23 @@ namespace Wpf10_Shawarmas
             username = "donnie@shawarmas.com";
             password = "1234";
 
+            var empleadoService = new ServiceWorker(); // Servicio para manejar empleados
+            var todosEmpleados = empleadoService.ObtenerTodos(); // Obtener todos los empleados
+
+            var empleado = todosEmpleados.FirstOrDefault(emp =>
+                emp.Mail == username && emp.Passw == password); // Buscar empleado con las credenciales proporcionadas
+
+            if (empleado != null) // Si se encuentra el empleado, abrir el menu principal
+            {
+                var mainmenu = new WindowsMainMenu(empleado); // Pasar el empleado logueado al menu principal
+                mainmenu.Show();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Usuario o contraseña incorrectos");
+                PwdPassword.Clear();
+            }
         }
     }
 }

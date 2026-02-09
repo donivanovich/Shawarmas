@@ -10,6 +10,7 @@ namespace Wpf10_Shawarmas.MVVM.Model
     {
         public int IdPedido { get; set; }
         public DateTime FechaPedido { get; set; }
+        public bool Entregado { get; set; }
         public string NombreCliente { get; set; }
     }
 }

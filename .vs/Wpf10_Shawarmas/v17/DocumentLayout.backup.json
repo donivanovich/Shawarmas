@@ -7,22 +7,6 @@
       "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewefforts.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\services\\serviceworker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\services\\serviceworker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelorderdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelorderdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelordersummary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelordersummary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -31,12 +15,8 @@
       "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelproductorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelproduct.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelproduct.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelworker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelworker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelorderdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelorderdetail.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,98 +26,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": -1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ViewEfforts.xaml",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-06T16:14:06.982Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ServiceWorker.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Services\\ServiceWorker.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\Services\\ServiceWorker.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Services\\ServiceWorker.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\Services\\ServiceWorker.cs",
-              "ViewState": "AgIAACEAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:12:36.102Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ModelClient.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelClient.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelClient.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelClient.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelClient.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:12:24.46Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ModelOrder.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:12:18.022Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ModelOrderDetail.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:12:15.804Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ModelOrderSummary.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:12:14.735Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ModelProduct.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelProduct.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelProduct.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelProduct.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelProduct.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T15:46:54.663Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
@@ -145,23 +35,29 @@
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
-            },
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ModelWorker.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelWorker.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelWorker.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelWorker.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelWorker.cs",
+              "DocumentIndex": 1,
+              "Title": "ModelOrderSummary.cs",
+              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
+              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderSummary.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:11:55.292Z",
+              "WhenOpened": "2026-02-09T15:28:15.842Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 2,
               "Title": "ModelProductOrder.cs",
               "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelProductOrder.cs",
               "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelProductOrder.cs",
@@ -169,7 +65,32 @@
               "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelProductOrder.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-06T16:11:53.789Z",
+              "WhenOpened": "2026-02-09T15:28:16.661Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ModelOrderDetail.cs",
+              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
+              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrderDetail.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-09T15:27:33.318Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ViewEfforts.xaml",
+              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
+              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml*",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-02-09T15:11:23.241Z",
               "EditorCaption": ""
             }
           ]

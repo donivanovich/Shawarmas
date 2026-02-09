@@ -26,7 +26,7 @@ namespace Wpf10_Shawarmas.Services
             var lista = new List<ModelOrderSummary>();
 
             var dt = _db.EjecutarQuery(@"
-                SELECT p.id_pedido, p.fecha_pedido,
+                SELECT p.id_pedido, p.fecha_pedido, p.entregado,
                        c.nombre
                 FROM pedidos p
                 JOIN clientes c ON p.fk_id_user = c.id_user
@@ -39,6 +39,7 @@ namespace Wpf10_Shawarmas.Services
                 {
                     IdPedido = (int)row["id_pedido"],
                     FechaPedido = (DateTime)row["fecha_pedido"],
+                    Entregado = (bool)row["entregado"],
                     NombreCliente = row["nombre"]?.ToString()?.Trim() ?? ""
                 });
             }
@@ -101,6 +102,7 @@ namespace Wpf10_Shawarmas.Services
                 {
                     IdPedido = (int)rowPedido["id_pedido"],
                     FechaPedido = (DateTime)rowPedido["fecha_pedido"],
+                    Entregado = (bool)rowPedido["entregado"],
                     Pais = rowPedido["pais"]?.ToString()?.Trim() ?? "",
                     Ciudad = rowPedido["ciudad"]?.ToString()?.Trim() ?? "",
                     Calle = rowPedido["calle"]?.ToString()?.Trim() ?? "",

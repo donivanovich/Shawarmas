@@ -47,7 +47,7 @@ create table productos(id_producto int primary key auto_increment,
                            
 create table pedidos(id_pedido int primary key auto_increment,
 							fecha_pedido datetime not null,
-                            fecha_entrega datetime,
+                            entregado boolean not null,
                             pais varchar(30) not null,
                             ciudad varchar(50) not null,
                             calle varchar(200) not null,
@@ -107,8 +107,21 @@ insert into clientes(nombre,apellido1,apellido2,mail,passw) values
  ('Pedro', 'Castro', 'Grimaldo','pedro@gmail.com','1234'),
  ('Guillermo', 'Antonio', 'Pérez','galo@gmail.com','1234');
     
-insert into pedidos(fecha_pedido, pais, ciudad, calle, postal, fk_id_user, fk_tienda) values
- (sysdate(), 'España', 'Madrid','Calle Alcala 18','28028','1','1');
+insert into pedidos(fecha_pedido, entregado, pais, ciudad, calle, postal, fk_id_user, fk_tienda) values
+ (DATE '2023-01-30', true, 'España', 'Madrid','Calle Alcala 18','28028','1','1'),
+ (DATE '2025-02-16', true, 'España', 'Madrid', 'Gran Via 1', '28013', '1', '1'),
+ (DATE '2025-06-10', true, 'España', 'Barcelona', 'Rambla Catalunya 23', '08007', '2', '2'),
+ (DATE '2022-04-20', true, 'España', 'Madrid', 'Paseo Castellana 50', '28046', '1', '1'),
+ (sysdate(), false, 'España', 'Valencia', 'Calle Colón 15', '46004', '2', '1'),
+ (DATE '2022-05-19', true, 'España', 'Madrid', 'Calle Mayor 25', '28013', '1', '2'),
+ (DATE '2021-03-11', false, 'España', 'Sevilla', 'Avda Constitución 10', '41004', '2', '1'),
+ (DATE '2024-06-30', true, 'España', 'Madrid', 'Plaza España 9', '28008', '1', '1'),
+ (DATE '2025-07-12', true, 'España', 'Bilbao', 'Gran Via 45', '48011', '2', '2'),
+ (DATE '2024-10-30', false, 'España', 'Madrid', 'Calle Serrano 120', '28006', '1', '1'),
+ (DATE '2023-11-01', true, 'España', 'Zaragoza', 'Calle Alfonso I 22', '50003', '2', '2'),
+ (DATE '2024-12-31', true, 'España', 'Madrid', 'Puerta del Sol 4', '28013', '1', '1'),
+ (DATE '2021-05-28', false, 'España', 'Málaga', 'Calle Larios 34', '29005', '2', '1'),
+ (DATE '2020-01-15', true, 'España', 'Madrid', 'Calle Preciados 3', '28013', '1', '2');
  
 -- Nike AirMax (colores: Negro, Blanco, Gris)
 INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_color, imagen) VALUES
@@ -192,10 +205,22 @@ INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_
 ('Puma', 'Classic', 79.99, 640, 1, 10, 2, '/productos/pumaClassic.png');
 
 insert into productos_pedidos(fk_producto, fk_pedido, cantidad) values
- (1, 1, 3),
- (2, 1, 4),
- (3, 1, 1);
- 
+(1, 1, 3),
+(2, 2, 4),
+(3, 3, 1),
+(4, 3, 1),
+(8, 4, 2), 
+(21, 5, 1), 
+(3, 6, 3),
+(6, 7, 2),
+(17, 8, 2),
+(24, 8, 2),
+(25, 9, 1),
+(11, 10, 3),
+(30, 11, 2),
+(17, 12, 2),
+(9, 13, 1),
+(3, 14, 1);
 
 delimiter //
 
@@ -310,7 +335,7 @@ delimiter //
 create procedure obtenerPedido(in _id_pedido int)
 
 begin
-    select p.id_pedido, p.fecha_pedido, p.fecha_entrega,
+    select p.id_pedido, p.fecha_pedido, p.entregado,
            c.nombre, c.apellido1, c.mail,
            pr.marca, pr.modelo, pp.cantidad
     from pedidos p
