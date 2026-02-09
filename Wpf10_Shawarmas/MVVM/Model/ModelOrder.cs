@@ -19,10 +19,8 @@ namespace Wpf10_Shawarmas.MVVM.Model
         public int FkTienda { get; set; }
 
         public Cliente Cliente { get; set; } = new();
-        public List<LineaPedido> Lineas { get; set; } = new();
+        public List<Producto> Productos { get; set; } = new();
 
-        public decimal Total => Lineas.Sum(l => l.Producto.Precio * l.Cantidad);
-        public string ClienteNombre => $"{Cliente.Nombre} {Cliente.Apellido1}";
     }
 
     public class Cliente
@@ -35,25 +33,18 @@ namespace Wpf10_Shawarmas.MVVM.Model
         public string Passw { get; set; } = "";
     }
 
-    public class LineaPedido
-    {
-        public int Id { get; set; }
-        public int FkProducto { get; set; }
-        public int FkPedido { get; set; }
-        public int Cantidad { get; set; }
-        public Producto Producto { get; set; } = new();
-    }
 
     public class Producto
     {
         public int IdProducto { get; set; }
+        public int Cantidad { get; set; }
         public string Marca { get; set; } = "";
         public string Modelo { get; set; } = "";
         public decimal Precio { get; set; }
         public int Stock { get; set; }
-        public int FkCategoria { get; set; }
-        public int FkTalla { get; set; }
-        public int FkColor { get; set; }
+        public string Categoria { get; set; }
+        public string Talla { get; set; }
+        public string Color { get; set; }
         public string Imagen { get; set; } = "";
     }
 }

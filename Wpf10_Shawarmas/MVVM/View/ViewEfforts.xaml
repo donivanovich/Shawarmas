@@ -107,7 +107,7 @@
                                     FontSize="18"/>
 
                                 <TextBlock 
-                                    Text="{Binding NombreCliente}" 
+                                    Text="{Binding Cliente.Nombre}" 
                                     Foreground="#EEE"
                                     FontSize="14"/>
 

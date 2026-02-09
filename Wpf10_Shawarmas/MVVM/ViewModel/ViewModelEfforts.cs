@@ -19,10 +19,12 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ObservableCollection<ModelOrderSummary> Pedidos { get; set; }
+        // Lista de pedidos que se bindea a la UI
+        public ObservableCollection<Pedido> Pedidos { get; set; }
 
-        private ModelOrderDetail _pedidoSeleccionado;
-        public ModelOrderDetail PedidoSeleccionado
+        // Pedido seleccionado (detalle)
+        private Pedido _pedidoSeleccionado;
+        public Pedido PedidoSeleccionado
         {
             get => _pedidoSeleccionado;
             set
@@ -32,19 +34,26 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
             }
         }
 
+        // Comando para cuando se selecciona un pedido en la lista
         public ICommand SeleccionarPedidoCommand { get; }
+
         private ServiceOrder _serviceOrder;
 
         public ViewModelEfforts()
         {
             _serviceOrder = new ServiceOrder();
-            Pedidos = new ObservableCollection<ModelOrderSummary>(_serviceOrder.GetPedidos());
-            SeleccionarPedidoCommand = new RelayCommand<ModelOrderSummary>(SeleccionarPedido);
+
+            // Supongo que tu servicio ahora tiene GetAllPedidos() que devuelve List<Pedido>
+            var pedidosOriginales = _serviceOrder.GetAllPedidos();
+            Pedidos = new ObservableCollection<Pedido>(pedidosOriginales);
+
+            SeleccionarPedidoCommand = new RelayCommand<Pedido>(SeleccionarPedido);
         }
 
-        private void SeleccionarPedido(ModelOrderSummary pedido)
+        private void SeleccionarPedido(Pedido pedido)
         {
-            PedidoSeleccionado = _serviceOrder.GetPedidoDetalle(pedido.IdPedido);
+            // Al seleccionar de la lista, simplemente se convierte en "detalle"
+            PedidoSeleccionado = pedido;
         }
     }
 }
