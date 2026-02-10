@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Wpf10_Shawarmas")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f00b40c45f57092332d5f5b1da496bc892d79f0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+617d9196d49852d96b4093caa5a60f3b27434a5b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Wpf10_Shawarmas")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Wpf10_Shawarmas")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
