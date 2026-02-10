@@ -29,11 +29,11 @@ namespace Wpf10_Shawarmas.MVVM.View
         private void BtnSignUp_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtName.Text) ||
-        string.IsNullOrWhiteSpace(TxtSurename1.Text) ||
-        string.IsNullOrWhiteSpace(TxtEmail.Text) ||
-        string.IsNullOrWhiteSpace(PwdPassword.Password))
+                string.IsNullOrWhiteSpace(TxtSurename1.Text) ||
+                string.IsNullOrWhiteSpace(TxtEmail.Text) ||
+                string.IsNullOrWhiteSpace(PwdPassword.Password))
             {
-                MessageBox.Show("Rellena todos los campos obligatorios");
+                MessageBox.Show("Debes rellenar todos los campos");
                 return;
             }
 
@@ -45,34 +45,41 @@ namespace Wpf10_Shawarmas.MVVM.View
                 Mail = TxtEmail.Text.Trim(),
                 Passw = PwdPassword.Password,
 
-                // 🔥 Valores por DEFECTO (configuración después en ViewConfiguration)
+                // Valores por DEFECTO (configuración después en ViewConfiguration)
                 Fullscreen = false,
                 Mute = false,
-                ModeUse = "writter",  // Empleado básico
-                Volume = 50,          // 50%
-                FkTienda = 1          // Tienda 1
+                ModeUse = "writter",
+                Volume = 50,
+                FkTienda = 1
             };
 
             var service = new ServiceWorker();
 
             if (service.MailExiste(nuevoEmpleado.Mail))
             {
-                MessageBox.Show("❌ Ese email ya está registrado");
+                MessageBox.Show("Ese email ya está registrado");
                 TxtEmail.Focus();
                 return;
             }
 
             if (service.RegistrarEmpleado(nuevoEmpleado))
             {
-                MessageBox.Show("✅ ¡Empleado registrado! Configura en Ajustes.");
+                MessageBox.Show("¡Empleado registrado!");
                 ViewLogin loginWindow = new ViewLogin();
                 loginWindow.Show();
                 this.Close();
             }
             else
             {
-                MessageBox.Show("❌ Error al registrar. Revisa los datos.");
+                MessageBox.Show("Error al registrar. Revisa los datos.");
             }
+        }
+
+        private void BtnReturn_Click(object sender, RoutedEventArgs e)
+        {
+            ViewLogin loginWindow = new ViewLogin();
+            loginWindow.Show();
+            this.Close();
         }
     }
 }

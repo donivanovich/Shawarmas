@@ -32,6 +32,18 @@
             Content="Sign Up" 
             Click="BtnSignUp_Click"/> <!--Button Sign Up-->
 
+        <Button
+            x:Name="BtnReturn"
+            Grid.Column="0"
+            Grid.Row="2"
+            Width="50"
+            HorizontalAlignment="Center"
+            Height="15"
+            FontSize="10"
+            Style="{StaticResource ButtonDefault}"
+            Content="Return" 
+            Click="BtnReturn_Click"/> <!--Button Return-->
+
         <Grid
             Grid.Row="1"
             Grid.Column="0"

@@ -43,7 +43,6 @@
                             Cursor="Hand">
 
                             <Button.Resources>
-                                <!-- Hover Style -->
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
@@ -134,7 +133,7 @@
                     <Border 
                         Background="#2C2C2C" 
                         CornerRadius="10" 
-                        Padding="10">
+                        Padding="10" Cursor="">
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -142,16 +141,17 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
+                            
                             <TextBlock 
                                 Grid.Row="0"
-                                Text="Order Items" 
+                                Text="Items" 
                                 FontWeight="Bold" 
                                 HorizontalAlignment="Center"
                                 FontSize="16" 
                                 Foreground="#FFF" 
                                 Margin="0,0,0,10"/>
 
+                            <!--Productos del Pedido-->
                             <ScrollViewer 
                                 Grid.Row="1"
                                 VerticalScrollBarVisibility="Auto"
@@ -165,7 +165,7 @@
                                                 CornerRadius="8" 
                                                 Padding="8" 
                                                 Margin="0,5">
-                                                
+
                                                 <StackPanel 
                                                     Orientation="Horizontal" 
                                                     VerticalAlignment="Center">
@@ -179,9 +179,11 @@
                                                         Source="{Binding ElementName=rutaGenerada, Path=Text}" 
                                                         Width="75" 
                                                         Height="75" 
-                                                        Margin="0,0,10,0"/>
+                                                        Margin="10,0,10,0"/>
 
-                                                    <StackPanel>
+                                                    <StackPanel
+                                                        VerticalAlignment="Center"
+                                                        Margin="5,0,15,0">
                                                         <TextBlock 
                                                             Text="{Binding Marca}"
                                                             FontWeight="Bold"
@@ -190,7 +192,11 @@
                                                         <TextBlock 
                                                             Text="{Binding Modelo}" 
                                                             Foreground="#CCC"/>
+                                                        
+                                                    </StackPanel>
 
+                                                    <StackPanel
+                                                        VerticalAlignment="Center">
                                                         <TextBlock 
                                                             Text="{Binding Precio, StringFormat=C}"
                                                             Foreground="#AAA"/>
@@ -201,7 +207,7 @@
                                                         </TextBlock>
 
                                                         <TextBlock Foreground="#AAA">
-                                                            <Run Text="x"/>
+                                                            <Run Text="x"/>                                                         
                                                             <Run Text="{Binding Cantidad}"/>
                                                         </TextBlock>
                                                     </StackPanel>
@@ -211,9 +217,9 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
-
+                            
+                            <!--Detalles del Pedido-->
                             <StackPanel Grid.Row="2">
-                                <!-- Detalles del pedido -->
                                 <Border 
                                     Background="#3A3A3A" 
                                     CornerRadius="8" 
@@ -222,18 +228,20 @@
 
                                     <StackPanel>
                                         <TextBlock 
-                                            Text="Order Details" 
+                                            Text="Details" 
                                             FontWeight="Bold" 
+                                            HorizontalAlignment="Center"
                                             FontSize="14" 
                                             Foreground="#FFF" 
                                             Margin="0,0,0,8"/>
 
-                                        <!-- Cliente + Dirección UNIFICADO -->
                                         <TextBlock Foreground="#FFF" FontSize="12" Margin="0,0,0,6" TextWrapping="Wrap">
                                             <Run Text="Client:" FontWeight="SemiBold"/>
                                             <Run Text="{Binding Cliente.Nombre}"/>
                                             <Run Text="{Binding Cliente.Apellido1}"/>
                                             <Run Text="{Binding Cliente.Apellido2}"/>
+                                            <LineBreak/>
+                                            <Run Text="{Binding Cliente.Mail, FallbackValue='Mail: '}" />
                                             <LineBreak/>
                                             <Run Text="{Binding Pais, FallbackValue='Country: '}" />
                                             <LineBreak/>
@@ -244,14 +252,14 @@
                                             <Run Text="{Binding Postal, StringFormat='ZIP: {0}', FallbackValue='ZIP: '}" />
                                         </TextBlock>
 
-                                        <!-- Fecha -->
                                         <TextBlock 
                                             Text="{Binding FechaPedido, StringFormat='Date: {0:dd/MM/yyyy}', FallbackValue='Date: Pending'}" 
                                             Foreground="#CCC" 
                                             FontSize="11"/>
                                     </StackPanel>
                                 </Border>
-
+                                
+                                <!--Boton marcar como Completado-->
                                 <Button 
                                     Content="Mark as completed"
                                     Command="{Binding DataContext.MarcarComoCompletadoCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}"
@@ -260,14 +268,13 @@
                                     Padding="10,5"
                                     Width="140"
                                     Height="35"
-                                    Cursor="Hand">  
+                                    Cursor="Hand">
                                 </Button>
                             </StackPanel>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </ContentControl.ContentTemplate>
-
         </ContentControl>
     </Grid>
 </Page>

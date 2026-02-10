@@ -115,13 +115,7 @@ insert into pedidos(fecha_pedido, entregado, pais, ciudad, calle, postal, fk_id_
  (sysdate(), false, 'España', 'Valencia', 'Calle Colón 15', '46004', '2', '1'),
  (DATE '2022-05-19', true, 'España', 'Madrid', 'Calle Mayor 25', '28013', '1', '2'),
  (DATE '2021-03-11', false, 'España', 'Sevilla', 'Avda Constitución 10', '41004', '2', '1'),
- (DATE '2024-06-30', true, 'España', 'Madrid', 'Plaza España 9', '28008', '1', '1'),
- (DATE '2025-07-12', true, 'España', 'Bilbao', 'Gran Via 45', '48011', '2', '2'),
- (DATE '2024-10-30', false, 'España', 'Madrid', 'Calle Serrano 120', '28006', '1', '1'),
- (DATE '2023-11-01', true, 'España', 'Zaragoza', 'Calle Alfonso I 22', '50003', '2', '2'),
- (DATE '2024-12-31', true, 'España', 'Madrid', 'Puerta del Sol 4', '28013', '1', '1'),
- (DATE '2021-05-28', false, 'España', 'Málaga', 'Calle Larios 34', '29005', '2', '1'),
- (DATE '2020-01-15', true, 'España', 'Madrid', 'Calle Preciados 3', '28013', '1', '2');
+ (DATE '2024-06-30', true, 'España', 'Madrid', 'Plaza España 9', '28008', '1', '1');
  
 -- Nike AirMax (colores: Negro, Blanco, Gris)
 INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_color, imagen) VALUES
@@ -132,7 +126,6 @@ INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_
 ('Nike', 'AirMax', 99.99, 700, 1, 3, 3, '/productos/airMax.png'),
 ('Nike', 'AirMax', 99.99, 600, 1, 4, 1, '/productos/airMax.png'),
 ('Nike', 'AirMax', 99.99, 540, 1, 5, 2, '/productos/airMax.png'),
--- ('Nike', 'AirMax', 99.99, 600, 1, 5, 1, '/productos/airMax.png'),
 ('Nike', 'AirMax', 99.99, 700, 1, 5, 3, '/productos/airMax.png'),
 ('Nike', 'AirMax', 99.99, 540, 1, 6, 2, '/productos/airMax.png'),
 ('Nike', 'AirMax', 99.99, 600, 1, 6, 1, '/productos/airMax.png'),
@@ -205,22 +198,22 @@ INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_
 ('Puma', 'Classic', 79.99, 640, 1, 10, 2, '/productos/pumaClassic.png');
 
 insert into productos_pedidos(fk_producto, fk_pedido, cantidad) values
-(1, 1, 3),
-(2, 2, 4),
-(3, 3, 1),
-(4, 3, 1),
-(8, 4, 2), 
-(21, 5, 1), 
-(3, 6, 3),
-(6, 7, 2),
-(17, 8, 2),
-(24, 8, 2),
-(25, 9, 1),
-(11, 10, 3),
-(30, 11, 2),
-(17, 12, 2),
-(9, 13, 1),
-(3, 14, 1);
+(1, 1, 1),
+(45, 1, 2),
+(59, 1, 1),
+(45, 2, 1),
+(44, 2, 1),
+(70, 3, 2),
+(65, 3, 1),
+(43, 4, 1), 
+(10, 4, 1),
+(56, 4, 1),
+(39, 5, 4), 
+(5, 6, 2),
+(25, 6, 3),
+(64, 7, 3),
+(17, 8, 1),
+(24, 8, 2);
 
 delimiter //
 
