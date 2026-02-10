@@ -18,11 +18,6 @@ namespace Wpf10_Shawarmas.Services
             _db = new ServiceDatabase();
         }
 
-        // ===============================
-        // PEDIDOS RESUMEN (panel izquierdo)
-        // ===============================
-        
-
         public List<Pedido> GetAllPedidos()
         {
             var pedidos = new Dictionary<int, Pedido>();
@@ -121,6 +116,12 @@ namespace Wpf10_Shawarmas.Services
             }
 
             return new List<Pedido>(pedidos.Values);
+        }
+
+        public void SetPedidoAsEntregado(int idPedido, bool entregado)
+        {
+            string sql = $"UPDATE pedidos SET entregado = {(entregado ? 1 : 0)} WHERE id_pedido = {idPedido}";
+            _db.EjecutarQuery(sql);
         }
 
     }

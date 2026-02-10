@@ -19,10 +19,8 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // Lista de pedidos que se bindea a la UI
         public ObservableCollection<Pedido> Pedidos { get; set; }
 
-        // Pedido seleccionado (detalle)
         private Pedido _pedidoSeleccionado;
         public Pedido PedidoSeleccionado
         {
@@ -31,11 +29,12 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
             {
                 _pedidoSeleccionado = value;
                 OnPropertyChanged();
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
-        // Comando para cuando se selecciona un pedido en la lista
         public ICommand SeleccionarPedidoCommand { get; }
+        public ICommand MarcarComoCompletadoCommand { get; }
 
         private ServiceOrder _serviceOrder;
 
@@ -43,17 +42,39 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
         {
             _serviceOrder = new ServiceOrder();
 
-            // Supongo que tu servicio ahora tiene GetAllPedidos() que devuelve List<Pedido>
             var pedidosOriginales = _serviceOrder.GetAllPedidos();
             Pedidos = new ObservableCollection<Pedido>(pedidosOriginales);
 
-            SeleccionarPedidoCommand = new RelayCommand<Pedido>(SeleccionarPedido);
+            SeleccionarPedidoCommand = new RelayCommand<Pedido>(SeleccionarPedido); 
+            MarcarComoCompletadoCommand = new RelayCommand<object>(MarcarComoCompletado, CanMarcarComoCompletadoObj);
         }
 
         private void SeleccionarPedido(Pedido pedido)
         {
-            // Al seleccionar de la lista, simplemente se convierte en "detalle"
             PedidoSeleccionado = pedido;
+        }
+
+        private void MarcarComoCompletado(object obj)
+        {
+            if (PedidoSeleccionado != null)
+            {
+                PedidoSeleccionado.Entregado = true;
+                _serviceOrder.SetPedidoAsEntregado(PedidoSeleccionado.IdPedido, true);
+
+                var pedidosActualizados = _serviceOrder.GetAllPedidos();
+                Pedidos.Clear();
+                foreach (var p in pedidosActualizados)
+                {
+                    Pedidos.Add(p);
+                }
+
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        private bool CanMarcarComoCompletadoObj(object obj)
+        {
+            return PedidoSeleccionado != null && !PedidoSeleccionado.Entregado;
         }
     }
 }
