@@ -33,6 +33,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Width="Auto">
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/> <!--Label Username-->
                 <RowDefinition Height="Auto"/> <!--Textbox Username-->
@@ -40,65 +41,68 @@
                 <RowDefinition Height="Auto"/> <!--PasswordBox-->
                 <RowDefinition Height="Auto"/> <!--Buttons-->
             </Grid.RowDefinitions>
-            <TextBlock
-                Text="Username:"
-                Grid.Row="0"
-                FontSize="10"
-                FontWeight="Bold"
-                HorizontalAlignment="Stretch"
-                Margin="0,0,0,5"/>
-            <TextBox
-                x:Name="TxtUsername"
-                Grid.Row="1"
-                HorizontalAlignment="Stretch"
-                Margin="0,0,0,5"
-                Width="150"
-                Height="15"/>
-            <TextBlock
-                Text="Password:"
-                Grid.Row="2"
-                FontSize="10"
-                FontWeight="Bold"
-                HorizontalAlignment="Stretch"
-                Margin="0,0,0,5"/>
-            <PasswordBox
-                x:Name="PwdPassword"
-                Grid.Row="3"
-                HorizontalAlignment="Stretch"
-                Width="150"
-                Height="15"/>
-            <Grid
-                Grid.Row="4"
-                Width="150"
-                Margin="0,10,0,0"
-                Height="25"
-                HorizontalAlignment="Center">
+            
+            <StackPanel>
+                <TextBlock
+                    Text="Username:"
+                    Grid.Row="0"
+                    FontSize="10"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,0,0,5"/>
+                <TextBox
+                    x:Name="TxtUsername"
+                    Grid.Row="1"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,0,0,5"
+                    Width="150"
+                    Height="15"/>
+                <TextBlock
+                    Text="Password:"
+                    Grid.Row="2"
+                    FontSize="10"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,0,0,5"/>
+                <PasswordBox
+                    x:Name="PwdPassword"
+                    Grid.Row="3"
+                    HorizontalAlignment="Stretch"
+                    Width="150"
+                    Height="15"/>
+                <Grid
+                    Grid.Row="4"
+                    Width="150"
+                    Margin="0,10,0,0"
+                    Height="25"
+                    HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/> <!--Button Sign Up-->
                     <ColumnDefinition Width="*"/> <!--Button Login-->
                 </Grid.ColumnDefinitions>
-                
+
                 <Button
-                    x:Name="BtnSignUp"
-                    Grid.Column="0"
-                    FontSize="8"
-                    Style="{StaticResource ButtonDefault}"
-                    HorizontalAlignment="Stretch"
-                    Width="50"
-                    Height="15"
-                    Click="BtnSignUp_Click"
-                    Content="Sign Up"/> <!--Sign Up-->
+                        x:Name="BtnSignUp"
+                        Grid.Column="0"
+                        FontSize="8"
+                        Style="{StaticResource ButtonDefault}"
+                        HorizontalAlignment="Stretch"
+                        Width="50"
+                        Height="15"
+                        Click="BtnSignUp_Click"
+                        Content="Sign Up"/> <!--Sign Up-->
                 <Button
-                    x:Name="BtnLogin"
-                    Grid.Column="1"
-                    FontSize="8"
-                    Style="{StaticResource ButtonDefault}"
-                    HorizontalAlignment="Stretch"
-                    Width="50"
-                    Height="15"
-                    Click="BtnLogin_Click"
-                    Content="Login"/> <!--Login-->
-            </Grid>
+                        x:Name="BtnLogin"
+                        Grid.Column="1"
+                        FontSize="8"
+                        Style="{StaticResource ButtonDefault}"
+                        HorizontalAlignment="Stretch"
+                        Width="50"
+                        Height="15"
+                        Click="BtnLogin_Click"
+                        Content="Login"/> <!--Login-->
+                </Grid>
+            </StackPanel>
         </Grid> <!--Login Controls-->
         
         <Button

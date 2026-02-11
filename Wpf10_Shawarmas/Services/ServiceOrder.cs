@@ -71,7 +71,7 @@ namespace Wpf10_Shawarmas.Services
             {
                 int idPedido = Convert.ToInt32(row["id_pedido"]);
 
-                if (!pedidos.TryGetValue(idPedido, out Pedido pedido))
+                if (!pedidos.TryGetValue(idPedido, out var pedido))
                 {
                     pedido = new Pedido
                     {

@@ -106,7 +106,6 @@ namespace Wpf10_Shawarmas.MVVM.View
             _usuario.Volume = (int)SliderVolume.Value;  // 0.0-1.0 → 0-100
 
             var service = new ServiceWorker();
-            MessageBox.Show(service.DebugEmpleados());
 
             if (service.ActualizarConfig(_usuario))
             {

@@ -1,42 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\",
+  "WorkspaceRootPath": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\windowmainmenu.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowmainmenu.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\windowlogin.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowlogin.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\windowsignup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowsignup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\windowsignup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowsignup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\windowlogin.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\windowlogin.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\view\\viewefforts.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewefforts.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\kosoi\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\model\\modelorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\model\\modelorder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\services\\servicedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\services\\servicedatabase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\ivan.kosolovskyy_alu\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\view\\viewefforts.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
-      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\view\\viewefforts.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
+      "AbsoluteMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|c:\\users\\kosoi\\documents\\github\\wpfshawarmas\\wpf10_shawarmas\\mvvm\\viewmodel\\viewmodelefforts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EE2F2C95-46F7-4C9A-9D3B-9AB9E20438BE}|Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj|solutionrelative:wpf10_shawarmas\\mvvm\\viewmodel\\viewmodelefforts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,12 +18,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -59,112 +27,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "WindowMainMenu.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowMainMenu.xaml.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowMainMenu.xaml.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowMainMenu.xaml.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\WindowMainMenu.xaml.cs",
-              "ViewState": "AgIAAE0AAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "Title": "ModelOrder.cs",
+              "DocumentMoniker": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
+              "ToolTip": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-10T16:35:51.708Z",
+              "WhenOpened": "2026-02-11T23:53:39.94Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "WindowLogin.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowLogin.xaml.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowLogin.xaml.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowLogin.xaml.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\WindowLogin.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "ViewModelEfforts.cs",
+              "DocumentMoniker": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\ViewModel\\ViewModelEfforts.cs",
+              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\ViewModel\\ViewModelEfforts.cs",
+              "ToolTip": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\ViewModel\\ViewModelEfforts.cs",
+              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\ViewModel\\ViewModelEfforts.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABgAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-10T16:35:41.285Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "WindowSignUp.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowSignUp.xaml.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowSignUp.xaml.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowSignUp.xaml.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\WindowSignUp.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEkAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-10T16:33:30.401Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WindowSignUp.xaml",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowSignUp.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowSignUp.xaml",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowSignUp.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\WindowSignUp.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-10T16:30:29.276Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "WindowLogin.xaml",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowLogin.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\WindowLogin.xaml",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\WindowLogin.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\WindowLogin.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-10T16:30:24.285Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ModelOrder.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\Model\\ModelOrder.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAowDIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-10T15:15:52.598Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ServiceDatabase.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Services\\ServiceDatabase.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\Services\\ServiceDatabase.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Services\\ServiceDatabase.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\Services\\ServiceDatabase.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA7AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-10T15:14:13.406Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ViewEfforts.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml.cs",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml.cs",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml.cs",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAUwB4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-09T23:54:42.517Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ViewEfforts.xaml",
-              "DocumentMoniker": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "RelativeDocumentMoniker": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "ToolTip": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "RelativeToolTip": "Wpf10_Shawarmas\\MVVM\\View\\ViewEfforts.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-02-09T23:27:41.531Z",
+              "WhenOpened": "2026-02-11T23:39:55.879Z",
               "EditorCaption": ""
             }
           ]

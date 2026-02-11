@@ -26,7 +26,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             InitializeComponent();
         }
 
-        private void BtnSignUp_Click(object sender, RoutedEventArgs e)
+        private async void BtnSignUp_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtName.Text) ||
                 string.IsNullOrWhiteSpace(TxtSurename1.Text) ||
@@ -45,7 +45,6 @@ namespace Wpf10_Shawarmas.MVVM.View
                 Mail = TxtEmail.Text.Trim(),
                 Passw = PwdPassword.Password,
 
-                // Valores por DEFECTO (configuración después en ViewConfiguration)
                 Fullscreen = false,
                 Mute = false,
                 ModeUse = "writter",
@@ -53,16 +52,19 @@ namespace Wpf10_Shawarmas.MVVM.View
                 FkTienda = 1
             };
 
+            BtnSignUp.IsEnabled = false;
+            BtnReturn.IsEnabled = false;
+
             var service = new ServiceWorker();
 
-            if (service.MailExiste(nuevoEmpleado.Mail))
+            if (await service.MailExiste(nuevoEmpleado.Mail))
             {
                 MessageBox.Show("Ese email ya está registrado");
                 TxtEmail.Focus();
                 return;
             }
 
-            if (service.RegistrarEmpleado(nuevoEmpleado))
+            if (await service.RegistrarEmpleado(nuevoEmpleado))
             {
                 MessageBox.Show("¡Empleado registrado!");
                 ViewLogin loginWindow = new ViewLogin();
@@ -73,6 +75,9 @@ namespace Wpf10_Shawarmas.MVVM.View
             {
                 MessageBox.Show("Error al registrar. Revisa los datos.");
             }
+
+            BtnSignUp.IsEnabled = true;
+            BtnReturn.IsEnabled = true;
         }
 
         private void BtnReturn_Click(object sender, RoutedEventArgs e)

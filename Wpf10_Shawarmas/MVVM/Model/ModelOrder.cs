@@ -42,9 +42,9 @@ namespace Wpf10_Shawarmas.MVVM.Model
         public string Modelo { get; set; } = "";
         public decimal Precio { get; set; }
         public int Stock { get; set; }
-        public string Categoria { get; set; }
-        public string Talla { get; set; }
-        public string Color { get; set; }
+        public string Categoria { get; set; } = "";
+        public string Talla { get; set; } = "";
+        public string Color { get; set; } = "";
         public string Imagen { get; set; } = "";
     }
 }

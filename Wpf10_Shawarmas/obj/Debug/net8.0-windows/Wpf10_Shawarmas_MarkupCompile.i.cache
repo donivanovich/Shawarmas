@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\
+C:\Users\kosoi\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\
 Wpf10_Shawarmas
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\App.xaml
+C:\Users\kosoi\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\App.xaml
 6657361691
 1-1940392730
 181339501796
-2061427059124
+206564575803
 MVVM\View\ViewAbout.xaml;MVVM\View\ViewConfiguration.xaml;MVVM\View\ViewEfforts.xaml;WindowLogin.xaml;WindowMainMenu.xaml;WindowSignUp.xaml;
 
 True

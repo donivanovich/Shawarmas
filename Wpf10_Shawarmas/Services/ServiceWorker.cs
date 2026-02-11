@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,35 +19,40 @@ namespace Wpf10_Shawarmas.Services
             _db = new ServiceDatabase();
         }
 
-        public List<Empleado> ObtenerTodos() // Obtiene todos los empleados de la base de datos
+        public async Task<List<Empleado>> ObtenerTodos()
         {
-            var dt = _db.EjecutarQuery("SELECT * FROM empleados");
-            var lista = new List<Empleado>();
-
-            foreach (DataRow row in dt.Rows)
+            return await Task.Run(() =>
             {
-                lista.Add(new Empleado
+                var dt = _db.EjecutarQuery("SELECT * FROM empleados");
+                var lista = new List<Empleado>();
+
+                foreach (DataRow row in dt.Rows)
                 {
-                    Id = (int)row["id_empleado"],
-                    Nombre = row["nombre"].ToString(),
-                    Apellido1 = row["apellido1"].ToString(),
-                    Apellido2 = row["apellido2"]?.ToString() ?? "",
-                    Mail = row["mail"].ToString(),
-                    Passw = row["passw"]?.ToString()?.Trim() ?? "",
-                    Fullscreen = (bool)row["fullscreen"],
-                    Mute = (bool)row["mute"],
-                    ModeUse = row["mode_use"].ToString(),
-                    Volume = (int)(byte)row["volume"],
-                    FkTienda = (int)row["fk_tienda"]
-                });
-            }
-            return lista;
+                    lista.Add(new Empleado
+                    {
+                        Id = (int)row["id_empleado"],
+                        Nombre = row["nombre"].ToString(),
+                        Apellido1 = row["apellido1"].ToString(),
+                        Apellido2 = row["apellido2"]?.ToString() ?? "",
+                        Mail = row["mail"].ToString(),
+                        Passw = row["passw"]?.ToString()?.Trim() ?? "",
+                        Fullscreen = (bool)row["fullscreen"],
+                        Mute = (bool)row["mute"],
+                        ModeUse = row["mode_use"].ToString(),
+                        Volume = (int)(byte)row["volume"],
+                        FkTienda = (int)row["fk_tienda"]
+                    });
+                }
+                return lista;
+            });
         }
 
-        public bool RegistrarEmpleado(Empleado nuevoEmpleado)
+        public async Task<bool> RegistrarEmpleado(Empleado nuevoEmpleado)
         {
             try
             {
+                string passwordHash = GetPasswordHash(nuevoEmpleado.Passw);
+
                 string sql = $@"INSERT INTO empleados 
                     (nombre, apellido1, apellido2, mail, passw, fullscreen, mute, mode_use, volume, fk_tienda)
                     VALUES (
@@ -54,7 +60,7 @@ namespace Wpf10_Shawarmas.Services
                         '{nuevoEmpleado.Apellido1.Replace("'", "''")}', 
                         '{nuevoEmpleado.Apellido2?.Replace("'", "''") ?? ""}', 
                         '{nuevoEmpleado.Mail.Replace("'", "''")}', 
-                        '{nuevoEmpleado.Passw.Replace("'", "''")}', 
+                        '{passwordHash.Replace("'", "''")}', 
                         {(nuevoEmpleado.Fullscreen ? 1 : 0)},
                         {(nuevoEmpleado.Mute ? 1 : 0)},
                         '{nuevoEmpleado.ModeUse.Replace("'", "''")}', 
@@ -62,7 +68,7 @@ namespace Wpf10_Shawarmas.Services
                         {nuevoEmpleado.FkTienda}
                     )";
 
-                _db.EjecutarComando(sql);
+                await Task.Run(() => _db.EjecutarComando(sql));
                 return true;
             }
             catch
@@ -70,12 +76,16 @@ namespace Wpf10_Shawarmas.Services
                 return false;
             }
         }
-        public bool MailExiste(string mail)
+        public async Task<bool> MailExiste(string mail)
         {
             try
             {
-                var dt = _db.EjecutarQuery($"SELECT COUNT(*) as total FROM empleados WHERE mail = '{mail.Replace("'", "''")}'");
-                return Convert.ToInt32(dt.Rows[0]["total"]) > 0;
+                var resultado = await Task.Run(() =>
+                {
+                    var dt = _db.EjecutarQuery($"SELECT COUNT(*) as total FROM empleados WHERE mail = '{mail.Replace("'", "''")}'");
+                    return Convert.ToInt32(dt.Rows[0]["total"]) > 0;
+                });
+                return resultado;
             }
             catch
             {
@@ -85,14 +95,14 @@ namespace Wpf10_Shawarmas.Services
 
         public bool ActualizarConfig(Empleado empleado)
         {
-            int volumeSeguro = Math.Max(0, Math.Min(255, empleado.Volume));  // 0-255
+            int volumeSeguro = Math.Max(0, Math.Min(255, empleado.Volume));
 
             string sql = $@"UPDATE empleados SET 
-        fullscreen = {(empleado.Fullscreen ? 1 : 0)},
-        mute = {(empleado.Mute ? 1 : 0)},
-        mode_use = '{empleado.ModeUse.Replace("'", "''")}',
-        volume = {volumeSeguro}
-        WHERE id_empleado = {empleado.Id}";
+                fullscreen = {(empleado.Fullscreen ? 1 : 0)},
+                mute = {(empleado.Mute ? 1 : 0)},
+                mode_use = '{empleado.ModeUse.Replace("'", "''")}',
+                volume = {volumeSeguro}
+                WHERE id_empleado = {empleado.Id}";
 
             try
             {
@@ -106,20 +116,49 @@ namespace Wpf10_Shawarmas.Services
             }
         }
 
-
-        public string DebugEmpleados()
+        private static string GetPasswordHash(string password)
         {
-            var dt = _db.EjecutarQuery("SELECT id_empleado, mail, fullscreen, mute, mode_use, volume FROM empleados");
-            string debug = "Empleados en DB:\n\n";
+            if (string.IsNullOrWhiteSpace(password)) return "";
 
-            foreach (DataRow row in dt.Rows)
+            byte[] salt = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+                rng.GetBytes(salt);
+
+            string saltB64 = Convert.ToBase64String(salt);
+            string toHash = password + saltB64;
+
+            using (var md5 = MD5.Create())
             {
-                debug += $"ID {row["id_empleado"]}: {row["mail"]} | " +
-                        $"Fullscreen={row["fullscreen"]} | Mute={row["mute"]} | " +
-                        $"Mode={row["mode_use"]} | Vol={row["volume"]}\n";
-            }
+                byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(toHash));
 
-            return debug;
+                byte[] result = new byte[32];
+                Array.Copy(salt, 0, result, 0, 16);
+                Array.Copy(hash, 0, result, 16, 16);
+                return Convert.ToBase64String(result);
+            }
+        }
+
+        public static bool VerifyPassword(string password, string storedHash)
+        {
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(storedHash))
+                return false;
+
+            try
+            {
+                byte[] data = Convert.FromBase64String(storedHash);
+                byte[] salt = new byte[16];
+                Array.Copy(data, 0, salt, 0, 16);
+
+                string toHash = password + Convert.ToBase64String(salt);
+                using (var md5 = MD5.Create())
+                {
+                    byte[] newHash = md5.ComputeHash(Encoding.UTF8.GetBytes(toHash));
+                    byte[] oldHash = new byte[16];
+                    Array.Copy(data, 16, oldHash, 0, 16);
+                    return CryptographicOperations.FixedTimeEquals(newHash, oldHash);
+                }
+            }
+            catch { return false; }
         }
     }
 }
