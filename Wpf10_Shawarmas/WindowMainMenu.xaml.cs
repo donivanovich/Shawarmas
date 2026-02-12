@@ -77,6 +77,14 @@ namespace Wpf10_Shawarmas
 
         private void ApplyUserConfig()
         {
+            if (!WindowStateService.IsInitialized)
+            {
+                WindowStateService.OriginalState = WindowState;
+                WindowStateService.OriginalStyle = WindowStyle;
+                WindowStateService.OriginalResizeMode = ResizeMode;
+                WindowStateService.IsInitialized = true;
+            }
+
             if (_usuarioLogueado.Mute)
             {
                 bgMusic.Volume = 0.0;
@@ -92,10 +100,19 @@ namespace Wpf10_Shawarmas
 
             if (_usuarioLogueado.Fullscreen)
             {
+                WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 ResizeMode = ResizeMode.NoResize;
                 WindowState = WindowState.Maximized;
                 WindowStateService.IsFullscreen = true;
+            }
+            else
+            {
+                WindowStyle = WindowStateService.OriginalStyle;
+                ResizeMode = WindowStateService.OriginalResizeMode;
+                WindowState = WindowStateService.OriginalState;
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                WindowStateService.IsFullscreen = false;
             }
 
         } // Funcion para aplicar la configuracion del empleado desde la BBDD
@@ -113,6 +130,7 @@ namespace Wpf10_Shawarmas
 
             bgMusic.Source = new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Music/music.mp3"));
             bgMusic.Play();
+
         } // Evento para iniciar musica antes de que cargue la ventana
     }
 }

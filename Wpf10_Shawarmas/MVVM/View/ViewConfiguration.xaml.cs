@@ -45,6 +45,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             _parentWindow.WindowStyle = WindowStateService.OriginalStyle;
             _parentWindow.ResizeMode = WindowStateService.OriginalResizeMode;
             _parentWindow.WindowState = WindowStateService.OriginalState;
+            _parentWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
             WindowStateService.IsFullscreen = false;
         } // Boton para quitar fullscreen
@@ -127,6 +128,14 @@ namespace Wpf10_Shawarmas.MVVM.View
             _parentWindow = FindParentWindow(this);
             if (_parentWindow == null) return;
 
+            if (!WindowStateService.IsInitialized)
+            {
+                WindowStateService.OriginalState = _parentWindow.WindowState;
+                WindowStateService.OriginalStyle = _parentWindow.WindowStyle;
+                WindowStateService.OriginalResizeMode = _parentWindow.ResizeMode;
+                WindowStateService.IsInitialized = true;
+            }
+
             ToggleFullScreen.IsChecked = _usuario.Fullscreen;
             SliderVolume.Value = _usuario.Volume;
 
@@ -149,14 +158,6 @@ namespace Wpf10_Shawarmas.MVVM.View
             if (WindowsMainMenu.BgMusicInstance != null && _usuario != null)
             {
                 WindowsMainMenu.BgMusicInstance.Volume = _usuario.Mute ? 0.0 : (_usuario.Volume / 100.0);
-            }
-
-            if (!WindowStateService.IsInitialized)
-            {
-                WindowStateService.OriginalState = _parentWindow.WindowState;
-                WindowStateService.OriginalStyle = _parentWindow.WindowStyle;
-                WindowStateService.OriginalResizeMode = _parentWindow.ResizeMode;
-                WindowStateService.IsInitialized = true;
             }
 
         } // Evento para aplicar la configuracion antes de que cargue
