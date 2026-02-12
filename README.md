@@ -1,6 +1,6 @@
-## 📄 INFORMACIÓN DEL PROYECTO
-👤 Nombre del Proyecto: Shawarmas
-👨‍💻 Autor: Ivan Kosolovskyy Fetsyk & Javier Jimenez Simon
+## 📄 INFORMACIÓN DEL PROYECTO  
+👤 Nombre del Proyecto: Shawarmas  
+👨‍💻 Autor: Ivan Kosolovskyy Fetsyk & Javier Jimenez Simon  
 
 ---
 
