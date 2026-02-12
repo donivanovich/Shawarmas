@@ -15,8 +15,7 @@
             <RowDefinition Height="0.7*"/> <!--Footer-->
         </Grid.RowDefinitions>
 
-        <Grid
-            Grid.Row="0">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -31,6 +30,7 @@
                 Height="Auto" 
                 Grid.Column="0" 
                 Click="BtnEfforts_Click"/>
+            
             <Button 
                 x:Name="BtnConfiguration" 
                 Content="Configuration" 
@@ -38,12 +38,14 @@
                 Height="Auto" 
                 Grid.Column="1" 
                 Click="BtnConfiguration_Click"/>
+            
             <Button 
                 x:Name="BtnAbout" 
                 Content="About Us" 
                 Width="Auto" Height="Auto" 
                 Grid.Column="2" 
                 Click="BtnAbout_Click"/>
+            
             <Button 
                 x:Name="BtnExit" 
                 Content="Exit" 
@@ -54,8 +56,7 @@
              
         </Grid> <!--ToolBar-->
 
-        <Grid
-            Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/> <!--Products-->
                 <ColumnDefinition Width="*"/> <!--Details-->
@@ -72,8 +73,7 @@
             Grid.Row="2"
             Background="Black">
 
-            <StackPanel 
-                Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal">
                 <TextBlock 
                     Text="Mute:"
                     Foreground="White"
@@ -81,10 +81,12 @@
                     FontSize="16"
                     VerticalAlignment="Center" 
                     Margin="10,0,10,0"/>
+                
                 <ToggleButton
                     x:Name="MuteToggle"
                     Click="MuteToggle_Click"
                     Style="{StaticResource SimpleToggleSwitch}"/>
+                
             </StackPanel>
         </Grid>
         
@@ -95,5 +97,6 @@
             UnloadedBehavior="Stop"
             Visibility="Hidden"
             MediaEnded="BgMusic_MediaEnded"/> <!--MusicPlayer--> <!--Cambiar extension a mp3 para escucha-->
+        
     </Grid>
 </Window>

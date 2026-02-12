@@ -41,7 +41,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             {
                 Nombre = TxtName.Text.Trim(),
                 Apellido1 = TxtSurename1.Text.Trim(),
-                Apellido2 = string.IsNullOrWhiteSpace(TxtSurename2.Text) ? null : TxtSurename2.Text.Trim(),
+                Apellido2 = TxtSurename2?.Text?.Trim() ?? "",
                 Mail = TxtEmail.Text.Trim(),
                 Passw = PwdPassword.Password,
 
@@ -55,16 +55,16 @@ namespace Wpf10_Shawarmas.MVVM.View
             BtnSignUp.IsEnabled = false;
             BtnReturn.IsEnabled = false;
 
-            var service = new ServiceWorker();
+            var service = new ServiceEmployee();
 
-            if (await service.MailExiste(nuevoEmpleado.Mail))
+            if (await service.EmailExists(nuevoEmpleado.Mail))
             {
                 MessageBox.Show("Ese email ya está registrado");
                 TxtEmail.Focus();
                 return;
             }
 
-            if (await service.RegistrarEmpleado(nuevoEmpleado))
+            if (await service.CreateEmpleyee(nuevoEmpleado))
             {
                 MessageBox.Show("¡Empleado registrado!");
                 ViewLogin loginWindow = new ViewLogin();

@@ -25,8 +25,8 @@ namespace Wpf10_Shawarmas
             InitializeComponent();
         }
 
-        string username;
-        string password;
+        string? username;
+        string? password;
 
         private int intentos = 0;
         private DateTime? bloqueo = null;
@@ -54,15 +54,15 @@ namespace Wpf10_Shawarmas
             BtnSignUp.IsEnabled = false;
             BtnGuest.IsEnabled = false;
 
-            var empleadoService = new ServiceWorker(); // Servicio para manejar empleados
-            var todosEmpleados = await empleadoService.ObtenerTodos(); // Obtener todos los empleados
+            var empleadoService = new ServiceEmployee(); // Servicio para manejar empleados
+            var todosEmpleados = await empleadoService.GetAllEmployees(); // Obtener todos los empleados
 
             BtnLogin.IsEnabled = true;
             BtnSignUp.IsEnabled = true;
             BtnGuest.IsEnabled = true;
 
             var empleado = todosEmpleados.FirstOrDefault(emp =>
-                emp.Mail == username && ServiceWorker.VerifyPassword(password, emp.Passw)); // Buscar empleado con las credenciales proporcionadas
+                emp.Mail == username && ServiceEmployee.VerifyPassword(password, emp.Passw)); // Buscar empleado con las credenciales proporcionadas
 
             if (empleado != null) // Si se encuentra el empleado, abrir el menu principal
             {
@@ -102,8 +102,8 @@ namespace Wpf10_Shawarmas
             username = "donnie@shawarmas.com";
             password = "1234";
 
-            var empleadoService = new ServiceWorker(); // Servicio para manejar empleados
-            var todosEmpleados = await empleadoService.ObtenerTodos(); // Obtener todos los empleados
+            var empleadoService = new ServiceEmployee(); // Servicio para manejar empleados
+            var todosEmpleados = await empleadoService.GetAllEmployees(); // Obtener todos los empleados
 
             var empleado = todosEmpleados.FirstOrDefault(emp =>
                 emp.Mail == username && emp.Passw == password); // Buscar empleado con las credenciales proporcionadas

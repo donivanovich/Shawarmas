@@ -10,16 +10,16 @@ using Wpf10_Shawarmas.MVVM.Model;
 
 namespace Wpf10_Shawarmas.Services
 {
-    class ServiceWorker
+    class ServiceEmployee
     {
         private readonly ServiceDatabase _db;
 
-        public ServiceWorker()
+        public ServiceEmployee()
         {
             _db = new ServiceDatabase();
         }
 
-        public async Task<List<Empleado>> ObtenerTodos()
+        public async Task<List<Empleado>> GetAllEmployees()
         {
             return await Task.Run(() =>
             {
@@ -31,14 +31,14 @@ namespace Wpf10_Shawarmas.Services
                     lista.Add(new Empleado
                     {
                         Id = (int)row["id_empleado"],
-                        Nombre = row["nombre"].ToString(),
-                        Apellido1 = row["apellido1"].ToString(),
+                        Nombre = row["nombre"].ToString() ?? "",
+                        Apellido1 = row["apellido1"].ToString() ?? "",
                         Apellido2 = row["apellido2"]?.ToString() ?? "",
-                        Mail = row["mail"].ToString(),
+                        Mail = row["mail"].ToString() ?? "",
                         Passw = row["passw"]?.ToString()?.Trim() ?? "",
                         Fullscreen = (bool)row["fullscreen"],
                         Mute = (bool)row["mute"],
-                        ModeUse = row["mode_use"].ToString(),
+                        ModeUse = row["mode_use"].ToString() ?? "",
                         Volume = (int)(byte)row["volume"],
                         FkTienda = (int)row["fk_tienda"]
                     });
@@ -47,11 +47,11 @@ namespace Wpf10_Shawarmas.Services
             });
         }
 
-        public async Task<bool> RegistrarEmpleado(Empleado nuevoEmpleado)
+        public async Task<bool> CreateEmpleyee(Empleado nuevoEmpleado)
         {
             try
             {
-                string passwordHash = GetPasswordHash(nuevoEmpleado.Passw);
+                string passwordHash = GeneratePasswordHash(nuevoEmpleado.Passw);
 
                 string sql = $@"INSERT INTO empleados 
                     (nombre, apellido1, apellido2, mail, passw, fullscreen, mute, mode_use, volume, fk_tienda)
@@ -76,7 +76,8 @@ namespace Wpf10_Shawarmas.Services
                 return false;
             }
         }
-        public async Task<bool> MailExiste(string mail)
+
+        public async Task<bool> EmailExists(string mail)
         {
             try
             {
@@ -93,7 +94,7 @@ namespace Wpf10_Shawarmas.Services
             }
         }
 
-        public bool ActualizarConfig(Empleado empleado)
+        public bool UpdateEmployeeConfig(Empleado empleado)
         {
             int volumeSeguro = Math.Max(0, Math.Min(255, empleado.Volume));
 
@@ -116,7 +117,7 @@ namespace Wpf10_Shawarmas.Services
             }
         }
 
-        private static string GetPasswordHash(string password)
+        private static string GeneratePasswordHash(string password)
         {
             if (string.IsNullOrWhiteSpace(password)) return "";
 

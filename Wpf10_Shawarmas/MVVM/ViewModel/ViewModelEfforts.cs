@@ -63,6 +63,7 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
 
                 var pedidosActualizados = _serviceOrder.GetAllPedidos();
                 Pedidos.Clear();
+
                 foreach (var p in pedidosActualizados)
                 {
                     Pedidos.Add(p);

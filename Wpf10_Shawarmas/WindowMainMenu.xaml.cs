@@ -22,9 +22,10 @@ namespace Wpf10_Shawarmas
     /// </summary>
     public partial class WindowsMainMenu : Window
     {
-        public static MediaElement BgMusicInstance { get; private set; }
+        public static MediaElement? BgMusicInstance { get; private set; }
         private readonly Empleado _usuarioLogueado;
-        public WindowsMainMenu(Empleado usuario = null)
+
+        public WindowsMainMenu(Empleado? usuario = null)
         {
             InitializeComponent();
             _usuarioLogueado = usuario ?? new Empleado();
@@ -85,11 +86,13 @@ namespace Wpf10_Shawarmas
                 Application.Current.Shutdown();
             }
         }
+
         private void BgMusic_MediaEnded(object sender, RoutedEventArgs e)
         {
             bgMusic.Position = TimeSpan.Zero;
             bgMusic.Play();
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             bgMusic.Play();

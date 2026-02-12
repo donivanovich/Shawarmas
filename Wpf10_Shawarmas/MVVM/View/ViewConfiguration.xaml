@@ -14,7 +14,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- TITLE CARD -->
         <Border
             Grid.Row="0"
             Width="420"
@@ -39,10 +38,9 @@
                 Foreground="White"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"/>
-            
-        </Border>
 
-        <!-- MAIN CARD -->
+        </Border> <!-- Header -->
+
         <Border
             Grid.Row="1"
             Width="520"
@@ -72,7 +70,6 @@
                     <RowDefinition Height="90"/>
                 </Grid.RowDefinitions>
 
-                <!-- LABELS -->
                 <Border 
                     Grid.Row="0" 
                     Grid.Column="0" 
@@ -87,7 +84,8 @@
                         FontWeight="Medium"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"/>
-                </Border>
+
+                </Border> <!-- Resolution Label -->
 
                 <Border 
                     Grid.Row="1" 
@@ -103,8 +101,8 @@
                         FontWeight="Medium"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"/>
-                    
-                </Border>
+
+                </Border> <!-- Mode of Use Label -->
 
                 <Border 
                     Grid.Row="2" 
@@ -120,10 +118,9 @@
                         FontWeight="Medium"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"/>
-                    
-                </Border>
 
-                <!-- CONTROLS -->
+                </Border> <!-- Volume Label -->
+
                 <Border 
                     Grid.Row="0" 
                     Grid.Column="1" 
@@ -141,8 +138,8 @@
                         Content="Full Screen"
                         Checked="ToggleFullScreen_Checked"
                         Unchecked="ToggleFullScreen_Unchecked"/>
-                    
-                </Border>
+
+                </Border> <!-- Resolution Control -->
 
                 <Border 
                     Grid.Row="1" 
@@ -163,7 +160,7 @@
                         <ComboBoxItem Content="Editor"/>
                         <ComboBoxItem Content="Admin"/>
                     </ComboBox>
-                </Border>
+                </Border> <!-- Mode of Use Control -->
 
                 <Border 
                     Grid.Row="2" 
@@ -183,11 +180,10 @@
                         Minimum="0"
                         Maximum="100"
                         ValueChanged="VolumeSlider_ValueChanged"/>
-                </Border>
+                </Border> <!-- Volume Control -->
             </Grid>
-        </Border>
+        </Border> <!-- Content -->
 
-        <!-- ACTION BUTTONS -->
         <StackPanel
             Grid.Row="2"
             Orientation="Horizontal"
@@ -202,7 +198,7 @@
                 Height="36"
                 Margin="14,0"
                 Content="Cancel"
-                Click="BtnCancel_Click"/>
+                Click="BtnCancel_Click"/> <!-- Cancel Button -->
 
             <Button
                 x:Name="BtnSave"
@@ -211,8 +207,8 @@
                 Height="36"
                 Margin="14,0"
                 Content="Save"
-                Click="BtnSave_Click"/>
-            
-        </StackPanel>
+                Click="BtnSave_Click"/> <!-- Save Button -->
+
+        </StackPanel> <!-- Footer -->
     </Grid>
 </Page>

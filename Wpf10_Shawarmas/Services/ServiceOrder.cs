@@ -64,7 +64,6 @@ namespace Wpf10_Shawarmas.Services
                 ORDER BY p.id_pedido
             ";
 
-
             var dt = _db.EjecutarQuery(sql);
 
             foreach (DataRow row in dt.Rows)

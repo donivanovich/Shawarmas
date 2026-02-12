@@ -17,10 +17,8 @@ namespace Wpf10_Shawarmas.MVVM.Model
         public string Postal { get; set; } = "";
         public int FkCliente { get; set; }
         public int FkTienda { get; set; }
-
         public Cliente Cliente { get; set; } = new();
         public List<Producto> Productos { get; set; } = new();
-
     }
 
     public class Cliente

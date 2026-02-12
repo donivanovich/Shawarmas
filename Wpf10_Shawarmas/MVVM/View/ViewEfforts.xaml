@@ -14,7 +14,6 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- IZQUIERDA: Pedidos -->
         <ScrollViewer 
             Grid.Column="0" 
             VerticalScrollBarVisibility="Auto">
@@ -103,26 +102,25 @@
                                     Text="{Binding IdPedido}" 
                                     Foreground="#FFF" 
                                     FontWeight="Bold" 
-                                    FontSize="18"/>
+                                    FontSize="18"/> <!-- OrderID -->
 
                                 <TextBlock 
                                     Text="{Binding Cliente.Nombre}" 
                                     Foreground="#EEE"
-                                    FontSize="14"/>
+                                    FontSize="14"/> <!-- Client Name -->
 
                                 <TextBlock 
                                     Text="{Binding FechaPedido, StringFormat=d}" 
                                     Foreground="#AAA" 
-                                    FontSize="12"/>
+                                    FontSize="12"/> <!-- Date -->
                                 
                             </StackPanel>
-                        </Button>
+                        </Button> <!-- Order Card -->
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer>
+        </ScrollViewer> <!-- Orders -->
 
-        <!-- DERECHA: Detalles del Pedido -->
         <ContentControl 
             Grid.Column="1" 
             Content="{Binding PedidoSeleccionado}" 
@@ -151,7 +149,6 @@
                                 Foreground="#FFF" 
                                 Margin="0,0,0,10"/>
 
-                            <!--Productos del Pedido-->
                             <ScrollViewer 
                                 Grid.Row="1"
                                 VerticalScrollBarVisibility="Auto"
@@ -184,6 +181,7 @@
                                                     <StackPanel
                                                         VerticalAlignment="Center"
                                                         Margin="5,0,15,0">
+                                                        
                                                         <TextBlock 
                                                             Text="{Binding Marca}"
                                                             FontWeight="Bold"
@@ -195,8 +193,8 @@
                                                         
                                                     </StackPanel>
 
-                                                    <StackPanel
-                                                        VerticalAlignment="Center">
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        
                                                         <TextBlock 
                                                             Text="{Binding Precio, StringFormat=C}"
                                                             Foreground="#AAA"/>
@@ -216,9 +214,8 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </ScrollViewer>
-                            
-                            <!--Detalles del Pedido-->
+                            </ScrollViewer> <!-- Items Details -->
+
                             <StackPanel Grid.Row="2">
                                 <Border 
                                     Background="#3A3A3A" 
@@ -256,10 +253,10 @@
                                             Text="{Binding FechaPedido, StringFormat='Date: {0:dd/MM/yyyy}', FallbackValue='Date: Pending'}" 
                                             Foreground="#CCC" 
                                             FontSize="11"/>
+                                        
                                     </StackPanel>
                                 </Border>
                                 
-                                <!--Boton marcar como Completado-->
                                 <Button 
                                     Content="Mark as completed"
                                     Command="{Binding DataContext.MarcarComoCompletadoCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}"
@@ -269,12 +266,13 @@
                                     Width="140"
                                     Height="35"
                                     Cursor="Hand">
-                                </Button>
-                            </StackPanel>
+
+                                </Button> <!-- Completed Button -->
+                            </StackPanel> <!-- Client Details & Completed Button -->
                         </Grid>
                     </Border>
                 </DataTemplate>
             </ContentControl.ContentTemplate>
-        </ContentControl>
+        </ContentControl> <!-- Orders Details -->
     </Grid>
 </Page>

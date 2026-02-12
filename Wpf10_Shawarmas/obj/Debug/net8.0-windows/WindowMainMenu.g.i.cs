@@ -109,7 +109,7 @@ namespace Wpf10_Shawarmas {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Wpf10_Shawarmas;component/windowmainmenu.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Wpf10_Shawarmas;V1.0.0.0;component/windowmainmenu.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\WindowMainMenu.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

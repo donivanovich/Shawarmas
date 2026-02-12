@@ -9,20 +9,18 @@ namespace Wpf10_Shawarmas.MVVM.View
     public static class WindowStateService
     {
         public static bool IsFullscreen { get; set; } = false;
-
         public static WindowState OriginalState { get; set; }
         public static WindowStyle OriginalStyle { get; set; }
         public static ResizeMode OriginalResizeMode { get; set; }
-
         public static bool IsInitialized { get; set; } = false;
     }
 
     public partial class ViewConfiguration : Page
     {
-        private Window _parentWindow;
+        private Window? _parentWindow;
         private readonly Empleado _usuario;
 
-        public ViewConfiguration(Empleado usuario = null)
+        public ViewConfiguration(Empleado? usuario = null)
         {
             InitializeComponent();
             _usuario = usuario ?? new Empleado();
@@ -64,7 +62,6 @@ namespace Wpf10_Shawarmas.MVVM.View
             }
 
         }
-
         private void ToggleFullScreen_Checked(object sender, RoutedEventArgs e)
         {
             if (_parentWindow == null) return;
@@ -99,25 +96,21 @@ namespace Wpf10_Shawarmas.MVVM.View
                 return;
             }
 
-            // 🔥 Lee controles actualizados
             _usuario.Fullscreen = ToggleFullScreen.IsChecked ?? false;
-            //_usuario.Mute = MuteToggle.IsChecked ?? false;  // Tu toggle
             _usuario.ModeUse = ((ComboBoxItem)ComboBoxModeOfUse.SelectedItem)?.Content?.ToString() ?? "writter";
-            _usuario.Volume = (int)SliderVolume.Value;  // 0.0-1.0 → 0-100
+            _usuario.Volume = (int)SliderVolume.Value;
 
-            var service = new ServiceWorker();
+            var service = new ServiceEmployee();
 
-            if (service.ActualizarConfig(_usuario))
+            if (service.UpdateEmployeeConfig(_usuario))
             {
-                MessageBox.Show("✅ Configuración guardada en DB!");
+                MessageBox.Show("Configuración guardada en DB!");
 
-                // Aplica inmediatamente
                 WindowsMainMenu.BgMusicInstance.Volume = _usuario.Mute ? 0.0 : (SliderVolume.Value);
-                //MuteToggle.IsChecked = _usuario.Mute;
             }
             else
             {
-                MessageBox.Show("❌ Error al guardar");
+                MessageBox.Show("Error al guardar");
             }
         }
 
@@ -126,7 +119,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             WindowsMainMenu.BgMusicInstance.Volume = SliderVolume.Value;
         }
 
-        private Window FindParentWindow(DependencyObject child)
+        private Window? FindParentWindow(DependencyObject child)
         {
             DependencyObject parent = child;
 
