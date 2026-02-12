@@ -248,7 +248,6 @@ C:\Users\javier.jimenez.simon\Documents\GITHUB\WpfShawarmas\Wpf10_Shawarmas\obj\
 C:\Users\javier.jimenez.simon\Documents\GITHUB\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\Wpf10_Shawarmas.genruntimeconfig.cache
 C:\Users\javier.jimenez.simon\Documents\GITHUB\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\ref\Wpf10_Shawarmas.dll
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\Wpf10_Shawarmas.exe
-C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\res\music.mp3
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\Wpf10_Shawarmas.deps.json
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\Wpf10_Shawarmas.runtimeconfig.json
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\Wpf10_Shawarmas.dll
@@ -296,3 +295,4 @@ C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\Wpf10_Shawarmas.pdb
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\Wpf10_Shawarmas.genruntimeconfig.cache
 C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\obj\Debug\net8.0-windows\ref\Wpf10_Shawarmas.dll
+C:\Users\ivan.kosolovskyy_alu\Documents\GitHub\WpfShawarmas\Wpf10_Shawarmas\bin\Debug\net8.0-windows\Resources\Music\music.mp3

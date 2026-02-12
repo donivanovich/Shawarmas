@@ -11,14 +11,14 @@ namespace Wpf10_Shawarmas.Services
 {
     public class ServiceOrder
     {
-        private readonly ServiceDatabase _db;
-
         public ServiceOrder()
         {
             _db = new ServiceDatabase();
         }
 
-        public List<Pedido> GetAllPedidos()
+        private readonly ServiceDatabase _db;
+
+        public List<Pedido> GetAllOrders()
         {
             var pedidos = new Dictionary<int, Pedido>();
 
@@ -64,7 +64,7 @@ namespace Wpf10_Shawarmas.Services
                 ORDER BY p.id_pedido
             ";
 
-            var dt = _db.EjecutarQuery(sql);
+            var dt = _db.ExecuteQuery(sql);
 
             foreach (DataRow row in dt.Rows)
             {
@@ -117,10 +117,10 @@ namespace Wpf10_Shawarmas.Services
             return new List<Pedido>(pedidos.Values);
         }
 
-        public void SetPedidoAsEntregado(int idPedido, bool entregado)
+        public void UpdateOrderDeliveredStatus(int idPedido, bool entregado)
         {
             string sql = $"UPDATE pedidos SET entregado = {(entregado ? 1 : 0)} WHERE id_pedido = {idPedido}";
-            _db.EjecutarQuery(sql);
+            _db.ExecuteQuery(sql);
         }
 
     }

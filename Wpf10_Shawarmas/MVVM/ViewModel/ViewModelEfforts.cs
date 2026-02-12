@@ -42,7 +42,7 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
         {
             _serviceOrder = new ServiceOrder();
 
-            var pedidosOriginales = _serviceOrder.GetAllPedidos();
+            var pedidosOriginales = _serviceOrder.GetAllOrders();
             Pedidos = new ObservableCollection<Pedido>(pedidosOriginales);
 
             SeleccionarPedidoCommand = new RelayCommand<Pedido>(SeleccionarPedido); 
@@ -59,9 +59,9 @@ namespace Wpf10_Shawarmas.MVVM.ViewModel
             if (PedidoSeleccionado != null)
             {
                 PedidoSeleccionado.Entregado = true;
-                _serviceOrder.SetPedidoAsEntregado(PedidoSeleccionado.IdPedido, true);
+                _serviceOrder.UpdateOrderDeliveredStatus(PedidoSeleccionado.IdPedido, true);
 
-                var pedidosActualizados = _serviceOrder.GetAllPedidos();
+                var pedidosActualizados = _serviceOrder.GetAllOrders();
                 Pedidos.Clear();
 
                 foreach (var p in pedidosActualizados)

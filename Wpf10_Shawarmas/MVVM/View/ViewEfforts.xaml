@@ -58,6 +58,7 @@
                                                         VerticalAlignment="Center"/>
 
                                                 </Border>
+                                                
                                                 <ControlTemplate.Triggers>
                                                     <Trigger 
                                                         Property="IsMouseOver" 
@@ -74,6 +75,7 @@
                                                             Value="#666"/>
 
                                                     </Trigger>
+                                                    
                                                     <Trigger 
                                                         Property="IsPressed" 
                                                         Value="True">
@@ -170,7 +172,7 @@
                                                     <TextBlock 
                                                         Visibility="Collapsed" 
                                                         x:Name="rutaGenerada" 
-                                                        Text="{Binding Imagen, StringFormat=/res{0}}"/>
+                                                        Text="{Binding Imagen, StringFormat=/Resources{0}}"/>
 
                                                     <Image 
                                                         Source="{Binding ElementName=rutaGenerada, Path=Text}" 
@@ -194,7 +196,6 @@
                                                     </StackPanel>
 
                                                     <StackPanel VerticalAlignment="Center">
-                                                        
                                                         <TextBlock 
                                                             Text="{Binding Precio, StringFormat=C}"
                                                             Foreground="#AAA"/>
@@ -233,20 +234,19 @@
                                             Margin="0,0,0,8"/>
 
                                         <TextBlock Foreground="#FFF" FontSize="12" Margin="0,0,0,6" TextWrapping="Wrap">
-                                            <Run Text="Client:" FontWeight="SemiBold"/>
-                                            <Run Text="{Binding Cliente.Nombre}"/>
+                                            <Run Text="{Binding Cliente.Nombre, FallbackValue='Name'}"/>
                                             <Run Text="{Binding Cliente.Apellido1}"/>
                                             <Run Text="{Binding Cliente.Apellido2}"/>
                                             <LineBreak/>
-                                            <Run Text="{Binding Cliente.Mail, FallbackValue='Mail: '}" />
+                                            <Run Text="{Binding Cliente.Mail, FallbackValue='Mail'}" />
                                             <LineBreak/>
-                                            <Run Text="{Binding Pais, FallbackValue='Country: '}" />
+                                            <Run Text="{Binding Calle, FallbackValue='Address'}" />
                                             <LineBreak/>
-                                            <Run Text="{Binding Ciudad, StringFormat='City: {0}', FallbackValue='City: '}" />
+                                            <Run Text="{Binding Ciudad, FallbackValue='City'}"/>
+                                            <Run Text=", " />
+                                            <Run Text="{Binding Pais, FallbackValue='Country'}" />
                                             <LineBreak/>
-                                            <Run Text="{Binding Calle, StringFormat='Address: {0}', FallbackValue='Address: '}" />
-                                            <LineBreak/>
-                                            <Run Text="{Binding Postal, StringFormat='ZIP: {0}', FallbackValue='ZIP: '}" />
+                                            <Run Text="{Binding Postal, FallbackValue='ZIP'}" />
                                         </TextBlock>
 
                                         <TextBlock 
@@ -256,7 +256,7 @@
                                         
                                     </StackPanel>
                                 </Border>
-                                
+
                                 <Button 
                                     Content="Mark as completed"
                                     Command="{Binding DataContext.MarcarComoCompletadoCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}"
@@ -265,9 +265,8 @@
                                     Padding="10,5"
                                     Width="140"
                                     Height="35"
-                                    Cursor="Hand">
-
-                                </Button> <!-- Completed Button -->
+                                    Cursor="Hand"/> <!-- Completed Button -->
+                                
                             </StackPanel> <!-- Client Details & Completed Button -->
                         </Grid>
                     </Border>

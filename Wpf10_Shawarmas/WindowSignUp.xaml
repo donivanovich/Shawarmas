@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf10_Shawarmas.MVVM.View"
         mc:Ignorable="d"
-        Icon="/res/favicon2.ico"
+        Icon="/Resources/Icons/favicon2.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Title="Sign Up" Height="300" Width="450">
@@ -22,29 +22,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button
-            x:Name="BtnSignUp"
-            Grid.Column="2"
-            Grid.Row="3"
-            Width="50"
-            Height="15"
-            FontSize="10"
-            Style="{StaticResource ButtonDefault}"
-            Content="Sign Up" 
-            Click="BtnSignUp_Click"/> <!--Button Sign Up-->
-
-        <Button
-            x:Name="BtnReturn"
-            Grid.Column="0"
-            Grid.Row="2"
-            Width="50"
-            HorizontalAlignment="Center"
-            Height="15"
-            FontSize="10"
-            Style="{StaticResource ButtonDefault}"
-            Content="Return" 
-            Click="BtnReturn_Click"/> <!--Button Return-->
-
         <Grid
             Grid.Row="1"
             Grid.Column="0"
@@ -59,7 +36,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
+
             <TextBlock
                 Text="Name:"
                 Grid.Row="0"
@@ -67,8 +44,8 @@
                 FontWeight="Bold"
                 Height="15"
                 Margin="0,0,0,10"
-                HorizontalAlignment="Stretch"/> <!--Label Name-->
-            
+                HorizontalAlignment="Stretch"/>
+
             <TextBlock
                 Text="Surename 1:"
                 Grid.Row="1"
@@ -76,8 +53,8 @@
                 FontWeight="Bold"
                 Height="15"
                 Margin="0,0,0,10"
-                HorizontalAlignment="Stretch"/> <!--Label Surename1-->
-            
+                HorizontalAlignment="Stretch"/>
+
             <TextBlock
                 Text="Surename 2:"
                 Grid.Row="2"
@@ -85,8 +62,8 @@
                 FontWeight="Bold"
                 Height="15"
                 Margin="0,0,0,10"
-                HorizontalAlignment="Stretch"/> <!--Label Surename2-->
-            
+                HorizontalAlignment="Stretch"/>
+
             <TextBlock
                 Text="Email:"
                 Grid.Row="3"
@@ -94,8 +71,8 @@
                 FontWeight="Bold"
                 Height="15"
                 Margin="0,0,0,10"
-                HorizontalAlignment="Stretch"/> <!--Label Email-->
-            
+                HorizontalAlignment="Stretch"/>
+
             <TextBlock
                 Text="Password:"
                 Grid.Row="4"
@@ -103,8 +80,8 @@
                 FontWeight="Bold"
                 Height="15"
                 Margin="0,0,0,10"
-                HorizontalAlignment="Stretch"/> <!--Label Password-->
-            
+                HorizontalAlignment="Stretch"/>
+
         </Grid> <!--Labels-->
 
         <Grid
@@ -128,7 +105,7 @@
                 Margin="0,0,0,10"
                 HorizontalAlignment="Stretch"
                 Width="200"
-                Height="15"/> <!--Input Name-->
+                Height="15"/> <!-- Name Input -->
             
             <TextBox
                 x:Name="TxtSurename1"
@@ -137,7 +114,7 @@
                 Margin="0,0,0,10"
                 HorizontalAlignment="Stretch"
                 Width="200"
-                Height="15"/> <!--Input Surename1-->
+                Height="15"/> <!-- Surename1 Input -->
             
             <TextBox
                 x:Name="TxtSurename2"
@@ -146,7 +123,7 @@
                 Margin="0,0,0,10"
                 HorizontalAlignment="Stretch"
                 Width="200"
-                Height="15"/> <!--Input Surename2-->
+                Height="15"/> <!-- Surename2 Input -->
             
             <TextBox
                 x:Name="TxtEmail"
@@ -155,7 +132,7 @@
                 Margin="0,0,0,10"
                 HorizontalAlignment="Stretch"
                 Width="200"
-                Height="15"/> <!--Input Email-->
+                Height="15"/> <!-- Email Input -->
             
             <PasswordBox
                 x:Name="PwdPassword"
@@ -164,8 +141,32 @@
                 Margin="0,0,0,10"
                 HorizontalAlignment="Stretch"
                 Width="200"
-                Height="15"/> <!--Input Password-->
+                Height="15"/> <!-- Password Input -->
             
         </Grid> <!--Input Fields-->
+
+        <Button
+            x:Name="BtnReturn"
+            Grid.Column="0"
+            Grid.Row="2"
+            Width="50"
+            HorizontalAlignment="Center"
+            Height="15"
+            FontSize="10"
+            Style="{StaticResource ButtonDefault}"
+            Content="Return" 
+            Click="BtnReturn_Click"/> <!-- Return Control -->
+
+        <Button
+            x:Name="BtnSignUp"
+            Grid.Column="2"
+            Grid.Row="3"
+            Width="50"
+            Height="15"
+            FontSize="10"
+            Style="{StaticResource ButtonDefault}"
+            Content="Sign Up" 
+            Click="BtnSignUp_Click"/> <!-- Sign Up Control -->
+
     </Grid>
 </Window>

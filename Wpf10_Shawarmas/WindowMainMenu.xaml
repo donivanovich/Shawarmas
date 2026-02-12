@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf10_Shawarmas"
         mc:Ignorable="d"
-        Icon="/res/favicon.ico"
+        Icon="/Resources/Icons/favicon.ico"
         WindowStartupLocation="CenterScreen"
         Title="Main Menu" Height="500" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.5*"/> <!--ToolBar-->
-            <RowDefinition Height="9*"/> <!--Content-->
-            <RowDefinition Height="0.7*"/> <!--Footer-->
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="0.7*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -29,45 +29,47 @@
                 Width="Auto" 
                 Height="Auto" 
                 Grid.Column="0" 
-                Click="BtnEfforts_Click"/>
-            
+                Click="BtnEfforts_Click"/> <!-- Efforts Button -->
+
             <Button 
                 x:Name="BtnConfiguration" 
                 Content="Configuration" 
                 Width="Auto" 
                 Height="Auto" 
                 Grid.Column="1" 
-                Click="BtnConfiguration_Click"/>
-            
+                Click="BtnConfiguration_Click"/> <!-- Configuration Button -->
+
             <Button 
                 x:Name="BtnAbout" 
                 Content="About Us" 
                 Width="Auto" Height="Auto" 
                 Grid.Column="2" 
-                Click="BtnAbout_Click"/>
-            
+                Click="BtnAbout_Click"/> <!-- About Us Button -->
+
             <Button 
                 x:Name="BtnExit" 
                 Content="Exit" 
                 Width="Auto" 
                 Height="Auto"
                 Grid.Column="3" 
-                Click="BtnExit_Click"/>
-             
-        </Grid> <!--ToolBar-->
+                Click="BtnExit_Click"/> <!-- Exit Button -->
+
+        </Grid> <!-- Header -->
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/> <!--Products-->
-                <ColumnDefinition Width="*"/> <!--Details-->
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-        </Grid> <!--Content-->
 
-        <Frame
-            Background="#0F0F0F"
-            Grid.Row="1"
-            x:Name="MainFrame" 
-            NavigationUIVisibility="Hidden"/>
+            <Frame
+                Background="#0F0F0F"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                x:Name="MainFrame" 
+                NavigationUIVisibility="Hidden"/> <!-- Frame for Navigation -->
+
+        </Grid> <!-- Content -->
 
         <Grid
             Grid.Row="2"
@@ -75,7 +77,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock 
-                    Text="Mute:"
+                    Text=" Mute:"
                     Foreground="White"
                     FontWeight="bold"
                     FontSize="16"
@@ -85,18 +87,17 @@
                 <ToggleButton
                     x:Name="MuteToggle"
                     Click="MuteToggle_Click"
-                    Style="{StaticResource SimpleToggleSwitch}"/>
-                
+                    Style="{StaticResource SimpleToggleSwitch}"/> <!-- Mute Control -->
+
+                <MediaElement 
+                    x:Name="bgMusic"
+                    Source="Resources/Music/music.mp" 
+                    LoadedBehavior="Play"
+                    UnloadedBehavior="Stop"
+                    Visibility="Hidden"
+                    MediaEnded="BgMusic_MediaEnded"/> <!-- MusicPlayer (cambiar extension a .mp3)-->
+
             </StackPanel>
-        </Grid>
-        
-        <MediaElement 
-            x:Name="bgMusic"
-            Source="res/music.mp" 
-            LoadedBehavior="Play"
-            UnloadedBehavior="Stop"
-            Visibility="Hidden"
-            MediaEnded="BgMusic_MediaEnded"/> <!--MusicPlayer--> <!--Cambiar extension a mp3 para escucha-->
-        
+        </Grid> <!-- Footer -->
     </Grid>
 </Window>

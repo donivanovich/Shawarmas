@@ -10,14 +10,14 @@ namespace Wpf10_Shawarmas.Services
 {
     class ServiceDatabase
     {
-        private readonly string _connectionString;
-
         public ServiceDatabase()
         {
-            _connectionString = "Server=localhost;Port=3306;Database=shawarmas;Uid=root;Pwd=1234;";
+            _connectionString = "Server=localhost;Port=3309;Database=shawarmas;Uid=root;Pwd=1234;";
         }
 
-        public DataTable EjecutarQuery(string sql)
+        private readonly string _connectionString;
+
+        public DataTable ExecuteQuery(string sql)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -30,7 +30,7 @@ namespace Wpf10_Shawarmas.Services
             return dt;
         }
 
-        public void EjecutarComando(string sql)
+        public void ExecuteCommand(string sql)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();

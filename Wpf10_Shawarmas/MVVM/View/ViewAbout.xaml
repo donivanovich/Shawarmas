@@ -67,7 +67,7 @@
                     <Image
                         Width="150"
                         Height="150"
-                        Source="/res/ProfilePictures/donivanovich.jpg">
+                        Source="/Resources/Images/donivanovich.jpg">
 
                         <Image.Clip>
                             <EllipseGeometry
@@ -139,7 +139,7 @@
                     <Image
                         Width="150"
                         Height="150"
-                        Source="/res/ProfilePictures/javierJ-S.png">
+                        Source="/Resources/Images/javierJ-S.png">
 
                         <Image.Clip>
                             <EllipseGeometry

@@ -78,13 +78,13 @@ namespace Wpf10_Shawarmas.MVVM.View
 
             BtnSignUp.IsEnabled = true;
             BtnReturn.IsEnabled = true;
-        }
+        } // Boton para crear cuenta de empleado
 
         private void BtnReturn_Click(object sender, RoutedEventArgs e)
         {
             ViewLogin loginWindow = new ViewLogin();
             loginWindow.Show();
             this.Close();
-        }
+        } // Boton para volver al inicio de sesion
     }
 }

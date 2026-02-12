@@ -27,7 +27,6 @@ namespace Wpf10_Shawarmas
 
         string? username;
         string? password;
-
         private int intentos = 0;
         private DateTime? bloqueo = null;
 

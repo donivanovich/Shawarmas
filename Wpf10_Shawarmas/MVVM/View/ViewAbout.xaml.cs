@@ -31,6 +31,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             {
                 NavigationService.GoBack();
             }
+
         } // Boton de navegacion de retorno a la Page anterior
     }
 }

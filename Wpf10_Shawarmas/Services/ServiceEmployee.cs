@@ -12,18 +12,18 @@ namespace Wpf10_Shawarmas.Services
 {
     class ServiceEmployee
     {
-        private readonly ServiceDatabase _db;
-
         public ServiceEmployee()
         {
             _db = new ServiceDatabase();
         }
 
+        private readonly ServiceDatabase _db;
+
         public async Task<List<Empleado>> GetAllEmployees()
         {
             return await Task.Run(() =>
             {
-                var dt = _db.EjecutarQuery("SELECT * FROM empleados");
+                var dt = _db.ExecuteQuery("SELECT * FROM empleados");
                 var lista = new List<Empleado>();
 
                 foreach (DataRow row in dt.Rows)
@@ -68,7 +68,7 @@ namespace Wpf10_Shawarmas.Services
                         {nuevoEmpleado.FkTienda}
                     )";
 
-                await Task.Run(() => _db.EjecutarComando(sql));
+                await Task.Run(() => _db.ExecuteCommand(sql));
                 return true;
             }
             catch
@@ -83,7 +83,7 @@ namespace Wpf10_Shawarmas.Services
             {
                 var resultado = await Task.Run(() =>
                 {
-                    var dt = _db.EjecutarQuery($"SELECT COUNT(*) as total FROM empleados WHERE mail = '{mail.Replace("'", "''")}'");
+                    var dt = _db.ExecuteQuery($"SELECT COUNT(*) as total FROM empleados WHERE mail = '{mail.Replace("'", "''")}'");
                     return Convert.ToInt32(dt.Rows[0]["total"]) > 0;
                 });
                 return resultado;
@@ -107,7 +107,7 @@ namespace Wpf10_Shawarmas.Services
 
             try
             {
-                _db.EjecutarComando(sql);
+                _db.ExecuteCommand(sql);
                 return true;
             }
             catch (Exception ex)

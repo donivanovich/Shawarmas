@@ -22,41 +22,17 @@ namespace Wpf10_Shawarmas
     /// </summary>
     public partial class WindowsMainMenu : Window
     {
-        public static MediaElement? BgMusicInstance { get; private set; }
-        private readonly Empleado _usuarioLogueado;
-
         public WindowsMainMenu(Empleado? usuario = null)
         {
             InitializeComponent();
             _usuarioLogueado = usuario ?? new Empleado();
             BgMusicInstance = bgMusic;
-            AplicarConfigUsuario();
+            ApplyUserConfig();
             MainFrame.Navigate(new ViewEfforts());
         }
 
-        private void AplicarConfigUsuario()
-        {
-            if (_usuarioLogueado.Mute)
-            {
-                bgMusic.Volume = 0.0;
-                MuteToggle.IsChecked = true;
-            }
-            else
-            {
-                bgMusic.Volume = 1.0;
-                MuteToggle.IsChecked = false;
-            }
-
-            bgMusic.Volume = _usuarioLogueado.Volume / 100.0;
-
-            if (_usuarioLogueado.Fullscreen)
-            {
-                WindowStyle = WindowStyle.None;
-                ResizeMode = ResizeMode.NoResize; 
-                WindowState = WindowState.Maximized;
-                WindowStateService.IsFullscreen = true;
-            }
-        }
+        public static MediaElement? BgMusicInstance { get; private set; }
+        private readonly Empleado _usuarioLogueado;
 
         private void BtnEfforts_Click(object sender, RoutedEventArgs e) // Boton para comprar
         {
@@ -87,21 +63,6 @@ namespace Wpf10_Shawarmas
             }
         }
 
-        private void BgMusic_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            bgMusic.Position = TimeSpan.Zero;
-            bgMusic.Play();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            bgMusic.Play();
-            bgMusic.Source = new Uri("res/music.mp3", UriKind.Relative);
-
-            bgMusic.Source = new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "res/music.mp3"));
-            bgMusic.Play();
-        }
-
         private void MuteToggle_Click(object sender, RoutedEventArgs e)
         {
             if (MuteToggle.IsChecked == true)
@@ -112,6 +73,46 @@ namespace Wpf10_Shawarmas
             {
                 bgMusic.Volume = 1.0;
             }
-        }
+        } // Toggle para mutear la musica
+
+        private void ApplyUserConfig()
+        {
+            if (_usuarioLogueado.Mute)
+            {
+                bgMusic.Volume = 0.0;
+                MuteToggle.IsChecked = true;
+            }
+            else
+            {
+                bgMusic.Volume = 1.0;
+                MuteToggle.IsChecked = false;
+            }
+
+            bgMusic.Volume = _usuarioLogueado.Volume / 100.0;
+
+            if (_usuarioLogueado.Fullscreen)
+            {
+                WindowStyle = WindowStyle.None;
+                ResizeMode = ResizeMode.NoResize;
+                WindowState = WindowState.Maximized;
+                WindowStateService.IsFullscreen = true;
+            }
+
+        } // Funcion para aplicar la configuracion del empleado desde la BBDD
+
+        private void BgMusic_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            bgMusic.Position = TimeSpan.Zero;
+            bgMusic.Play();
+        } // Control de Musica
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            bgMusic.Play();
+            bgMusic.Source = new Uri("Resources/Music/music.mp3", UriKind.Relative);
+
+            bgMusic.Source = new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Music/music.mp3"));
+            bgMusic.Play();
+        } // Evento para iniciar musica antes de que cargue la ventana
     }
 }
