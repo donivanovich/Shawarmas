@@ -315,7 +315,8 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="ToolBarButtons" TargetType="Button">
+        <Style x:Key="ToolBarButtons" 
+               TargetType="Button">
             <Setter Property="Background" Value="#FFF0F0F0"/>
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontSize" Value="14"/>
@@ -361,7 +362,8 @@
             </Setter>
         </Style>
 
-        <Style x:Key="StatusOrdenButton" TargetType="Button">
+        <Style x:Key="StatusOrdenButton" 
+               TargetType="Button">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Padding" Value="10,5"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -401,5 +403,112 @@
             </Setter>
         </Style>
 
+        <Style x:Key="OrderButtonCard" 
+               TargetType="Button">
+            <Setter Property="Background" Value="#2C2C2C"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border 
+                            x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="15">
+
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="scaleTransform" ScaleX="1.0" ScaleY="1.0"/>
+                                    <RotateTransform x:Name="rotateTransform" Angle="0"/>
+                                </TransformGroup>
+                            </Border.RenderTransform>
+
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState Name="Normal"/>
+                                    <VisualState Name="MouseOver">
+                                        <Storyboard>
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="scaleTransform"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.08" 
+                                                Duration="0:0:0.25"/>
+
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="scaleTransform"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.08" 
+                                                Duration="0:0:0.25"/>
+
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="rotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                To="5" 
+                                                Duration="0:0:0.25"/>
+
+                                            <DoubleAnimation 
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0.95" 
+                                                Duration="0:0:0.25"/>
+
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="scaleTransform"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="0.95" 
+                                                Duration="0:0:0.1"/>
+
+                                            <DoubleAnimation 
+                                                Storyboard.TargetName="scaleTransform"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="0.95"
+                                                Duration="0:0:0.1"/>
+
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#444"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#666"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="Foreground" Value="#2C2C2C"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="MinWidth" Value="10"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#2C2C2C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="PanningMode" Value="VerticalOnly"/>
+        </Style>
     </Application.Resources>
 </Application>
