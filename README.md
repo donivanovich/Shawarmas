@@ -84,7 +84,7 @@
 ### ELEMENTOS FUNCIONALES
 - ✅ Formulario parámetros `16/02`
 - ✅ Variables inicialización `16/02`
-- [ ] Botón generar grilla `DD/MM`
+- ✅ Botón generar grilla `16/02`
 - ✅ Interacción celdas `11/02`
 - ✅ Botón simulación `11/02`
 

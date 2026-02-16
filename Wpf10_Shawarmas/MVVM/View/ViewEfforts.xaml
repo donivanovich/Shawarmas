@@ -195,8 +195,9 @@
                                 Foreground="#CCC"
                                 Width="80"/>
 
-                            <TextBox 
-                                Text="{Binding NumFilas, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
+                                x:Name="TxtFilas"
+                                Text="{Binding NumFilas}"
                                 Width="80"
                                 HorizontalContentAlignment="Center"
                                 Background="#444"
@@ -211,8 +212,9 @@
                                 Foreground="#CCC"
                                 Width="80"/>
 
-                            <TextBox 
-                                Text="{Binding NumColumnas, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
+                                x:Name="TxtColumnas"
+                                Text="{Binding NumColumnas}"
                                 Width="80"
                                 HorizontalContentAlignment="Center"
                                 Background="#444"
@@ -223,7 +225,8 @@
                     </StackPanel>
                 </StackPanel> <!-- Inputs -->
 
-                <Button 
+                <Button
+                    x:Name="BtnInitialize"
                     Command="{Binding InicializarGrillaCommand}"
                     Content="Initialize Grid"
                     Style="{StaticResource DefaultButton}"
@@ -234,7 +237,7 @@
                     Background="#FFF0F0F0"
                     Foreground="Black"
                     BorderThickness="0"
-                    Cursor="Hand"/> <!-- Initialize Button -->
+                    Cursor="Hand" Click="BtnInitialize_Click"/> <!-- Initialize Button -->
 
             </StackPanel>
         </Border> <!-- Grid Configuration -->
