@@ -130,7 +130,7 @@
                     
                     <ToggleButton
                         x:Name="ToggleFullScreen"
-                        Style="{StaticResource SimpleToggleSwitch}"
+                        Style="{StaticResource ResolutionMuteToggleButton}"
                         Width="140"
                         Height="34"
                         HorizontalAlignment="Center"
@@ -172,7 +172,7 @@
                     <Slider
                         Background="Transparent"
                         x:Name="SliderVolume"
-                        Style="{StaticResource SimpleMonoSlider}"
+                        Style="{StaticResource VolumeSlider}"
                         Width="140"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
@@ -193,7 +193,7 @@
             
             <Button
                 x:Name="BtnCancel"
-                Style="{StaticResource ButtonDefault}"
+                Style="{StaticResource DefaultButton}"
                 Width="120"
                 Height="36"
                 Margin="14,0"
@@ -202,7 +202,7 @@
 
             <Button
                 x:Name="BtnSave"
-                Style="{StaticResource ButtonDefault}"
+                Style="{StaticResource DefaultButton}"
                 Width="120"
                 Height="36"
                 Margin="14,0"

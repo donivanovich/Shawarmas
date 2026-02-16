@@ -113,9 +113,9 @@ insert into pedidos(fecha_pedido, entregado, pais, ciudad, calle, postal, fk_id_
  (DATE '2025-06-10', true, 'España', 'Barcelona', 'Rambla Catalunya 23', '08007', '2', '2'),
  (DATE '2022-04-20', true, 'España', 'Madrid', 'Paseo Castellana 50', '28046', '1', '1'),
  (sysdate(), false, 'España', 'Valencia', 'Calle Colón 15', '46004', '2', '1'),
- (DATE '2022-05-19', true, 'España', 'Madrid', 'Calle Mayor 25', '28013', '1', '2'),
+ (DATE '2022-05-19', false, 'España', 'Madrid', 'Calle Mayor 25', '28013', '1', '2'),
  (DATE '2021-03-11', false, 'España', 'Sevilla', 'Avda Constitución 10', '41004', '2', '1'),
- (DATE '2024-06-30', true, 'España', 'Madrid', 'Plaza España 9', '28008', '1', '1');
+ (DATE '2024-06-30', false, 'España', 'Madrid', 'Plaza España 9', '28008', '1', '1');
  
 -- Nike AirMax (colores: Negro, Blanco, Gris)
 INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_color, imagen) VALUES
