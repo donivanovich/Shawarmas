@@ -22,6 +22,7 @@
         <ScrollViewer 
             Grid.Column="0"
             Grid.Row="0"
+            Margin="10"
             VerticalScrollBarVisibility="Auto">
             
             <ItemsControl 
@@ -38,66 +39,16 @@
                         <Button 
                             Command="{Binding DataContext.SeleccionarPedidoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                             CommandParameter="{Binding}"
+                            Style="{StaticResource OrderButtonCard}"
                             Padding="15"
-                            Width="155"
+                            Width="140"
                             Height="120"
-                            Margin="10,10,0,0"
+                            Margin="5"
                             Background="#2C2C2C"
                             BorderBrush="#444"
                             BorderThickness="1"
-                            Cursor="Hand">
-
-                            <Button.Resources>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border
-                                                    x:Name="border"
-                                                    Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="15">
-
-                                                    <ContentPresenter 
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"/>
-
-                                                </Border>
-                                                
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger 
-                                                        Property="IsMouseOver" 
-                                                        Value="True">
-
-                                                        <Setter 
-                                                            TargetName="border" 
-                                                            Property="Background" 
-                                                            Value="#444"/>
-
-                                                        <Setter 
-                                                            TargetName="border" 
-                                                            Property="BorderBrush" 
-                                                            Value="#666"/>
-
-                                                    </Trigger>
-                                                    
-                                                    <Trigger 
-                                                        Property="IsPressed" 
-                                                        Value="True">
-
-                                                        <Setter 
-                                                            TargetName="border" 
-                                                            Property="Background" 
-                                                            Value="#555"/>
-
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Resources>
+                            Cursor="Hand"
+                            RenderTransformOrigin="0.5,0.5">
 
                             <StackPanel>
                                 <TextBlock 
@@ -134,7 +85,7 @@
             Background="#2C2C2C"
             CornerRadius="10"
             Padding="20"
-            Margin="10">
+            Margin="10,10,30,10">
             
             <StackPanel HorizontalAlignment="Center">
                 <TextBlock 
@@ -237,7 +188,8 @@
                     Background="#FFF0F0F0"
                     Foreground="Black"
                     BorderThickness="0"
-                    Cursor="Hand" Click="BtnInitialize_Click"/> <!-- Initialize Button -->
+                    Cursor="Hand" 
+                    Click="BtnInitialize_Click"/> <!-- Initialize Button -->
 
             </StackPanel>
         </Border> <!-- Grid Configuration -->
@@ -245,7 +197,7 @@
         <ContentControl 
             Grid.Column="1" 
             Content="{Binding PedidoSeleccionado}" 
-            Margin="10" Cursor=""
+            Margin="2,10,10,10" Cursor=""
             Grid.RowSpan="2">
 
             <ContentControl.ContentTemplate>
@@ -253,7 +205,7 @@
                     <Border 
                         Background="#2C2C2C" 
                         CornerRadius="10" 
-                        Padding="10" Cursor="">
+                        Padding="10">
 
                         <Grid>
                             <Grid.RowDefinitions>
