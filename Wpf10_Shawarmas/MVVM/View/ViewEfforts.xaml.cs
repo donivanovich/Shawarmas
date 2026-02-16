@@ -29,5 +29,11 @@ namespace Wpf10_Shawarmas.MVVM.View
             InitializeComponent();
             DataContext = new ViewModelEfforts();
         }
+
+        private void BtnInitialize_Click(object sender, RoutedEventArgs e)
+        {
+            TxtFilas.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            TxtColumnas.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+        }
     }
 }
