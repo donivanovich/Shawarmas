@@ -93,7 +93,7 @@ namespace Wpf10_Shawarmas.MVVM.View
 
             if (service.UpdateEmployeeConfig(_usuario))
             {
-                MessageBox.Show("Configuración guardada en DB!");
+                MessageBox.Show("Se ha guardado la configuración");
 
                 if (WindowsMainMenu.BgMusicInstance != null)
                 {

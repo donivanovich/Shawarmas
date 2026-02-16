@@ -13,7 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Wpf10_Shawarmas.MVVM.Model;
 using Wpf10_Shawarmas.MVVM.ViewModel;
+using Wpf10_Shawarmas.Services;
 
 namespace Wpf10_Shawarmas.MVVM.View
 {

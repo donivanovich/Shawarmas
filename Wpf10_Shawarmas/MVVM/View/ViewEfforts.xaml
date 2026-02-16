@@ -9,13 +9,19 @@
       Title="ViewEfforts">
 
     <Grid Background="#1C1C1C">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="7*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
         <ScrollViewer 
-            Grid.Column="0" 
+            Grid.Column="0"
+            Grid.Row="0"
             VerticalScrollBarVisibility="Auto">
             
             <ItemsControl 
@@ -23,7 +29,7 @@
 
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
+                        <UniformGrid Columns="{Binding NumColumnas}" Rows="{Binding NumFilas}"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
@@ -123,10 +129,121 @@
             </ItemsControl>
         </ScrollViewer> <!-- Orders -->
 
+        <Border 
+            Grid.Row="1"
+            Background="#2C2C2C"
+            CornerRadius="10"
+            Padding="20"
+            Margin="10">
+            
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock 
+                    Text="Grid Configuration"
+                    FontWeight="Bold"
+                    FontSize="18"
+                    Foreground="#FFF"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,15"/> <!-- Title -->
+
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel
+                        Margin="0,0,10,0">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Margin="0,0,0,10">
+
+                            <TextBlock 
+                                Text="Initial Probability:"
+                                Foreground="#CCC"
+                                Width="120"/>
+
+                            <TextBox 
+                                Text="{Binding ProbInicial, UpdateSourceTrigger=PropertyChanged}"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Background="#444"
+                                Foreground="#FFF"
+                                BorderBrush="#666"/>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock 
+                                Text="Initial State (0/1):"
+                                Foreground="#CCC"
+                                Width="120"/>
+
+                            <TextBox 
+                                Text="{Binding EstadoInicial, UpdateSourceTrigger=PropertyChanged}"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Background="#444"
+                                Foreground="#FFF"
+                                BorderBrush="#666"
+                                MaxLength="1"/>
+
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Margin="0,0,0,10">
+
+                            <TextBlock 
+                                Text="Rows:"
+                                Foreground="#CCC"
+                                Width="80"/>
+
+                            <TextBox 
+                                Text="{Binding NumFilas, UpdateSourceTrigger=PropertyChanged}"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Background="#444"
+                                Foreground="#FFF"
+                                BorderBrush="#666"/>
+
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock 
+                                Text="Columns:"
+                                Foreground="#CCC"
+                                Width="80"/>
+
+                            <TextBox 
+                                Text="{Binding NumColumnas, UpdateSourceTrigger=PropertyChanged}"
+                                Width="80"
+                                HorizontalContentAlignment="Center"
+                                Background="#444"
+                                Foreground="#FFF"
+                                BorderBrush="#666"/>
+
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel> <!-- Inputs -->
+
+                <Button 
+                    Command="{Binding InicializarGrillaCommand}"
+                    Content="Initialize Grid"
+                    Style="{StaticResource DefaultButton}"
+                    Width="150"
+                    Height="35"
+                    HorizontalAlignment="Center"
+                    Margin="0,20,0,0"
+                    Background="#FFF0F0F0"
+                    Foreground="Black"
+                    BorderThickness="0"
+                    Cursor="Hand"/> <!-- Initialize Button -->
+
+            </StackPanel>
+        </Border> <!-- Grid Configuration -->
+
         <ContentControl 
             Grid.Column="1" 
             Content="{Binding PedidoSeleccionado}" 
-            Margin="10" Cursor="">
+            Margin="10" Cursor=""
+            Grid.RowSpan="2">
 
             <ContentControl.ContentTemplate>
                 <DataTemplate>
@@ -258,14 +375,13 @@
                                 </Border>
 
                                 <Button 
-                                    Content="Mark as completed"
+                                    Style="{StaticResource StatusOrdenButton}"
                                     Command="{Binding DataContext.MarcarComoCompletadoCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}"
                                     CommandParameter="{Binding}"
+                                    Content="Mark as completed"
                                     HorizontalAlignment="Center"
-                                    Padding="10,5"
-                                    Width="140"
-                                    Height="35"
-                                    Cursor="Hand"/> <!-- Completed Button -->
+                                    Width="140" 
+                                    Height="35"/> <!-- Completed Button -->
                                 
                             </StackPanel> <!-- Client Details & Completed Button -->
                         </Grid>

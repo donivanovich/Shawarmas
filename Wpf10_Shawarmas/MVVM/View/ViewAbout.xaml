@@ -34,13 +34,13 @@
                 Margin="20,0"
                 Width="100"
                 Height="32"
-                Style="{StaticResource ButtonDefault}"
+                Style="{StaticResource DefaultButton}"
                 Click="BtnReturn_Click"/> <!--Return Button-->
 
         </Border> <!-- Header -->
 
         <Border
-            Style="{StaticResource BorderCard}"
+            Style="{StaticResource DeveloperBorderCard}"
             Grid.Row="1"
             Grid.Column="0"
             Margin="30"
@@ -111,7 +111,7 @@
         </Border> <!-- Ivans Card -->
 
         <Border
-            Style="{StaticResource BorderCard}"
+            Style="{StaticResource DeveloperBorderCard}"
             Grid.Row="1"
             Grid.Column="1"
             Margin="30"

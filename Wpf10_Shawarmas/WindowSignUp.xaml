@@ -153,7 +153,7 @@
             HorizontalAlignment="Center"
             Height="15"
             FontSize="10"
-            Style="{StaticResource ButtonDefault}"
+            Style="{StaticResource DefaultButton}"
             Content="Return" 
             Click="BtnReturn_Click"/> <!-- Return Control -->
 
@@ -164,7 +164,7 @@
             Width="50"
             Height="15"
             FontSize="10"
-            Style="{StaticResource ButtonDefault}"
+            Style="{StaticResource DefaultButton}"
             Content="Sign Up" 
             Click="BtnSignUp_Click"/> <!-- Sign Up Control -->
 

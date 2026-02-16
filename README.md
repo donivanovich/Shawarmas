@@ -82,8 +82,8 @@
 ## 5️⃣ NÚCLEO FUNCIONAL (Workspace)
 
 ### ELEMENTOS FUNCIONALES
-- [ ] Formulario parámetros `DD/MM`
-- [ ] Variables inicialización `DD/MM`
+- ✅ Formulario parámetros `16/02`
+- ✅ Variables inicialización `16/02`
 - [ ] Botón generar grilla `DD/MM`
 - ✅ Interacción celdas `11/02`
 - ✅ Botón simulación `11/02`

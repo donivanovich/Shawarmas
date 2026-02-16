@@ -596,24 +596,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ivan.kosolovskyy_alu\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\kosoi\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+      "projectUniqueName": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
       "projectName": "Wpf10_Shawarmas",
-      "projectPath": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
-      "packagesPath": "C:\\Users\\ivan.kosolovskyy_alu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ivan.kosolovskyy_alu\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\obj\\",
+      "projectPath": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\Wpf10_Shawarmas.csproj",
+      "packagesPath": "C:\\Users\\kosoi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kosoi\\Documents\\GitHub\\WpfShawarmas\\Wpf10_Shawarmas\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\ivan.kosolovskyy_alu\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\kosoi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

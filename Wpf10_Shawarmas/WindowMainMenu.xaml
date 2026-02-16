@@ -24,7 +24,8 @@
             </Grid.ColumnDefinitions>
 
             <Button 
-                x:Name="BtnEfforts" 
+                x:Name="BtnEfforts"
+                Style="{StaticResource ToolBarButtons}"
                 Content="Efforts" 
                 Width="Auto" 
                 Height="Auto" 
@@ -33,6 +34,7 @@
 
             <Button 
                 x:Name="BtnConfiguration" 
+                Style="{StaticResource ToolBarButtons}"
                 Content="Configuration" 
                 Width="Auto" 
                 Height="Auto" 
@@ -41,6 +43,7 @@
 
             <Button 
                 x:Name="BtnAbout" 
+                Style="{StaticResource ToolBarButtons}"
                 Content="About Us" 
                 Width="Auto" Height="Auto" 
                 Grid.Column="2" 
@@ -48,6 +51,7 @@
 
             <Button 
                 x:Name="BtnExit" 
+                Style="{StaticResource ToolBarButtons}"
                 Content="Exit" 
                 Width="Auto" 
                 Height="Auto"
@@ -87,7 +91,7 @@
                 <ToggleButton
                     x:Name="MuteToggle"
                     Click="MuteToggle_Click"
-                    Style="{StaticResource SimpleToggleSwitch}"/> <!-- Mute Control -->
+                    Style="{StaticResource ResolutionMuteToggleButton}"/> <!-- Mute Control -->
 
                 <MediaElement 
                     x:Name="bgMusic"

@@ -1,16 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Wpf10_Shawarmas.MVVM.Model
 {
-    public class Pedido
+    public class Pedido : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private bool _entregado;
+        public bool Entregado
+        {
+            get => _entregado;
+            set
+            {
+                _entregado = value;
+                OnPropertyChanged();
+            }
+        }
         public int IdPedido { get; set; }
         public DateTime FechaPedido { get; set; }
-        public bool Entregado { get; set; }
         public string Pais { get; set; } = "";
         public string Ciudad { get; set; } = "";
         public string Calle { get; set; } = "";
