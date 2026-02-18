@@ -1,0 +1,125 @@
+import java.awt.*;
+import java.sql.*;
+import javax.swing.*;
+
+public class Login extends JFrame {
+
+	private JTextField txtMail;
+	private JPasswordField password;
+	private ImageIcon logo;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(() -> {
+			try {
+				Login frame = new Login();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	public Login() {
+		setTitle("Sign In");
+		setIconImage(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\icon.png").getImage());
+		setBackground(Color.WHITE);
+		getContentPane().setBackground(Color.WHITE);
+		setBounds(100, 100, 403, 272);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(null);
+
+		logo = new ImageIcon(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\logo.png")
+				.getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH));
+
+		JLabel lblMail = new JLabel("Mail");
+		lblMail.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblMail.setBounds(216, 48, 46, 31);
+		getContentPane().add(lblMail);
+
+		txtMail = new JTextField();
+		txtMail.setBounds(216, 74, 155, 20);
+		txtMail.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1, true));
+		txtMail.setCaretColor(Color.BLACK);
+		getContentPane().add(txtMail);
+		txtMail.setColumns(10);
+
+		JLabel lblPassword = new JLabel("Contraseña");
+		lblPassword.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblPassword.setBounds(216, 105, 86, 31);
+		getContentPane().add(lblPassword);
+
+		password = new JPasswordField();
+		password.setBounds(216, 131, 155, 20);
+		password.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1, true));
+		password.setCaretColor(Color.BLACK);
+		getContentPane().add(password);
+
+		JButton btnIcon = new JButton();
+		btnIcon.setBounds(20, 21, 176, 176);
+		btnIcon.setIcon(logo);
+		btnIcon.setFocusPainted(false);
+		btnIcon.setBorderPainted(false);
+		btnIcon.setContentAreaFilled(false);
+		btnIcon.setOpaque(false);
+		btnIcon.setFocusable(false);
+		getContentPane().add(btnIcon);
+
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setForeground(Color.WHITE);
+		btnSubmit.setBackground(Color.BLACK);
+		btnSubmit.setFont(new Font("Yu Gothic Medium", Font.BOLD, 11));
+		btnSubmit.setBounds(297, 177, 74, 31);
+		btnSubmit.setFocusPainted(false);
+		btnSubmit.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
+		btnSubmit.setBorderPainted(false);
+		btnSubmit.addActionListener(e -> {
+		    String mail = txtMail.getText();
+		    String passw = new String(password.getPassword());
+
+		    // Primero, intentamos conectar a la tabla 'clientes'
+		    try (Connection conn = DBConnection.getConnection()) {
+		        // Verificar en la tabla 'clientes'
+		        String sqlCliente = "SELECT * FROM clientes WHERE mail = ? AND passw = ?";
+		        PreparedStatement stmtCliente = conn.prepareStatement(sqlCliente);
+		        stmtCliente.setString(1, mail);
+		        stmtCliente.setString(2, passw);
+
+		        ResultSet rsCliente = stmtCliente.executeQuery();
+
+		        if (rsCliente.next()) {
+		            // Usuario encontrado en 'clientes'
+		            this.dispose();
+		            Customer.customerMail = mail;
+		            Customer window = new Customer();
+		            window.main(null);
+
+		        } else {
+		            // Si no lo encontramos en 'clientes', verificamos la tabla 'empleados'
+		            String sqlEmpleado = "SELECT * FROM empleados WHERE mail_empleado = ? AND passw_empleado = ?";
+		            PreparedStatement stmtEmpleado = conn.prepareStatement(sqlEmpleado);
+		            stmtEmpleado.setString(1, mail);
+		            stmtEmpleado.setString(2, passw);
+
+		            ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+		            if (rsEmpleado.next()) {
+		                // Usuario encontrado en 'empleados'
+		                this.dispose();
+		                Employee.mail = mail;
+		                Employee window = new Employee();
+		                window.main(null);
+
+		            } else {
+		                // Si no encontramos al usuario ni en clientes ni en empleados
+		                JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Sign In", 0);
+		            }
+		        }
+
+		    } catch (SQLException ex) {
+		        ex.printStackTrace();
+		        JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+		});
+		getContentPane().add(btnSubmit);
+	}
+}

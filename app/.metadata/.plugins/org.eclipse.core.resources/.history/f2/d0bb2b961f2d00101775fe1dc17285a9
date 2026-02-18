@@ -1,0 +1,134 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Image;
+import java.awt.Toolkit;
+
+import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.border.EmptyBorder;
+
+public class Login {
+
+	private JFrame frmShawarSignIn;
+	private JTextField txtMail;
+	private JPasswordField password;
+	private ImageIcon logo;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Login window = new Login();
+					window.frmShawarSignIn.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Login() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		logo = new ImageIcon(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\logo.png")
+                .getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH));
+		frmShawarSignIn = new JFrame();
+		frmShawarSignIn.setIconImage(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\icon.png").getImage());
+		frmShawarSignIn.setTitle("Sign In");
+		frmShawarSignIn.setBackground(new Color(255, 255, 255));
+		frmShawarSignIn.getContentPane().setForeground(new Color(0, 0, 0));
+		frmShawarSignIn.getContentPane().setBackground(new Color(255, 255, 255));
+		frmShawarSignIn.setBounds(100, 100, 403, 272);
+		frmShawarSignIn.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmShawarSignIn.getContentPane().setLayout(null);
+		
+		JLabel lblMail = new JLabel("Mail");
+		lblMail.setForeground(new Color(0, 0, 0));
+		lblMail.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblMail.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMail.setBounds(216, 48, 46, 31);
+		frmShawarSignIn.getContentPane().add(lblMail);
+		
+		txtMail = new JTextField();
+		txtMail.setForeground(new Color(0, 0, 0));
+		txtMail.setBackground(new Color(255, 255, 255));
+		txtMail.setBounds(216, 74, 155, 20);
+		txtMail.setCaretColor(Color.BLACK);
+		frmShawarSignIn.getContentPane().add(txtMail);
+		txtMail.setColumns(10);
+		
+		JLabel lblPassword = new JLabel("Password");
+		lblPassword.setForeground(new Color(0, 0, 0));
+		lblPassword.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblPassword.setHorizontalAlignment(SwingConstants.LEFT);
+		lblPassword.setBounds(216, 105, 86, 31);
+		frmShawarSignIn.getContentPane().add(lblPassword);
+		
+		password = new JPasswordField();
+		password.setForeground(new Color(0, 0, 0));
+		password.setBackground(new Color(255, 255, 255));
+		password.setBounds(216, 131, 155, 20);
+		password.setCaretColor(Color.BLACK);
+		frmShawarSignIn.getContentPane().add(password);
+		
+		JButton btnIcon = new JButton("");
+		btnIcon.setBackground(new Color(255, 255, 255));
+		btnIcon.setBounds(20, 21, 176, 176);
+		btnIcon.setIcon(logo);
+		btnIcon.setFocusPainted(false);        // Quita el borde azul al hacer clic o tab
+		btnIcon.setBorderPainted(false);       // Quita el borde del botón
+		btnIcon.setContentAreaFilled(false);   // Evita que se pinte el fondo al presionar
+		btnIcon.setOpaque(false);              // No necesita opacidad
+		btnIcon.setFocusable(false);           // Quita el enfoque por teclado
+		frmShawarSignIn.getContentPane().add(btnIcon);
+		
+		JButton btnSubmit = new JButton("Sumbit");
+		btnSubmit.setForeground(new Color(255, 255, 255));
+		btnSubmit.setFocusPainted(false);
+		btnSubmit.setBorderPainted(false);
+		btnSubmit.setVerticalAlignment(SwingConstants.BOTTOM);
+		btnSubmit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String mail = txtMail.getText();
+				String passw = password.getText();
+				boolean correcto = false;
+				
+				if(!correcto) {
+					JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Sign In", 0);
+				} else {
+					frmShawarSignIn.setVisible(false);
+					//frmShawarSignIn.dispose(); para cerrar la ventana
+					Customer window = new Customer();
+					window.main(null);
+				}
+			}		
+		});
+		btnSubmit.setBackground(new Color(0, 0, 0));
+		btnSubmit.setFont(new Font("Yu Gothic Medium", Font.BOLD, 11));
+		btnSubmit.setBounds(297, 177, 74, 31);
+		frmShawarSignIn.getContentPane().add(btnSubmit);
+	}
+}

@@ -1,0 +1,232 @@
+import java.awt.*;
+import java.sql.*;
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class Employee {
+
+	private JFrame frmEmployeeManagement;
+	private String name, surname1, surname2, id, store;
+	public static String mail;
+	private String country, city, address, zip_code;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Employee window = new Employee();
+					window.frmEmployeeManagement.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Employee() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		try (Connection conn = DBConnection.getConnection()) {
+			//TABLA EMPLEADOS
+			String sqlEmpleado = "SELECT * FROM empleados WHERE mail_empleado = ?";
+			PreparedStatement stmtEmpleado = conn.prepareStatement(sqlEmpleado);
+			stmtEmpleado.setString(1, mail);
+	        
+	        ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+	        if (rsEmpleado.next()) {
+	            name = rsEmpleado.getString("nombre_empleado");
+	            surname1 = rsEmpleado.getString("apellido1_empleado");
+	            surname2 = rsEmpleado.getString("apellido2_empleado");
+	            id = rsEmpleado.getString("id_empleado");
+	            store = rsEmpleado.getString("fk_tienda");
+	        }
+	        
+	        //TABLA TIENDA
+	        String sqlTienda = "SELECT * FROM tiendas WHERE id_tienda = ?";
+			PreparedStatement stmtTienda = conn.prepareStatement(sqlTienda);
+			stmtEmpleado.setString(1, store);
+	        
+	        ResultSet rsTienda = stmtEmpleado.executeQuery();
+	        
+	        if (rsTienda.next()) {
+	        	country = rsTienda.getString("pais_tienda");
+	        	city = rsTienda.getString("ciudad_tienda");
+	        	address = rsTienda.getString("calle_tienda");
+	        	zip_code = rsTienda.getString("postal_tienda");
+	        }
+
+	    } catch (SQLException ex) {
+	        ex.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+		
+		frmEmployeeManagement = new JFrame();
+	    frmEmployeeManagement.setTitle("Employee Management");
+	    frmEmployeeManagement.setIconImage(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\icon2.png").getImage());
+	    frmEmployeeManagement.setBounds(100, 100, 450, 300);
+	    frmEmployeeManagement.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frmEmployeeManagement.getContentPane().setLayout(null);
+
+	    JLabel lblId = new JLabel("ID: " + (id != null ? id : ""));
+	    lblId.setBounds(10, 11, 414, 14);
+	    frmEmployeeManagement.getContentPane().add(lblId);
+
+	    JLabel lblName = new JLabel("Nombre: " + (name != null ? name : "") + " " +
+	                                (surname1 != null ? surname1 : "") + " " +
+	                                (surname2 != null ? surname2 : ""));
+	    lblName.setBounds(10, 36, 414, 14);
+	    frmEmployeeManagement.getContentPane().add(lblName);
+
+	    JLabel lblMail = new JLabel("Mail: " + (mail != null ? mail : ""));
+	    lblMail.setBounds(10, 61, 414, 14);
+	    frmEmployeeManagement.getContentPane().add(lblMail);
+
+	    JLabel lblStore = new JLabel("Tienda ID: " + (store != null ? store : ""));
+	    lblStore.setBounds(10, 86, 424, 14);
+	    frmEmployeeManagement.getContentPane().add(lblStore);
+
+	    JMenuBar menuBar = new JMenuBar();
+	    frmEmployeeManagement.setJMenuBar(menuBar);
+
+	    JMenu mnAnadir = new JMenu("Añadir...");
+	    menuBar.add(mnAnadir);
+
+	    JMenuItem menuCustomer = new JMenuItem("Cliente");
+	    menuCustomer.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
+	    mnAnadir.add(menuCustomer);
+	    JMenuItem menuEmployee = new JMenuItem("Empleado");
+	    menuEmployee.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
+	    mnAnadir.add(menuEmployee);
+	    JMenuItem menuOrder = new JMenuItem("Pedido");
+	    menuOrder.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
+	    mnAnadir.add(menuOrder);
+	    JMenuItem menuStore = new JMenuItem("Tienda");
+	    menuStore.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
+	    mnAnadir.add(menuStore);
+	    JMenuItem menuProduct = new JMenuItem("Producto");
+	    menuProduct.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		AddProduct();
+	    	}
+	    });
+	    mnAnadir.add(menuProduct);
+
+	    JMenu mnOpciones = new JMenu("Opciones");
+	    menuBar.add(mnOpciones);
+
+	    JMenuItem menuCerrar = new JMenuItem("Cerrar Sesión");
+	    menuCerrar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		frmEmployeeManagement.dispose();
+	    		Login log = new Login();
+	    		log.main(null);
+	    	}
+	    });
+	    
+	    JMenuItem mntmInformacion = new JMenuItem("Información");
+	    mntmInformacion.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		JPanel panel = new JPanel(new GridLayout(0, 1));
+	    		panel.add(new JLabel("ID: "));
+	    		panel.add(new JLabel("Nombre: "));
+	    		panel.add(new JLabel("Mail: "));
+	    		panel.add(new JLabel("Tienda: "));
+	    		int result = JOptionPane.showConfirmDialog(null, panel, "Añadir Producto",
+	                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    	}
+	    });
+	    mnOpciones.add(mntmInformacion);
+	    mnOpciones.add(menuCerrar);
+		
+		//Poder modificar la informacion personal tanto de clientes como empleados
+		
+		//Poder editar estado de pedidos
+		
+		//Dar de alta clientes y empleados
+		
+		//Dar de alta productos
+	    
+	    
+	}
+	
+	private void AddProduct() {
+        JTextField marcaField = new JTextField();
+        JTextField modeloField = new JTextField();
+        JTextField precioField = new JTextField();
+        JTextField stockField = new JTextField();
+        JComboBox<String> categoriaBox = new JComboBox<>(new String[]{"Zapatillas", "Sudaderas", "Camisetas"});
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Categoria:"));
+        panel.add(categoriaBox);
+        panel.add(new JLabel("Marca:"));
+        panel.add(marcaField);
+        panel.add(new JLabel("Modelo:"));
+        panel.add(modeloField);
+        panel.add(new JLabel("Precio:"));
+        panel.add(precioField);
+        panel.add(new JLabel("Stock:"));
+        panel.add(stockField);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Añadir Producto",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+        	String categoria = (String) categoriaBox.getSelectedItem();
+            String marca = marcaField.getText();
+            String modelo = modeloField.getText();
+            String precioTexto = precioField.getText().replace(',', '.');//SI ALGUIEN INTRODUCE , ESTO PONE .
+            String stockTexto = stockField.getText();
+
+            try {
+                double precio = Double.parseDouble(precioTexto);
+                int stock = Integer.parseInt(stockTexto);
+
+                try (Connection conn = DBConnection.getConnection()) {
+                    String sql = "INSERT INTO productos (marca, modelo, categoria, precio, stock) VALUES (?, ?, ?, ?, ?)";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setString(1, marca);
+                    stmt.setString(2, modelo);
+                    stmt.setString(3, categoria);
+                    stmt.setDouble(4, precio);
+                    stmt.setInt(5, stock);
+
+                    int rowsInserted = stmt.executeUpdate();
+                    if (rowsInserted > 0) {
+                        JOptionPane.showMessageDialog(null, "Producto añadido exitosamente.");
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al insertar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Precio o stock no válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+}
