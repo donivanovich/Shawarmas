@@ -1,0 +1,66 @@
+import java.awt.*;
+import java.sql.*;
+import javax.swing.*;
+
+public class Customer {
+
+	private JFrame frame;
+	public String customerName;
+	//public static String customerMail;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Customer window = new Customer();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Customer() {
+		initialize();
+	}
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		
+		/*try (Connection nameInyector = DBConnection.getConnection()) {
+			String sqlCliente = "SELECT nombre FROM clientes WHERE mail = ?";
+			PreparedStatement stmtCliente = nameInyector.prepareStatement(sqlCliente);
+			stmtCliente.setString(1, customerMail);
+			ResultSet rs = stmtCliente.executeQuery();
+
+			if (rs.next()) {
+				customerName = rs.getString("nombre");
+			} else {
+				customerName = "Invitado";
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+		}*/
+		
+		frame = new JFrame();
+		frame.setTitle("Welcome, " + customerName);
+		frame.setIconImage(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\icon3.png").getImage());
+		frame.setBounds(100, 100, 570, 450);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Clientes");
+		lblNewLabel.setBounds(267, 186, 66, 14);
+		frame.getContentPane().add(lblNewLabel);
+	}
+
+}

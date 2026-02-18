@@ -1,0 +1,552 @@
+package src;
+
+import java.awt.*;
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import javax.swing.*;
+import java.awt.event.*;
+import java.net.URL;
+
+public class Customer {
+
+	private JFrame frameCustomer;
+	private String customerName = "";
+	public static String customerMail = "";
+	private List<Map<String, Object>> carrito = new ArrayList<>();
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Customer window = new Customer();
+					window.frameCustomer.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public Customer() {
+		initialize();
+	}
+	
+	private void initialize() {
+		addNombre();
+		
+		frameCustomer = new JFrame();
+		frameCustomer.getContentPane().setBackground(new Color(255, 255, 255));
+		frameCustomer.setTitle("Bienvenido, " + customerName);
+		frameCustomer.setIconImage(new ImageIcon(getClass().getResource("/img/faviconCustomer.png")).getImage());
+		frameCustomer.setBounds(100, 100, 570, 450);
+		frameCustomer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameCustomer.getContentPane().setLayout(null);
+		
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBackground(new Color(255, 255, 255));
+		frameCustomer.setJMenuBar(menuBar);
+		
+		JMenu mnOpciones = new JMenu("Opciones");
+		mnOpciones.setForeground(new Color(0, 0, 0));
+		mnOpciones.setBackground(new Color(255, 255, 255));
+		menuBar.add(mnOpciones);
+		
+			JMenuItem mntmCuenta = new JMenuItem("Cuenta");
+			mntmCuenta.setBackground(new Color(255, 255, 255));
+			mntmCuenta.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					cuenta();
+				}
+			});
+		
+			JMenuItem mntmPedidos = new JMenuItem("Pedidos");
+			mntmPedidos.setBackground(new Color(255, 255, 255));
+			mntmPedidos.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					pedidos();
+				}
+			});
+			
+			
+			JMenuItem mntmCerrarSesion = new JMenuItem("Cerrar Sesión");
+			mntmCerrarSesion.setBackground(new Color(255, 255, 255));
+			mntmCerrarSesion.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					frameCustomer.dispose();
+		    		Login.main(null);
+				}
+			});			
+			mnOpciones.add(mntmCuenta);
+			mnOpciones.add(mntmPedidos);
+			mnOpciones.add(mntmCerrarSesion);
+		
+		JMenu mnCarrito = new JMenu("Carrito");
+		mnCarrito.setForeground(new Color(0, 0, 0));
+		mnCarrito.setBackground(new Color(255, 255, 255));
+		menuBar.add(mnCarrito);
+		
+			JMenuItem mntmPagar = new JMenuItem("Pagar");
+			mntmPagar.setBackground(new Color(255, 255, 255));
+			mntmPagar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					pagar();
+				}
+			});
+			mnCarrito.add(mntmPagar);
+			
+		principal();
+		
+	}
+	
+	private void procesoPago() {
+		JTextField numeroTarjeta = new JTextField();
+        JTextField fechaVencimiento = new JTextField();
+        JTextField cvv = new JTextField();
+
+        boolean datosValidos = false;
+
+        while(!datosValidos) {
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            panel.add(new JLabel("Número de tarjeta (13 a 19 dígitos):"));
+            panel.add(numeroTarjeta);
+            panel.add(new JLabel("Fecha de vencimiento (MM/AA):"));
+            panel.add(fechaVencimiento);
+            panel.add(new JLabel("CVV (3 dígitos):"));
+            panel.add(cvv);
+
+            int resultado = JOptionPane.showConfirmDialog(null, panel, "Ingrese los datos de su tarjeta", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if(resultado != JOptionPane.OK_OPTION) break;
+
+            String tarjeta = numeroTarjeta.getText().trim();
+            String fecha = fechaVencimiento.getText().trim();
+            String codigo = cvv.getText().trim();
+
+            if(!tarjeta.matches("^\\d{16}$")) {
+                JOptionPane.showMessageDialog(null, "Número de tarjeta inválido. Debe tener 16 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            if (!fecha.matches("^(0[1-9]|1[0-2])/\\d{2}$")) {
+                JOptionPane.showMessageDialog(null, "Fecha inválida. Formato correcto: MM/AA.", "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            if (!codigo.matches("^\\d{3}$")) {
+                JOptionPane.showMessageDialog(null, "CVV inválido. Debe tener 3 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            datosValidos = true;
+            JOptionPane.showMessageDialog(null, "Pago procesado correctamente.");
+        }
+	}
+	
+	private void pagar() {
+	    if (carrito.isEmpty()) {
+	        JOptionPane.showMessageDialog(frameCustomer, "Tu carrito está vacío.", "Información", JOptionPane.INFORMATION_MESSAGE);
+	        return;
+	    }
+	    
+	    procesoPago();
+	    
+	    try (Connection conn = DBConnection.getConnection()) {
+	        conn.setAutoCommit(false);
+
+	        int idCliente = -1;
+	        try (PreparedStatement stmt = conn.prepareStatement("SELECT id_user FROM clientes WHERE mail = ?")) {
+	            stmt.setString(1, customerMail);
+	            ResultSet rs = stmt.executeQuery();
+	            if (rs.next()) idCliente = rs.getInt("id_user");
+	        }
+
+	        int idTienda = 1; 
+
+	        int idPedido = -1;
+	        try (PreparedStatement stmt = conn.prepareStatement("""
+	            INSERT INTO pedidos (fecha_pedido, pais, ciudad, calle, postal, fk_id_user, fk_tienda) 
+	            VALUES (NOW(), 'España', 'Madrid', 'Calle Falsa 123', '28000', ?, ?)
+	            """, Statement.RETURN_GENERATED_KEYS)) {
+	            stmt.setInt(1, idCliente);
+	            stmt.setInt(2, idTienda);
+	            stmt.executeUpdate();
+	            ResultSet keys = stmt.getGeneratedKeys();
+	            if (keys.next()) idPedido = keys.getInt(1);
+	        }
+
+	        try (PreparedStatement stmt = conn.prepareStatement("""
+	            INSERT INTO productos_pedidos (fk_producto, fk_pedido, cantidad) 
+	            VALUES (?, ?, ?)
+	            """)) {
+	            for (Map<String, Object> item : carrito) {
+	                stmt.setInt(1, (int) item.get("id_producto"));
+	                stmt.setInt(2, idPedido);
+	                stmt.setInt(3, (int) item.get("cantidad"));
+	                stmt.addBatch();
+	            }
+	            stmt.executeBatch();
+	        }
+
+	        conn.commit();
+	        carrito.clear();
+	        JOptionPane.showMessageDialog(frameCustomer, "¡Pago realizado con éxito! Pedido %d" + idPedido);
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(frameCustomer, "Error al procesar el pedido.", "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+
+	
+	private void principal() {
+	    JLabel lblPrecioInt = new JLabel("0");
+	    lblPrecioInt.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    JLabel lblCategoria = new JLabel("Categoría:");
+	    lblCategoria.setFont(new Font("Tahoma", Font.BOLD, 11));
+	    JButton btnImagenProducto = new JButton("");
+
+	    JComboBox<String> comboBoxModelo = new JComboBox<>();
+	    JComboBox<String> comboBoxTalla = new JComboBox<>();
+	    JComboBox<String> comboBoxColor = new JComboBox<>();
+
+	    // Mappings para traducir entre nombres y IDs
+	    Map<String, Integer> tallaToId = new HashMap<>();
+	    Map<String, Integer> colorToId = new HashMap<>();
+	    Map<Integer, String> idToTalla = new HashMap<>();
+	    Map<Integer, String> idToColor = new HashMap<>();
+
+	    JButton btnCarrito = new JButton("Añadir al Carrito");
+	    btnCarrito.setBackground(new Color(0, 0, 0));
+	    btnCarrito.setForeground(Color.WHITE);
+	    btnCarrito.setFont(new Font("Yu Gothic Medium", Font.BOLD | Font.ITALIC, 11));
+	    btnCarrito.setBounds(40, 324, 140, 23);
+	    btnCarrito.setFocusPainted(false);
+	    btnCarrito.setBorderPainted(false);
+	    btnCarrito.addActionListener(e -> {
+	        String modelo = (String) comboBoxModelo.getSelectedItem();
+	        String talla = (String) comboBoxTalla.getSelectedItem();
+	        String color = (String) comboBoxColor.getSelectedItem();
+
+	        if (modelo == null || talla == null || color == null) {
+	            JOptionPane.showMessageDialog(frameCustomer, "Selecciona modelo, talla y color.", "Error", JOptionPane.WARNING_MESSAGE);
+	            return;
+	        }
+
+	        try (Connection conn = DBConnection.getConnection()) {
+	            String sql = """
+	                SELECT id_producto, precio FROM productos 
+	                WHERE modelo = ? 
+	                  AND fk_talla = (SELECT id_talla FROM tallas WHERE talla = ?) 
+	                  AND fk_color = (SELECT id_color FROM colores WHERE color = ?)
+	                """;
+	            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	                stmt.setString(1, modelo);
+	                stmt.setString(2, talla);
+	                stmt.setString(3, color);
+	                ResultSet rs = stmt.executeQuery();
+	                if (rs.next()) {
+	                    Map<String, Object> item = new HashMap<>();
+	                    item.put("id_producto", rs.getInt("id_producto"));
+	                    item.put("precio", rs.getDouble("precio"));
+	                    item.put("cantidad", 1);
+	                    carrito.add(item);
+	                    JOptionPane.showMessageDialog(frameCustomer, "Producto añadido al carrito.");
+	                } else {
+	                    JOptionPane.showMessageDialog(frameCustomer, "No se encontró el producto seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
+	                }
+	            }
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	            JOptionPane.showMessageDialog(frameCustomer, "Error al añadir al carrito.", "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	    });
+
+	    // Posiciones y estilo
+	    btnImagenProducto.setBounds(40, 80, 220, 220);
+	    btnImagenProducto.setFocusPainted(false);
+	    btnImagenProducto.setContentAreaFilled(false);
+	    btnImagenProducto.setOpaque(false);
+
+	    comboBoxModelo.setBounds(406, 107, 98, 22);
+	    comboBoxTalla.setBounds(406, 172, 98, 22);
+	    comboBoxColor.setBounds(406, 241, 98, 22);
+
+	    JLabel lblModelo = new JLabel("Modelo:");
+	    lblModelo.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    lblModelo.setBounds(308, 111, 61, 14);
+	    JLabel lblTalla = new JLabel("Talla:");
+	    lblTalla.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    lblTalla.setBounds(308, 176, 61, 14);
+	    JLabel lblColor = new JLabel("Color:");
+	    lblColor.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    lblColor.setBounds(308, 245, 61, 14);
+	    lblCategoria.setBounds(308, 40, 220, 14);
+	    JLabel lblPrecio = new JLabel("Precio:");
+	    lblPrecio.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	    lblPrecio.setBounds(308, 324, 46, 14);
+	    lblPrecioInt.setBounds(406, 324, 98, 14);
+
+	    frameCustomer.getContentPane().add(btnCarrito);
+	    frameCustomer.getContentPane().add(btnImagenProducto);
+	    frameCustomer.getContentPane().add(comboBoxModelo);
+	    frameCustomer.getContentPane().add(comboBoxTalla);
+	    frameCustomer.getContentPane().add(comboBoxColor);
+	    frameCustomer.getContentPane().add(lblModelo);
+	    frameCustomer.getContentPane().add(lblTalla);
+	    frameCustomer.getContentPane().add(lblColor);
+	    frameCustomer.getContentPane().add(lblCategoria);
+	    frameCustomer.getContentPane().add(lblPrecio);
+	    frameCustomer.getContentPane().add(lblPrecioInt);
+
+	    // Cargar tallas y colores en mapas
+	    try (Connection conn = DBConnection.getConnection()) {
+	        ResultSet rs = conn.createStatement().executeQuery("SELECT id_talla, talla FROM tallas");
+	        while (rs.next()) {
+	            tallaToId.put(rs.getString("talla"), rs.getInt("id_talla"));
+	            idToTalla.put(rs.getInt("id_talla"), rs.getString("talla"));
+	        }
+	        rs = conn.createStatement().executeQuery("SELECT id_color, color FROM colores");
+	        while (rs.next()) {
+	            colorToId.put(rs.getString("color"), rs.getInt("id_color"));
+	            idToColor.put(rs.getInt("id_color"), rs.getString("color"));
+	        }
+
+	        rs = conn.createStatement().executeQuery("SELECT DISTINCT modelo FROM productos");
+	        while (rs.next()) {
+	            comboBoxModelo.addItem(rs.getString("modelo"));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    // Función que actualiza combos y visual
+	    Runnable actualizarVista = () -> {
+	        String modelo = (String) comboBoxModelo.getSelectedItem();
+	        if (modelo == null) return;
+
+	        String tallaSel = (String) comboBoxTalla.getSelectedItem();
+	        String colorSel = (String) comboBoxColor.getSelectedItem();
+
+	        comboBoxTalla.removeAllItems();
+	        comboBoxColor.removeAllItems();
+
+	        Set<Integer> tallas = new HashSet<>();
+	        Set<Integer> colores = new HashSet<>();
+	        int fk_categoria = 0;
+	        String imagen = "";
+	        double precio = 0;
+
+	        try (Connection conn = DBConnection.getConnection()) {
+	            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM productos WHERE modelo = ?");
+	            stmt.setString(1, modelo);
+	            ResultSet rs = stmt.executeQuery();
+	            while (rs.next()) {
+	                tallas.add(rs.getInt("fk_talla"));
+	                colores.add(rs.getInt("fk_color"));
+	                if (imagen.isEmpty()) {
+	                    imagen = rs.getString("imagen");
+	                    precio = rs.getDouble("precio");
+	                    fk_categoria = rs.getInt("fk_categoria");
+	                }
+	            }
+
+	            for (int id : tallas) comboBoxTalla.addItem(idToTalla.get(id));
+	            for (int id : colores) comboBoxColor.addItem(idToColor.get(id));
+
+	            // Restaurar selección si es válida
+	            if (tallaSel != null && comboBoxTalla.getItemCount() > 0)
+	                comboBoxTalla.setSelectedItem(tallaSel);
+	            if (colorSel != null && comboBoxColor.getItemCount() > 0)
+	                comboBoxColor.setSelectedItem(colorSel);
+
+	            lblPrecioInt.setText(String.format("%.2f €", precio));
+
+	            stmt = conn.prepareStatement("SELECT categoria FROM categorias WHERE id_categoria = ?");
+	            stmt.setInt(1, fk_categoria);
+	            rs = stmt.executeQuery();
+	            if (rs.next()) lblCategoria.setText("Categoría: " + rs.getString("categoria"));
+
+	            if (imagen != null && !imagen.isEmpty()) {
+	                URL imageUrl = getClass().getResource(imagen);
+	                if (imageUrl != null) {
+	                    ImageIcon icon = new ImageIcon(new ImageIcon(imageUrl).getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH));
+	                    btnImagenProducto.setIcon(icon);
+	                } else {
+	                    btnImagenProducto.setIcon(null);
+	                }
+	            } else {
+	                btnImagenProducto.setIcon(null);
+	            }
+
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	    };
+
+	    comboBoxModelo.addActionListener(e -> actualizarVista.run());
+
+	    comboBoxTalla.addActionListener(e -> {
+	        String modelo = (String) comboBoxModelo.getSelectedItem();
+	        String talla = (String) comboBoxTalla.getSelectedItem();
+	        if (modelo == null || talla == null) return;
+	        comboBoxColor.removeAllItems();
+	        try (Connection conn = DBConnection.getConnection()) {
+	            PreparedStatement stmt = conn.prepareStatement("""
+	                SELECT DISTINCT c.color
+	                FROM productos p
+	                JOIN colores c ON p.fk_color = c.id_color
+	                JOIN tallas t ON p.fk_talla = t.id_talla
+	                WHERE p.modelo = ? AND t.talla = ?
+	            """);
+	            stmt.setString(1, modelo);
+	            stmt.setString(2, talla);
+	            ResultSet rs = stmt.executeQuery();
+	            while (rs.next()) {
+	                comboBoxColor.addItem(rs.getString("color"));
+	            }
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	    });
+
+	    comboBoxColor.addActionListener(e -> {
+	        String modelo = (String) comboBoxModelo.getSelectedItem();
+	        String color = (String) comboBoxColor.getSelectedItem();
+	        if (modelo == null || color == null) return;
+	        comboBoxTalla.removeAllItems();
+	        try (Connection conn = DBConnection.getConnection()) {
+	            PreparedStatement stmt = conn.prepareStatement("""
+	                SELECT DISTINCT t.talla
+	                FROM productos p
+	                JOIN tallas t ON p.fk_talla = t.id_talla
+	                JOIN colores c ON p.fk_color = c.id_color
+	                WHERE p.modelo = ? AND c.color = ?
+	            """);
+	            stmt.setString(1, modelo);
+	            stmt.setString(2, color);
+	            ResultSet rs = stmt.executeQuery();
+	            while (rs.next()) {
+	                comboBoxTalla.addItem(rs.getString("talla"));
+	            }
+	        } catch (SQLException ex) {
+	            ex.printStackTrace();
+	        }
+	    });
+
+	    if (comboBoxModelo.getItemCount() > 0) {
+	        comboBoxModelo.setSelectedIndex(0);
+	        actualizarVista.run();
+	    }
+	}
+
+
+private void pedidos() {
+    try (Connection conn = DBConnection.getConnection()) {
+        String sqlPedidos = """
+            SELECT 
+			    p.id_pedido,
+			    p.fecha_pedido,
+			    p.fecha_entrega,
+			    SUM(pr.precio * pp.cantidad) AS total,
+			    IF(p.fecha_entrega IS NULL, 'Pendiente', 'Entregado') AS estado
+			FROM pedidos p
+			JOIN productos_pedidos pp ON p.id_pedido = pp.fk_pedido
+			JOIN productos pr ON pr.id_producto = pp.fk_producto
+			JOIN clientes c ON c.id_user = p.fk_id_user
+			WHERE c.mail = ?
+			GROUP BY p.id_pedido
+			ORDER BY p.fecha_pedido DESC;
+        """;
+
+        PreparedStatement stmt = conn.prepareStatement(sqlPedidos);
+        stmt.setString(1, customerMail);
+        ResultSet rs = stmt.executeQuery();
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        boolean hayPedidos = false;
+
+        while (rs.next()) {
+            hayPedidos = true;
+            int id = rs.getInt("id_pedido");
+            Timestamp fecha = rs.getTimestamp("fecha_pedido");
+            String estado = rs.getString("estado");
+            double total = rs.getDouble("total");
+
+            JPanel item = new JPanel(new GridLayout(0, 1));
+            item.setBorder(BorderFactory.createTitledBorder("Pedido #" + id));
+            item.add(new JLabel("Fecha: " + fecha.toString()));
+            item.add(new JLabel("Total: " + String.format("%.2f €", total)));
+            item.add(new JLabel("Estado: " + estado));
+            panel.add(item);
+        }
+
+        if (!hayPedidos) {
+            panel.add(new JLabel("No tienes pedidos."));
+        }
+
+        JOptionPane.showMessageDialog(frameCustomer, panel, "Tus pedidos", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(frameCustomer, "Error al obtener pedidos.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
+
+
+private void addNombre() {
+	try (Connection nombre = DBConnection.getConnection()) {
+		String sqlCliente = "SELECT nombre FROM clientes WHERE mail = ?";
+		PreparedStatement stmtCliente = nombre.prepareStatement(sqlCliente);
+		stmtCliente.setString(1, customerMail);
+		ResultSet rsCliente = stmtCliente.executeQuery();
+
+		if (rsCliente.next()) {
+			customerName = rsCliente.getString("nombre");
+		} else {
+			customerName = "Invitado";
+		}
+	} catch (SQLException exCliente) {
+		exCliente.printStackTrace();
+		JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+	}
+}
+
+private void cuenta() {
+	try (Connection connEmpleado = DBConnection.getConnection()) {
+    	String sqlEmpleado = "SELECT * FROM clientes WHERE mail = ?";
+		PreparedStatement stmtEmpleado = connEmpleado.prepareStatement(sqlEmpleado);
+		stmtEmpleado.setString(1, customerMail);
+        
+        ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+        if (rsEmpleado.next()) {
+            String ap1 = rsEmpleado.getString("apellido1");
+            String ap2 = rsEmpleado.getString("apellido2");
+            String id = rsEmpleado.getString("id_user");
+            String passw = rsEmpleado.getString("passw");
+            
+            JPanel panelEmpleado = new JPanel(new GridLayout(0, 1));
+            panelEmpleado.add(new JLabel("ID: " + id));
+	        panelEmpleado.add(new JLabel("Nombre: " + customerName + " " + ap1 + " " + ap2));
+	        panelEmpleado.add(new JLabel("Email: " + customerMail));
+	        String pass = "*".repeat(passw.length());
+	        panelEmpleado.add(new JLabel("Contraseña: " + pass));
+	        
+	        JOptionPane.showMessageDialog(frameCustomer, panelEmpleado, "Tu información", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    } catch (SQLException exEmpleado) {
+        exEmpleado.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+}

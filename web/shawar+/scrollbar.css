@@ -1,0 +1,27 @@
+/* Aplica a todo el documento */
+body::-webkit-scrollbar {
+    width: 16px; /* Ancho de la scrollbar */
+    height: 30px;
+}
+  /* Fondo de la barra */
+body::-webkit-scrollbar-track {
+    background: black;
+    border-radius: 8px;
+}
+
+  /* Pulgar (el botón que se arrastra) */
+body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 0px;
+    border: none;
+}
+
+  /* Al pasar el cursor sobre el pulgar */
+body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+  /* Estilo general */
+* {
+    scrollbar-width: thin; /* auto | thin | none */
+    scrollbar-color: white black ; /* pulgar | fondo */
+}

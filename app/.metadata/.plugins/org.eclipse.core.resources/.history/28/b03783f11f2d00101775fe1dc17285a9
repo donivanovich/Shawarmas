@@ -1,0 +1,87 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+public class Login extends JFrame {
+
+	private JTextField txtMail;
+	private JPasswordField password;
+	private ImageIcon logo;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(() -> {
+			try {
+				Login frame = new Login();
+				frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	public Login() {
+		setTitle("Sign In");
+		setIconImage(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\icon.png").getImage());
+		setBackground(Color.WHITE);
+		getContentPane().setBackground(Color.WHITE);
+		setBounds(100, 100, 403, 272);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(null);
+
+		logo = new ImageIcon(new ImageIcon("H:\\Mi unidad\\JAVA\\img\\logo.png")
+				.getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH));
+
+		JLabel lblMail = new JLabel("Mail");
+		lblMail.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblMail.setBounds(216, 48, 46, 31);
+		getContentPane().add(lblMail);
+
+		txtMail = new JTextField();
+		txtMail.setBounds(216, 74, 155, 20);
+		txtMail.setCaretColor(Color.BLACK);
+		getContentPane().add(txtMail);
+		txtMail.setColumns(10);
+
+		JLabel lblPassword = new JLabel("Password");
+		lblPassword.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
+		lblPassword.setBounds(216, 105, 86, 31);
+		getContentPane().add(lblPassword);
+
+		password = new JPasswordField();
+		password.setBounds(216, 131, 155, 20);
+		password.setCaretColor(Color.BLACK);
+		getContentPane().add(password);
+
+		JButton btnIcon = new JButton();
+		btnIcon.setBounds(20, 21, 176, 176);
+		btnIcon.setIcon(logo);
+		btnIcon.setFocusPainted(false);
+		btnIcon.setBorderPainted(false);
+		btnIcon.setContentAreaFilled(false);
+		btnIcon.setOpaque(false);
+		btnIcon.setFocusable(false);
+		getContentPane().add(btnIcon);
+
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setForeground(Color.WHITE);
+		btnSubmit.setBackground(Color.BLACK);
+		btnSubmit.setFont(new Font("Yu Gothic Medium", Font.BOLD, 11));
+		btnSubmit.setBounds(297, 177, 74, 31);
+		btnSubmit.setFocusPainted(false);
+		btnSubmit.setBorderPainted(false);
+		btnSubmit.addActionListener(e -> {
+			String mail = txtMail.getText();
+			String passw = new String(password.getPassword());
+			boolean correcto = false;
+
+			if (!correcto) {
+				JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Sign In", JOptionPane.ERROR_MESSAGE);
+			} else {
+				this.setVisible(false);
+				// new Customer().setVisible(true); // Ejemplo si Customer también es un JFrame
+			}
+		});
+		getContentPane().add(btnSubmit);
+	}
+}

@@ -1,0 +1,1373 @@
+package src;
+
+import java.awt.*;
+import java.sql.*;
+import java.util.*;
+import javax.swing.*;
+import java.awt.event.*;
+import java.time.*;
+
+public class Employee {
+
+	private JFrame frmEmployee;
+	private String name, surname1, surname2, id, store, country, city, address, zip_code, passw;
+	public static String mail;
+	private ImageIcon logo;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Employee window = new Employee();
+					window.frmEmployee.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public Employee() {
+		initialize();
+	}
+
+	private void initialize() {
+		logo = new ImageIcon(new ImageIcon(getClass().getResource("/img/logo.png")).getImage().getScaledInstance(239, 239, Image.SCALE_SMOOTH));
+		frmEmployee = new JFrame();
+		frmEmployee.setTitle("Employee Management");
+		frmEmployee.setIconImage(new ImageIcon(getClass().getResource("/img/faviconEmployee.png")).getImage());
+	    frmEmployee.setBounds(100, 100, 462, 300);
+	    frmEmployee.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frmEmployee.getContentPane().setLayout(null);
+	    
+	    JButton btnIcon = new JButton("");
+		btnIcon.setBackground(new Color(255, 255, 255));
+		btnIcon.setBounds(0, 0, 446, 239);
+		btnIcon.setIcon(logo);
+		btnIcon.setFocusPainted(false);      
+		btnIcon.setBorderPainted(false);       
+		btnIcon.setContentAreaFilled(false);   
+		btnIcon.setOpaque(false);              
+		btnIcon.setFocusable(false);           
+		frmEmployee.getContentPane().add(btnIcon);
+
+	    JMenuBar menuBar = new JMenuBar();
+	    frmEmployee.setJMenuBar(menuBar);
+
+	    JMenu mnInventario = new JMenu("Inventario"); 										// MENU PARA PRODUCTOS
+	    mnInventario.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    	}
+	    });
+	    menuBar.add(mnInventario);
+	    
+		    JMenuItem mntmOrder = new JMenuItem("Hacer Pedido");
+		    mntmOrder.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		hacerPedido(); //Despliega ventana para tramitar un pedido
+		    	}
+		    });	
+		    
+		    JMenuItem mntmProducto = new JMenuItem("Añadir Producto");
+		    mntmProducto.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		addProducto(); //Despliega una ventana para dar de alta un nuevo producto
+		    	}
+		    });
+		    
+		    JMenuItem mntmStock = new JMenuItem("Actualizar Stock");
+		    mntmStock.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		actualizarStock(); //Actualizar el stock de un producto
+		    	}
+		    });
+		    
+		    mnInventario.add(mntmOrder);
+		    mnInventario.add(mntmProducto);
+		    mnInventario.add(mntmStock);
+	    
+	    JMenu mnNewMenu = new JMenu("Añadir...");                     			   // MENU PARA AÑADIR DATOS A TABLAS
+	    menuBar.add(mnNewMenu);
+    	    
+    	    JMenuItem mntmColor = new JMenuItem("Color");
+    	    mntmColor.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addColor(); //Despliega una ventana para dar de alta un nuevo color
+    	    	}
+    	    });
+    	    
+    	    JMenuItem mntmStore = new JMenuItem("Tienda");
+    	    mntmStore.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addTienda(); //Despliega una ventana para dar de alta una nueva tienda
+    	    	}
+    	    });
+    	    
+    	    JMenuItem mntmEmployee = new JMenuItem("Empleado");
+    	    mntmEmployee.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addEmpleado(); //Despliega una ventana para dar de alta un nuevo empleado
+    	    	}
+    	    });
+    	    
+    	    JMenuItem mntmTalla = new JMenuItem("Talla");
+    	    mntmTalla.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addTalla(); //Despliega una ventana para dar de alta una nueva talla
+    	    	}
+    	    });
+    	    
+    	    JMenuItem mntmCategoria = new JMenuItem("Categoría");
+    	    mntmCategoria.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addCategoria(); //Despliega una ventana para dar de alta una nueva categoria
+    	    	}
+    	    });
+    	    
+    	    JMenuItem mntmCustomer = new JMenuItem("Cliente");
+    	    mntmCustomer.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		addCliente(); //Despliega una ventana para dar de alta un nuevo cliente
+    	    	}
+    	    });
+    	    
+    	    mnNewMenu.add(mntmCustomer);
+    	    mnNewMenu.add(mntmCategoria);
+    	    mnNewMenu.add(mntmEmployee);
+    	    mnNewMenu.add(mntmTalla);
+    	    mnNewMenu.add(mntmColor);
+    	    mnNewMenu.add(mntmStore);
+	    
+	    JMenu mnEditar = new JMenu("Modificar...");                                           // MENU PARA MODIFICAR DATOS DE PERSONAS
+	    menuBar.add(mnEditar);
+	    
+		    JMenuItem mntmClienteEditar = new JMenuItem("Cliente");
+		    mntmClienteEditar.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		editCliente(); //Solicita un email y verifica que se encuentre en la tabla clientes, despues abre una ventana para modificar los datos del cliente
+		    	}
+		    });
+		    
+		    JMenuItem mntmInfoPersonal = new JMenuItem("Tu Información");
+		    mntmInfoPersonal.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		editTuInfo(); //Abre una ventana para editar tu informacion
+		    	}
+		    });
+		    
+		    JMenuItem mntmEmpleado = new JMenuItem("Empleado");
+		    mntmEmpleado.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		editEmpleado(); //Solicita un email y verifica que se encuentre en la tabla empleados, despues abre una ventana para modificar los datos del empleado
+		    	}
+		    });
+		    
+		    mnEditar.add(mntmEmpleado);
+		    mnEditar.add(mntmInfoPersonal);
+		    mnEditar.add(mntmClienteEditar);
+	    
+	    JMenu mnVer = new JMenu("Ver...");
+	    menuBar.add(mnVer);
+	    
+		    JMenuItem mntmEstadoPedidos = new JMenuItem("Estado Pedidos");
+		    mntmEstadoPedidos.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		verEstadoPedidos();
+		    	}
+		    });
+		    
+		    JMenuItem mntmDatos = new JMenuItem("Tus datos");
+		    mntmDatos.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		verTusDatos();
+		    	}
+		    });
+		    
+		    mnVer.add(mntmDatos);
+		    mnVer.add(mntmEstadoPedidos);
+	    	    
+	    JMenu mnOpciones = new JMenu("Opciones");
+	    menuBar.add(mnOpciones);
+	    
+    	    JMenuItem mntmCerrar = new JMenuItem("Cerrar Sesión");
+    	    mntmCerrar.addActionListener(new ActionListener() {
+    	    	public void actionPerformed(ActionEvent e) {
+    	    		frmEmployee.dispose();
+    	    		Login.main(null);
+    	    	}
+    	    });
+    	    
+    	    mnOpciones.add(mntmCerrar);
+	}
+
+//----------------------------------------------------------------------------------------METODOS------------------------------------------------------------------------------------------------------------------------------------
+
+//                                           INVENTARIO	
+	
+private void hacerPedido() {
+    JTextField paisField = new JTextField();
+    JTextField ciudadField = new JTextField();
+    JTextField calleField = new JTextField();
+    JTextField postalField = new JTextField();
+    JTextField idUserField = new JTextField();
+
+    JComboBox<String> comboBoxTienda = new JComboBox<>();
+    Map<String, String> mapCalleIdTienda = new HashMap<>();
+
+    try (Connection connTienda = DBConnection.getConnection()) {
+        String sqlTienda = "SELECT id_tienda, calle FROM tiendas";
+        PreparedStatement stmtTienda = connTienda.prepareStatement(sqlTienda);
+        ResultSet rsTienda = stmtTienda.executeQuery();
+
+        while(rsTienda.next()) {
+            String idTienda = rsTienda.getString("id_tienda");
+            String calle = rsTienda.getString("calle");
+            comboBoxTienda.addItem(calle);
+            mapCalleIdTienda.put(calle, idTienda);
+        }
+
+    } catch(SQLException exTienda) {
+        exTienda.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al cargar las tiendas", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JPanel panelPedido = new JPanel(new GridLayout(0, 1));
+    panelPedido.add(new JLabel("País:"));
+    panelPedido.add(paisField);
+    panelPedido.add(new JLabel("Ciudad:"));
+    panelPedido.add(ciudadField);
+    panelPedido.add(new JLabel("Calle:"));
+    panelPedido.add(calleField);
+    panelPedido.add(new JLabel("Código Postal:"));
+    panelPedido.add(postalField);
+    panelPedido.add(new JLabel("ID Cliente:"));
+    panelPedido.add(idUserField);
+    panelPedido.add(new JLabel("Tienda:"));
+    panelPedido.add(comboBoxTienda);
+
+    int resultPanelPedido = JOptionPane.showConfirmDialog(null, panelPedido, "Añadir Pedido", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if(resultPanelPedido != JOptionPane.OK_OPTION) return;
+
+    String pais = paisField.getText().trim();
+    String ciudad = ciudadField.getText().trim();
+    String calle = calleField.getText().trim();
+    String postal = postalField.getText().trim();
+    String idUser = idUserField.getText().trim();
+
+    String calleTiendaSeleccionada = (String) comboBoxTienda.getSelectedItem();
+    String idTiendaSeleccionada = mapCalleIdTienda.get(calleTiendaSeleccionada);
+
+    if(pais.isEmpty() || ciudad.isEmpty() || calle.isEmpty() || postal.isEmpty() || idUser.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    int idCliente;
+    int idTienda;
+    try {
+        idCliente = Integer.parseInt(idUser);
+        idTienda = Integer.parseInt(idTiendaSeleccionada);
+    } catch(NumberFormatException exTiendaSeleccionada) {
+        JOptionPane.showMessageDialog(null, "El ID de cliente o tienda no es válido", "Error de formato", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    int idPedidoGenerado = -1;
+    Timestamp timestampNow = Timestamp.valueOf(LocalDateTime.now());
+
+    try (Connection connPedido = DBConnection.getConnection()) {
+        String sqlPedido = "INSERT INTO pedidos (fecha_pedido, pais, ciudad, calle, postal, fk_id_user, fk_tienda) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement stmtPedido = connPedido.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS);
+        stmtPedido.setTimestamp(1, timestampNow);
+        stmtPedido.setString(2, pais);
+        stmtPedido.setString(3, ciudad);
+        stmtPedido.setString(4, calle);
+        stmtPedido.setString(5, postal);
+        stmtPedido.setInt(6, idCliente);
+        stmtPedido.setInt(7, idTienda);
+
+        int rowsInserted = stmtPedido.executeUpdate();
+        if(rowsInserted == 0) {
+            JOptionPane.showMessageDialog(null, "Error al insertar el pedido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        ResultSet generatedKeys = stmtPedido.getGeneratedKeys();
+        if(generatedKeys.next()) {
+            idPedidoGenerado = generatedKeys.getInt(1);
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo obtener el ID del pedido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    } catch (SQLException exPedido) {
+        exPedido.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al insertar el pedido.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    Map<String, Integer> mapNombreIdProducto = new HashMap<>();
+    JComboBox<String> comboBoxProducto = new JComboBox<>();
+    try (Connection connProducto = DBConnection.getConnection()) {
+        String sqlProducto = """
+            SELECT p.id_producto, p.modelo, p.marca, c.categoria, t.talla, co.color
+            FROM productos p
+            JOIN categorias c ON p.fk_categoria = c.id_categoria
+            JOIN tallas t ON p.fk_talla = t.id_talla
+            JOIN colores co ON p.fk_color = co.id_color
+            WHERE p.stock > 0
+        """;
+        PreparedStatement stmtProducto = connProducto.prepareStatement(sqlProducto);
+        ResultSet rsProducto = stmtProducto.executeQuery();
+
+        while(rsProducto.next()) {
+            int idProducto = rsProducto.getInt("id_producto");
+            String modelo = rsProducto.getString("modelo");
+            String marca = rsProducto.getString("marca");
+            String categoria = rsProducto.getString("categoria");
+            String talla = rsProducto.getString("talla");
+            String color = rsProducto.getString("color");
+
+            String productoSeleccion = String.format("(%s) %s %s | Talla: %s | Color: %s", categoria, marca, modelo, talla, color);
+            comboBoxProducto.addItem(productoSeleccion);
+            mapNombreIdProducto.put(productoSeleccion, idProducto);
+        }
+    } catch(SQLException exProducto) {
+        exProducto.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al cargar productos", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    while(true) {
+        JTextField cantidadField = new JTextField();
+        JPanel panelProducto = new JPanel(new GridLayout(0, 1));
+        panelProducto.add(new JLabel("Producto:"));
+        panelProducto.add(comboBoxProducto);
+        panelProducto.add(new JLabel("Cantidad:"));
+        panelProducto.add(cantidadField);
+
+        int resultPanelProducto = JOptionPane.showConfirmDialog(null, panelProducto, "Añadir producto al pedido",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if(resultPanelProducto != JOptionPane.OK_OPTION) break;
+
+        String productoSeleccionado = (String) comboBoxProducto.getSelectedItem();
+        int idProducto = mapNombreIdProducto.get(productoSeleccionado);
+        int cantidad;
+
+        try {
+            cantidad = Integer.parseInt(cantidadField.getText().trim());
+            if(cantidad <= 0) throw new NumberFormatException();
+        } catch(NumberFormatException exCantidad) {
+            JOptionPane.showMessageDialog(null, "Cantidad no válida", "Error", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        try (Connection connProductoPedido = DBConnection.getConnection()) {
+            String sqlProductoPedido = "INSERT INTO productos_pedidos (fk_producto, fk_pedido, cantidad) VALUES (?, ?, ?)";
+            PreparedStatement stmtProductoPedido = connProductoPedido.prepareStatement(sqlProductoPedido);
+            stmtProductoPedido.setInt(1, idProducto);
+            stmtProductoPedido.setInt(2, idPedidoGenerado);
+            stmtProductoPedido.setInt(3, cantidad);
+
+            stmtProductoPedido.executeUpdate();
+        } catch(SQLException exProductoPedido) {
+            exProductoPedido.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al añadir producto al pedido", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        int continuar = JOptionPane.showConfirmDialog(null, "¿Quieres añadir otro producto?", "Continuar", JOptionPane.YES_NO_OPTION);
+
+        if(continuar != JOptionPane.YES_OPTION) break; 
+    }
+
+    JOptionPane.showMessageDialog(null, "Pedido creado exitosamente.");
+}
+
+private void addProducto() {
+    while(true) {
+        JTextField marcaField = new JTextField();
+        JTextField modeloField = new JTextField();
+        JTextField precioField = new JTextField();
+        JTextField stockField = new JTextField();
+        JComboBox<String> comboBoxCategoria = new JComboBox<>();
+        JComboBox<String> comboBoxTalla = new JComboBox<>();
+        JComboBox<String> comboBoxColor = new JComboBox<>();
+
+        Map<String, String> mapIdCategoria = new HashMap<>();
+        Map<String, String> mapIdTalla = new HashMap<>();
+        Map<String, String> mapIdColor = new HashMap<>();
+
+        try (Connection conn = DBConnection.getConnection()) {
+            String sqlCategoria = "SELECT id_categoria, categoria FROM categorias";
+            PreparedStatement stmtCategoria = conn.prepareStatement(sqlCategoria);
+            ResultSet rsCategoria = stmtCategoria.executeQuery();
+            while(rsCategoria.next()) {
+                String idCategoria = rsCategoria.getString("id_categoria");
+                String categoria = rsCategoria.getString("categoria");
+                comboBoxCategoria.addItem(categoria);
+                mapIdCategoria.put(categoria, idCategoria);
+            }
+
+            String sqlTalla = "SELECT id_talla, talla FROM tallas";
+            PreparedStatement stmtTalla = conn.prepareStatement(sqlTalla);
+            ResultSet rsTalla = stmtTalla.executeQuery();
+            while(rsTalla.next()) {
+                String idTalla = rsTalla.getString("id_talla");
+                String talla = rsTalla.getString("talla");
+                comboBoxTalla.addItem(talla);
+                mapIdTalla.put(talla, idTalla);
+            }
+
+            String sqlColore = "SELECT id_color, color FROM colores";
+            PreparedStatement stmtColore = conn.prepareStatement(sqlColore);
+            ResultSet rsColore = stmtColore.executeQuery();
+            while(rsColore.next()) {
+                String idColor = rsColore.getString("id_color");
+                String color = rsColore.getString("color");
+                comboBoxColor.addItem(color);
+                mapIdColor.put(color, idColor);
+            }
+        } catch(SQLException exCategoriaTallaColor) {
+        	exCategoriaTallaColor.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al cargar los datos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        JPanel panelProducto = new JPanel(new GridLayout(0, 1));
+        panelProducto.add(new JLabel("Categoría:"));
+        panelProducto.add(comboBoxCategoria);
+        panelProducto.add(new JLabel("Marca:"));
+        panelProducto.add(marcaField);
+        panelProducto.add(new JLabel("Modelo:"));
+        panelProducto.add(modeloField);
+        panelProducto.add(new JLabel("Precio:"));
+        panelProducto.add(precioField);
+        panelProducto.add(new JLabel("Stock:"));
+        panelProducto.add(stockField);
+        panelProducto.add(new JLabel("Talla:"));
+        panelProducto.add(comboBoxTalla);
+        panelProducto.add(new JLabel("Color:"));
+        panelProducto.add(comboBoxColor);
+
+        int result = JOptionPane.showConfirmDialog(null, panelProducto, "Añadir Producto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(result != JOptionPane.OK_OPTION) {
+            break;
+        }
+
+        String categoria = (String) comboBoxCategoria.getSelectedItem();
+        String marca = marcaField.getText().trim();
+        String modelo = modeloField.getText().trim();
+        String precioTexto = precioField.getText().replace(',', '.');
+        String stockTexto = stockField.getText().trim();
+
+        if(marca.isEmpty() || modelo.isEmpty() || precioTexto.isEmpty() || stockTexto.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos.", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        try {
+            double precio = Double.parseDouble(precioTexto);
+            int stock = Integer.parseInt(stockTexto);
+            String idCategoria = mapIdCategoria.get(categoria);
+            String idTalla = mapIdTalla.get((String) comboBoxTalla.getSelectedItem());
+            String idColor = mapIdColor.get((String) comboBoxColor.getSelectedItem());
+
+            try (Connection connInsertProducto = DBConnection.getConnection()) {
+                String sqlInsertProducto = "INSERT INTO productos (marca, modelo, precio, stock, fk_categoria, fk_talla, fk_color) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmtInsertProducto = connInsertProducto.prepareStatement(sqlInsertProducto);
+                stmtInsertProducto.setString(1, marca);
+                stmtInsertProducto.setString(2, modelo);
+                stmtInsertProducto.setDouble(3, precio);
+                stmtInsertProducto.setInt(4, stock);
+                stmtInsertProducto.setString(5, idCategoria);
+                stmtInsertProducto.setString(6, idTalla);
+                stmtInsertProducto.setString(7, idColor);
+
+                int rowsInserted = stmtInsertProducto.executeUpdate();
+                if(rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(null, "Producto añadido exitosamente.");
+                    break;
+                }
+            } catch(SQLException exInsertProducto) {
+                exInsertProducto.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al insertar el producto en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch(NumberFormatException exPrecioStock) {
+            JOptionPane.showMessageDialog(null, "El precio o el stock no son válidos. Usa números correctos.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+}
+
+private void actualizarStock() {
+    JComboBox<String> comboBoxCategoria = new JComboBox<>();
+    JComboBox<String> comboBoxMarca = new JComboBox<>();
+    JComboBox<String> comboBoxModelo = new JComboBox<>();
+    JComboBox<String> comboBoxTalla = new JComboBox<>();
+    JComboBox<String> comboBoxColor = new JComboBox<>();
+    JTextField nuevoStockField = new JTextField();
+
+    Map<String, String> mapIdCategoria = new HashMap<>();
+    Map<String, String> mapIdTalla = new HashMap<>();
+    Map<String, String> mapIdColor = new HashMap<>();
+
+    try (Connection connMarcaModeloCategoriaTallaColor = DBConnection.getConnection()) {
+        String sqlMarca = "SELECT DISTINCT marca FROM productos";
+        PreparedStatement stmtMarca = connMarcaModeloCategoriaTallaColor.prepareStatement(sqlMarca);
+        ResultSet rsMarca = stmtMarca.executeQuery();
+        while(rsMarca.next()) {
+        	comboBoxMarca.addItem(rsMarca.getString("marca"));
+        }
+
+        String sqlModelo = "SELECT DISTINCT modelo FROM productos";
+        PreparedStatement stmtModelo = connMarcaModeloCategoriaTallaColor.prepareStatement(sqlModelo);
+        ResultSet rsModelo = stmtModelo.executeQuery();
+        while(rsModelo.next()) {
+        	comboBoxModelo.addItem(rsModelo.getString("modelo"));
+        }
+
+        String sqlCategoria = "SELECT id_categoria, categoria FROM categorias";
+        PreparedStatement stmtCategoria = connMarcaModeloCategoriaTallaColor.prepareStatement(sqlCategoria);
+        ResultSet rsCategoria = stmtCategoria.executeQuery();
+        while(rsCategoria.next()) {
+            String id = rsCategoria.getString("id_categoria");
+            String nombre = rsCategoria.getString("categoria");
+            comboBoxCategoria.addItem(nombre);
+            mapIdCategoria.put(nombre, id);
+        }
+
+        String sqlTalla = "SELECT id_talla, talla FROM tallas";
+        PreparedStatement stmtTalla = connMarcaModeloCategoriaTallaColor.prepareStatement(sqlTalla);
+        ResultSet rsTalla = stmtTalla.executeQuery();
+        while(rsTalla.next()) {
+            String id = rsTalla.getString("id_talla");
+            String talla = rsTalla.getString("talla");
+            comboBoxTalla.addItem(talla);
+            mapIdTalla.put(talla, id);
+        }
+
+        String sqlColor = "SELECT id_color, color FROM colores";
+        PreparedStatement stmtColor = connMarcaModeloCategoriaTallaColor.prepareStatement(sqlColor);
+        ResultSet rsColor = stmtColor.executeQuery();
+        while(rsColor.next()) {
+            String id = rsColor.getString("id_color");
+            String color = rsColor.getString("color");
+            comboBoxColor.addItem(color);
+            mapIdColor.put(color, id);
+        }
+
+    } catch(SQLException exMarcaModeloCategoriaTallaColor) {
+        exMarcaModeloCategoriaTallaColor.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al cargar los datos del producto.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JPanel panelProducto = new JPanel(new GridLayout(0, 1));
+    panelProducto.add(new JLabel("Categoría:"));
+    panelProducto.add(comboBoxCategoria);
+    panelProducto.add(new JLabel("Marca:"));
+    panelProducto.add(comboBoxMarca);
+    panelProducto.add(new JLabel("Modelo:"));
+    panelProducto.add(comboBoxModelo);
+    panelProducto.add(new JLabel("Talla:"));
+    panelProducto.add(comboBoxTalla);
+    panelProducto.add(new JLabel("Color:"));
+    panelProducto.add(comboBoxColor);
+    panelProducto.add(new JLabel("Nuevo stock:"));
+    panelProducto.add(nuevoStockField);
+
+    int result = JOptionPane.showConfirmDialog(null, panelProducto, "Actualizar Stock", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    if(result != JOptionPane.OK_OPTION) {
+        return;
+    }
+
+    String categoria = (String) comboBoxCategoria.getSelectedItem();
+    String marca = (String) comboBoxMarca.getSelectedItem();
+    String modelo = (String) comboBoxModelo.getSelectedItem();
+    String talla = (String) comboBoxTalla.getSelectedItem();
+    String color = (String) comboBoxColor.getSelectedItem();
+    String nuevoStockTexto = nuevoStockField.getText().trim();
+
+    if(categoria == null || marca == null || modelo == null || talla == null || color == null || nuevoStockTexto.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos.", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    try {
+        int nuevoStock = Integer.parseInt(nuevoStockTexto);
+        String idCategoria = mapIdCategoria.get(categoria);
+        String idTalla = mapIdTalla.get(talla);
+        String idColor = mapIdColor.get(color);
+
+        try (Connection connUpdateProducto = DBConnection.getConnection()) {
+            String sqlUpdateProducto = "UPDATE productos SET stock = ? WHERE marca = ? AND modelo = ? AND fk_categoria = ? AND fk_talla = ? AND fk_color = ?";
+            PreparedStatement stmtUpdateProducto = connUpdateProducto.prepareStatement(sqlUpdateProducto);
+            stmtUpdateProducto.setInt(1, nuevoStock);
+            stmtUpdateProducto.setString(2, marca);
+            stmtUpdateProducto.setString(3, modelo);
+            stmtUpdateProducto.setString(4, idCategoria);
+            stmtUpdateProducto.setString(5, idTalla);
+            stmtUpdateProducto.setString(6, idColor);
+
+            int rowsUpdated = stmtUpdateProducto.executeUpdate();
+            if(rowsUpdated > 0) {
+                JOptionPane.showMessageDialog(null, "Stock actualizado exitosamente.");
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró el producto especificado.", "No encontrado", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+	    } catch (NumberFormatException exNuevoStock) {
+	        JOptionPane.showMessageDialog(null, "El stock debe ser un número entero válido.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException exProducto) {
+        exProducto.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al actualizar el stock.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+	
+//                                             AÑADIR
+
+private void addCliente() { 
+	while(true) {
+	    JTextField nombreField = new JTextField();
+	    JTextField ap1Field = new JTextField();
+	    JTextField ap2Field = new JTextField();
+	    JTextField mailField = new JTextField();
+	    JPasswordField  passwField = new JPasswordField ();
+
+	    JPanel panelCliente = new JPanel(new GridLayout(0, 1));
+	    panelCliente.add(new JLabel("Nombre:"));
+	    panelCliente.add(nombreField);
+	    panelCliente.add(new JLabel("Apellido 1:"));
+	    panelCliente.add(ap1Field);
+	    panelCliente.add(new JLabel("Apellido 2:"));
+	    panelCliente.add(ap2Field);
+	    panelCliente.add(new JLabel("Email:"));
+	    panelCliente.add(mailField);
+	    panelCliente.add(new JLabel("Contraseña:"));
+	    panelCliente.add(passwField);
+
+	    int resultPanelCliente = JOptionPane.showConfirmDialog(null, panelCliente, "Añadir Cliente", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+	    if(resultPanelCliente != JOptionPane.OK_OPTION) break;
+
+	    String nombre = nombreField.getText().trim();
+	    String ap1 = ap1Field.getText().trim();
+	    String ap2 = ap2Field.getText().trim();
+	    String mail = mailField.getText().trim();
+	    String passw = passwField.getText().trim();
+
+	    if(nombre.isEmpty() || ap1.isEmpty()|| mail.isEmpty() || passw.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+	        continue;
+	    }
+
+	    if(!mail.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+	        JOptionPane.showMessageDialog(null, "Introduce un correo electrónico válido", "Email inválido", JOptionPane.ERROR_MESSAGE);
+	        continue;
+	    }
+
+	    if(passw.length() < 8) {
+	        JOptionPane.showMessageDialog(null, "La contraseña debe tener una extensión mínima de 8 caracteres", "Error Contraseña", JOptionPane.ERROR_MESSAGE);
+	        continue;
+	    }
+
+	    try (Connection connInsertCliente = DBConnection.getConnection()) {
+	        String sqlInsertCliente = "INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)";
+	        PreparedStatement stmtInsertCliente = connInsertCliente.prepareStatement(sqlInsertCliente);
+	        stmtInsertCliente.setString(1, nombre);
+	        stmtInsertCliente.setString(2, ap1);
+	        stmtInsertCliente.setString(3, ap2);
+	        stmtInsertCliente.setString(4, mail);
+	        stmtInsertCliente.setString(5, passw);
+
+	        int rowsInserted = stmtInsertCliente.executeUpdate();
+	        if(rowsInserted > 0) {
+	            JOptionPane.showMessageDialog(null, "Cliente añadido exitosamente.");
+	        }
+	    } catch(SQLException exInsertCliente) {
+	        exInsertCliente.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Error al insertar el cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+
+	    break;
+	}
+}
+
+private void addCategoria() {
+	while(true) {
+		JTextField categoriaField = new JTextField();
+	
+	    JPanel panelCategoria = new JPanel(new GridLayout(0, 1));
+	    panelCategoria.add(new JLabel("Categoria:"));
+	    panelCategoria.add(categoriaField);
+	
+	    int resultPanelCategoria = JOptionPane.showConfirmDialog(null, panelCategoria, "Añadir Categoría",
+	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    
+	    if(resultPanelCategoria != JOptionPane.OK_OPTION) break;
+	
+	    if(resultPanelCategoria == JOptionPane.OK_OPTION) {
+	        String categoria = categoriaField.getText();
+	        
+	        if(categoria.isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+	            continue;
+	        }
+	        
+	        try (Connection connCategoria = DBConnection.getConnection()) {
+	            String sqlCategoria = "INSERT INTO categorias (categoria) VALUES (?)";
+	            PreparedStatement stmtCategoria = connCategoria.prepareStatement(sqlCategoria);
+	            stmtCategoria.setString(1, categoria);
+	
+	            int rowsInserted = stmtCategoria.executeUpdate();
+	            
+	            if(rowsInserted > 0) JOptionPane.showMessageDialog(null, "Categoría añadido exitosamente.");
+	            
+	        } catch(SQLException exCategoria) {
+	            exCategoria.printStackTrace();
+	            JOptionPane.showMessageDialog(null, "Error al insertar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	        
+	        break;
+	    }
+	}
+}
+
+private void addEmpleado() { 
+    while(true) {
+        JTextField nombreField = new JTextField();
+        JTextField ap1Field = new JTextField();
+        JTextField ap2Field = new JTextField();
+        JTextField mailField = new JTextField();
+        JPasswordField  passwField = new JPasswordField ();
+        JComboBox<String> comboBoxTienda = new JComboBox<>();
+        Map<String, String> mapIdCalle = new HashMap<>();
+
+        try (Connection connTienda = DBConnection.getConnection()) {
+            String sqlTienda = "SELECT id_tienda, calle FROM tiendas";
+            PreparedStatement stmtTienda = connTienda.prepareStatement(sqlTienda);
+            ResultSet rsTienda = stmtTienda.executeQuery();
+
+            while(rsTienda.next()) {
+                String idTienda = rsTienda.getString("id_tienda");
+                String calle = rsTienda.getString("calle");
+                comboBoxTienda.addItem(calle);
+                mapIdCalle.put(calle, idTienda);
+            }
+        } catch(SQLException exTienda) {
+        	exTienda.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al cargar las tiendas", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JPanel panelEmpleado = new JPanel(new GridLayout(0, 1));
+        panelEmpleado.add(new JLabel("Nombre:"));
+        panelEmpleado.add(nombreField);
+        panelEmpleado.add(new JLabel("Apellido 1:"));
+        panelEmpleado.add(ap1Field);
+        panelEmpleado.add(new JLabel("Apellido 2:"));
+        panelEmpleado.add(ap2Field);
+        panelEmpleado.add(new JLabel("Email:"));
+        panelEmpleado.add(mailField);
+        panelEmpleado.add(new JLabel("Contraseña:"));
+        panelEmpleado.add(passwField);
+        panelEmpleado.add(new JLabel("Tienda:"));
+        panelEmpleado.add(comboBoxTienda);
+
+        int resultPanelEmpleado = JOptionPane.showConfirmDialog(null, panelEmpleado, "Añadir Empleado", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(resultPanelEmpleado != JOptionPane.OK_OPTION) break;
+
+        String nombre = nombreField.getText().trim();
+        String ap1 = ap1Field.getText().trim();
+        String ap2 = ap2Field.getText().trim();
+        String mail = mailField.getText().trim();
+        String passw = passwField.getText().trim();
+        String calleSeleccionada = (String) comboBoxTienda.getSelectedItem();
+        String idTienda = mapIdCalle.get(calleSeleccionada);
+
+        if(nombre.isEmpty() || ap1.isEmpty() || mail.isEmpty() || passw.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        if(!mail.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            JOptionPane.showMessageDialog(null, "Introduce un correo electrónico válido", "Email inválido", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        if(passw.length() < 8) {
+            JOptionPane.showMessageDialog(null, "La contraseña debe tener una extensión mínima de 8 caracteres", "Error Contraseña", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        try (Connection connInsertEmpleado = DBConnection.getConnection()) {
+            String sqlInsertEmpleado = "INSERT INTO empleados (nombre, apellido1, apellido2, mail, passw, fk_tienda) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement stmtInsertEmpleado = connInsertEmpleado.prepareStatement(sqlInsertEmpleado);
+            stmtInsertEmpleado.setString(1, nombre);
+            stmtInsertEmpleado.setString(2, ap1);
+            stmtInsertEmpleado.setString(3, ap2);
+            stmtInsertEmpleado.setString(4, mail);
+            stmtInsertEmpleado.setString(5, passw);
+            stmtInsertEmpleado.setString(6, idTienda);
+
+            int rowsInserted = stmtInsertEmpleado.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(null, "Empleado añadido exitosamente.");
+            }
+        } catch(SQLException exInsertEmpleado) {
+            exInsertEmpleado.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al insertar el empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        break;
+    }
+}
+
+private void addTalla() { 
+	while(true) {
+		JTextField tallaField = new JTextField();
+	
+	    JPanel panelTalla = new JPanel(new GridLayout(0, 1));
+	    panelTalla.add(new JLabel("Talla:"));
+	    panelTalla.add(tallaField);
+	
+	    int resultPanelTalla = JOptionPane.showConfirmDialog(null, panelTalla, "Añadir Talla",
+	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    
+	    if(resultPanelTalla != JOptionPane.OK_OPTION) {
+            break;
+        }
+	    
+	    if(resultPanelTalla == JOptionPane.OK_OPTION) {
+	        String talla = tallaField.getText();
+	        
+	        if(talla.isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+	            continue;
+	        }
+	        
+	        try (Connection connInsertTalla = DBConnection.getConnection()) {
+	            String sqlInsertTalla = "INSERT INTO tallas (talla) VALUES (?)";
+	            PreparedStatement stmtInsertTalla = connInsertTalla.prepareStatement(sqlInsertTalla);
+	            stmtInsertTalla.setString(1, talla);
+	
+	            int rowsInserted = stmtInsertTalla.executeUpdate();
+	            if(rowsInserted > 0) {
+	                JOptionPane.showMessageDialog(null, "Talla añadida exitosamente.");
+	            }
+	        } catch(SQLException exInsertTalla) {
+	            exInsertTalla.printStackTrace();
+	            JOptionPane.showMessageDialog(null, "Error al insertar la talla.", "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	        
+	        break;
+	    }
+	}
+}
+
+private void addColor() { 
+	while(true) {
+		JTextField colorField = new JTextField();
+	
+	    JPanel panelColor = new JPanel(new GridLayout(0, 1));
+	    panelColor.add(new JLabel("Color:"));
+	    panelColor.add(colorField);
+	
+	    int resultPanelColor = JOptionPane.showConfirmDialog(null, panelColor, "Añadir Color",
+	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	    
+	    if(resultPanelColor != JOptionPane.OK_OPTION) break;
+	
+	    if(resultPanelColor == JOptionPane.OK_OPTION) {
+	        String color = colorField.getText();
+	        
+	        if(color.isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+	            continue;
+	        }
+	        
+	        try (Connection connInsertColor = DBConnection.getConnection()) {
+	            String sqlInsertColor = "INSERT INTO colores (color) VALUES (?)";
+	            PreparedStatement stmtInsertColor = connInsertColor.prepareStatement(sqlInsertColor);
+	            stmtInsertColor.setString(1, color);
+	
+	            int rowsInserted = stmtInsertColor.executeUpdate();
+	            if(rowsInserted > 0) {
+	                JOptionPane.showMessageDialog(null, "Color añadido exitosamente.");
+	            }
+	        } catch(SQLException exInsertColor) {
+	            exInsertColor.printStackTrace();
+	            JOptionPane.showMessageDialog(null, "Error al insertar el color.", "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	        
+	        break;
+	    }
+	}
+}
+
+private void addTienda() {
+    while(true) {
+        JComboBox<String> comboBoxPais = new JComboBox<>(new String[]{"España", "Portugal"});
+        JComboBox<String> comboBoxCiudad = new JComboBox<>(new String[]{"Madrid", "Barcelona", "Valencia"});
+        JTextField calleField = new JTextField();
+        JTextField postalField = new JTextField();
+
+        comboBoxPais.addActionListener(e -> {
+            String paisSeleccionado = (String) comboBoxPais.getSelectedItem();
+            if(paisSeleccionado.equals("España")) {
+                comboBoxCiudad.setModel(new DefaultComboBoxModel<>(new String[]{"Madrid", "Barcelona", "Valencia"}));
+            } else if(paisSeleccionado.equals("Portugal")) {
+                comboBoxCiudad.setModel(new DefaultComboBoxModel<>(new String[]{"Oporto", "Lisboa"}));
+            }
+        });
+
+        JPanel panelTienda = new JPanel(new GridLayout(0, 1));
+        panelTienda.add(new JLabel("País:"));
+        panelTienda.add(comboBoxPais);
+        panelTienda.add(new JLabel("Ciudad:"));
+        panelTienda.add(comboBoxCiudad);
+        panelTienda.add(new JLabel("Calle:"));
+        panelTienda.add(calleField);
+        panelTienda.add(new JLabel("Código Postal:"));
+        panelTienda.add(postalField);
+
+        int resultPanelTienda = JOptionPane.showConfirmDialog(null, panelTienda, "Añadir Tienda", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if(resultPanelTienda != JOptionPane.OK_OPTION) break; 
+
+        String pais = (String) comboBoxPais.getSelectedItem();
+        String ciudad = (String) comboBoxCiudad.getSelectedItem();
+        String calle = calleField.getText().trim();
+        String codigo = postalField.getText().trim();
+
+        if(calle.isEmpty() || codigo.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        if(!codigo.matches("\\d+")) {
+            JOptionPane.showMessageDialog(null, "El código postal debe contener solo números", "Código postal inválido", JOptionPane.ERROR_MESSAGE);
+            continue;
+        }
+
+        try (Connection connInsertTienda = DBConnection.getConnection()) {
+            String sqlInsertTienda = "INSERT INTO tiendas (pais, ciudad, calle, postal) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmtInsertTienda = connInsertTienda.prepareStatement(sqlInsertTienda);
+            stmtInsertTienda.setString(1, pais);
+            stmtInsertTienda.setString(2, ciudad);
+            stmtInsertTienda.setString(3, calle);
+            stmtInsertTienda.setString(4, codigo);
+
+            int rowsInserted = stmtInsertTienda.executeUpdate();
+            if(rowsInserted > 0) {
+                JOptionPane.showMessageDialog(null, "Tienda añadida exitosamente.");
+            }
+        } catch(SQLException exInsertTienda) {
+            exInsertTienda.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al insertar la tienda.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        break;
+    }
+}
+
+//                                          MODIFICAR
+
+private void editEmpleado() {
+    JTextField emailField = new JTextField();
+
+    JPanel panelEmailEmpleado = new JPanel(new GridLayout(0, 1));
+    panelEmailEmpleado.add(new JLabel("Introduce el correo del empleado a editar:"));
+    panelEmailEmpleado.add(emailField);
+
+    int option = JOptionPane.showConfirmDialog(null, panelEmailEmpleado, "Buscar empleado", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE); 
+
+    if(option != JOptionPane.OK_OPTION) return; 
+
+    String email = emailField.getText().trim();
+    if(email.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "El correo no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JTextField nombreField = new JTextField();
+    JTextField ap1Field = new JTextField();
+    JTextField ap2Field = new JTextField();
+    JTextField mailField = new JTextField();
+    JPasswordField passwField = new JPasswordField();
+
+    try (Connection connEmpleado = DBConnection.getConnection()) {
+        String sqlEmpleado = "SELECT id_empleado, nombre, apellido1, apellido2, mail, passw FROM empleados WHERE mail = ?";
+        PreparedStatement stmtEmpleado = connEmpleado.prepareStatement(sqlEmpleado);
+        stmtEmpleado.setString(1, email);
+        ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+        if(!rsEmpleado.next()) {
+            JOptionPane.showMessageDialog(null, "No se encontró ningún empleado con ese email.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int empleadoId = rsEmpleado.getInt("id_empleado");
+        nombreField.setText(rsEmpleado.getString("nombre"));
+        ap1Field.setText(rsEmpleado.getString("apellido1"));
+        ap2Field.setText(rsEmpleado.getString("apellido2"));
+        mailField.setText(rsEmpleado.getString("mail"));
+        passwField.setText(rsEmpleado.getString("passw"));
+
+        JPanel panelEditEmpleado = new JPanel(new GridLayout(0, 1));
+        panelEditEmpleado.add(new JLabel("Nombre:")); 
+        panelEditEmpleado.add(nombreField);
+        panelEditEmpleado.add(new JLabel("Apellido 1:")); 
+        panelEditEmpleado.add(ap1Field);
+        panelEditEmpleado.add(new JLabel("Apellido 2:")); 
+        panelEditEmpleado.add(ap2Field);
+        panelEditEmpleado.add(new JLabel("Email:")); 
+        panelEditEmpleado.add(mailField);
+        panelEditEmpleado.add(new JLabel("Contraseña:")); 
+        panelEditEmpleado.add(passwField);
+
+        int resultPanelEditEmpleado = JOptionPane.showConfirmDialog(null, panelEditEmpleado, "Editar Empleado", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if(resultPanelEditEmpleado != JOptionPane.OK_OPTION) return;
+
+        if(nombreField.getText().isEmpty() || ap1Field.getText().isEmpty() ||
+            mailField.getText().isEmpty() || new String(passwField.getPassword()).isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String sqlUpdateEmpleado = "UPDATE empleados SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ?, passw = ? WHERE id_empleado = ?";
+        PreparedStatement stmtUpdateEmpleado = connEmpleado.prepareStatement(sqlUpdateEmpleado);
+        stmtUpdateEmpleado.setString(1, nombreField.getText().trim());
+        stmtUpdateEmpleado.setString(2, ap1Field.getText().trim());
+        stmtUpdateEmpleado.setString(3, ap2Field.getText().trim());
+        stmtUpdateEmpleado.setString(4, mailField.getText().trim());
+        stmtUpdateEmpleado.setString(5, new String(passwField.getPassword()).trim());
+        stmtUpdateEmpleado.setInt(6, empleadoId);
+
+        int rowsUpdated = stmtUpdateEmpleado.executeUpdate();
+        if(rowsUpdated > 0) {
+            JOptionPane.showMessageDialog(null, "Empleado actualizado correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo actualizar el empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch(SQLException exEmpleado) {
+    	exEmpleado.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al consultar la información del empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+private void editTuInfo() { 
+	try (Connection connEmpleado = DBConnection.getConnection()) {
+        String sqlEmpleado = "SELECT nombre, apellido1, apellido2, mail FROM empleados WHERE mail = ?";
+        PreparedStatement stmtEmpleado = connEmpleado.prepareStatement(sqlEmpleado);
+        stmtEmpleado.setString(1, mail);
+
+        ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+        if(rsEmpleado.next()) {
+            String nombre = rsEmpleado.getString("nombre");
+            String ap1 = rsEmpleado.getString("apellido1");
+            String ap2 = rsEmpleado.getString("apellido2");
+            String mailActual = rsEmpleado.getString("mail");
+
+            JTextField nombreField = new JTextField(nombre);
+            JTextField ap1Field = new JTextField(ap1);
+            JTextField ap2Field = new JTextField(ap2);
+            JTextField mailField = new JTextField(mailActual);
+
+            JPanel panelEditTuInfo = new JPanel(new GridLayout(0, 1));
+            panelEditTuInfo.add(new JLabel("Nombre:"));
+            panelEditTuInfo.add(nombreField);
+            panelEditTuInfo.add(new JLabel("Apellido 1:"));
+            panelEditTuInfo.add(ap1Field);
+            panelEditTuInfo.add(new JLabel("Apellido 2:"));
+            panelEditTuInfo.add(ap2Field);
+            panelEditTuInfo.add(new JLabel("Email:"));
+            panelEditTuInfo.add(mailField);
+
+            int resultPanelEditTuInfo = JOptionPane.showConfirmDialog(null, panelEditTuInfo, "Editar tu Información", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if(resultPanelEditTuInfo == JOptionPane.OK_OPTION) {
+                String newNombre = nombreField.getText().trim();
+                String newAp1 = ap1Field.getText().trim();
+                String newAp2 = ap2Field.getText().trim();
+                String newMail = mailField.getText().trim();
+
+                String sqlUpdateEmpleado = "UPDATE empleados SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ? WHERE mail = ?";
+                PreparedStatement stmtUpdateEmpleado = connEmpleado.prepareStatement(sqlUpdateEmpleado);
+                stmtUpdateEmpleado.setString(1, newNombre);
+                stmtUpdateEmpleado.setString(2, newAp1);
+                stmtUpdateEmpleado.setString(3, newAp2);
+                stmtUpdateEmpleado.setString(4, newMail);
+                stmtUpdateEmpleado.setString(5, mail); 
+
+                int rowsUpdated = stmtUpdateEmpleado.executeUpdate();
+
+                if(rowsUpdated > 0) {
+                    JOptionPane.showMessageDialog(null, "Información actualizada correctamente.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No se pudo actualizar la información.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No se encontró ningún empleado con ese email.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch(SQLException exEmpleado) {
+    	exEmpleado.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al consultar la información del empleado.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+private void editCliente() { 
+    JPanel panelEmailCliente = new JPanel(new GridLayout(0, 1));
+    panelEmailCliente.add(new JLabel("Email del Cliente:"));
+    JTextField emailField = new JTextField();
+    panelEmailCliente.add(emailField);
+
+    int resultPanelEmailCliente = JOptionPane.showConfirmDialog(null, panelEmailCliente, "Buscar Cliente por Email", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if(resultPanelEmailCliente != JOptionPane.OK_OPTION) return;
+
+    String email = emailField.getText().trim();
+    
+    if(email.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Por favor, ingresa un email válido.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try (Connection connCliente = DBConnection.getConnection()) {
+        String sqlCliente = "SELECT * FROM clientes WHERE mail = ?";
+        PreparedStatement stmtCliente = connCliente.prepareStatement(sqlCliente);
+        stmtCliente.setString(1, email);
+        ResultSet rsCliente = stmtCliente.executeQuery();
+
+        if(rsCliente.next()) {
+            String nombre = rsCliente.getString("nombre");
+            String apellido1 = rsCliente.getString("apellido1");
+            String apellido2 = rsCliente.getString("apellido2");
+            String mailCliente = rsCliente.getString("mail");
+            String passw = rsCliente.getString("passw");
+
+            JTextField nombreField = new JTextField(nombre);
+            JTextField ap1Field = new JTextField(apellido1);
+            JTextField ap2Field = new JTextField(apellido2);
+            JTextField mailField = new JTextField(mailCliente);
+            JPasswordField passwField = new JPasswordField(passw);
+
+            JPanel panelEdit = new JPanel(new GridLayout(0, 1));
+            panelEdit.add(new JLabel("Nombre:"));
+            panelEdit.add(nombreField);
+            panelEdit.add(new JLabel("Apellido 1:"));
+            panelEdit.add(ap1Field);
+            panelEdit.add(new JLabel("Apellido 2:"));
+            panelEdit.add(ap2Field);
+            panelEdit.add(new JLabel("Email:"));
+            panelEdit.add(mailField);
+            panelEdit.add(new JLabel("Contraseña:"));
+            panelEdit.add(passwField);
+
+            int resultPanelEdit = JOptionPane.showConfirmDialog(null, panelEdit, "Editar Cliente", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if(resultPanelEdit == JOptionPane.OK_OPTION) {
+                String newNombre = nombreField.getText();
+                String newAp1 = ap1Field.getText();
+                String newAp2 = ap2Field.getText();
+                String newEmail = mailField.getText().trim();
+                String newPassw = new String(passwField.getPassword()).trim();
+
+                if(newNombre.isEmpty() || newAp1.isEmpty() || newEmail.isEmpty() || newPassw.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos.", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                String sqlUpdateCliente = "UPDATE clientes SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ?, passw = ? WHERE mail = ?";
+                
+                try (PreparedStatement stmtUpdateCliente = connCliente.prepareStatement(sqlUpdateCliente)) {
+                	stmtUpdateCliente.setString(1, newNombre);
+                	stmtUpdateCliente.setString(2, newAp1);
+                	stmtUpdateCliente.setString(3, newAp2);
+                	stmtUpdateCliente.setString(4, newEmail);
+                	stmtUpdateCliente.setString(5, newPassw);
+                	stmtUpdateCliente.setString(6, email);
+                	stmtUpdateCliente.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Cliente actualizado exitosamente.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Cliente no encontrado con ese email.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch(SQLException exCliente) {
+        exCliente.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al acceder a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+	
+//                                             VER
+
+private void verTusDatos() {
+	try (Connection connEmpleado = DBConnection.getConnection()) {
+		String sqlEmpleado = "SELECT * FROM empleados WHERE mail = ?";
+		PreparedStatement stmtEmpleado = connEmpleado.prepareStatement(sqlEmpleado);
+		stmtEmpleado.setString(1, mail);
+        
+        ResultSet rsEmpleado = stmtEmpleado.executeQuery();
+
+        if(rsEmpleado.next()) {
+            name = rsEmpleado.getString("nombre");
+            surname1 = rsEmpleado.getString("apellido1");
+            surname2 = rsEmpleado.getString("apellido2");
+            passw = rsEmpleado.getString("passw");
+            id = rsEmpleado.getString("id_empleado");
+            store = rsEmpleado.getString("fk_tienda");
+        }
+        
+        String sqlTienda = "SELECT * FROM tiendas WHERE id_tienda = ?";
+		PreparedStatement stmtTienda = connEmpleado.prepareStatement(sqlTienda);
+		stmtTienda.setString(1, store);	        
+        ResultSet rsTienda = stmtTienda.executeQuery();
+        
+        if(rsTienda.next()) {
+        	country = rsTienda.getString("pais");
+        	city = rsTienda.getString("ciudad");
+        	address = rsTienda.getString("calle");
+        	zip_code = rsTienda.getString("postal");
+        }
+
+    } catch(SQLException exEmpleado) {
+        exEmpleado.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+	
+	String pass = "*".repeat(passw.length());
+	JPanel panelTuInfo = new JPanel(new GridLayout(0, 1));
+	panelTuInfo.add(new JLabel("ID: " + id));
+	panelTuInfo.add(new JLabel("Nombre: " + name + " " + surname1 + " " + surname2));
+	panelTuInfo.add(new JLabel("Mail: " + mail));
+	panelTuInfo.add(new JLabel("Contraseña: " + pass));
+	panelTuInfo.add(new JLabel("Tienda: " + (store != null ? store : "")));
+	panelTuInfo.add(new JLabel("Pais: " + country));
+	panelTuInfo.add(new JLabel("Ciudad: " + city));
+	panelTuInfo.add(new JLabel("Dirección: " + address));
+	panelTuInfo.add(new JLabel("Codigo Postal: " + zip_code));
+	JOptionPane.showConfirmDialog(null, panelTuInfo, "Tu Información", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+}
+
+private void verEstadoPedidos() { 
+    JComboBox<String> comboBoxPedido = new JComboBox<>();
+    Map<String, Integer> mapIdPedido = new HashMap<>();
+
+    try (Connection connPedido = DBConnection.getConnection()) {
+        String sqlPedido = "SELECT id_pedido, calle FROM pedidos";
+        PreparedStatement stmtPedido = connPedido.prepareStatement(sqlPedido);
+        ResultSet rsPedido = stmtPedido.executeQuery();
+
+        while(rsPedido.next()) {
+            int id = rsPedido.getInt("id_pedido");
+            String calle = rsPedido.getString("calle");
+            String pedido = "(" + id + ") " + calle;
+            comboBoxPedido.addItem(pedido);
+            mapIdPedido.put(pedido, id);
+        }
+
+    } catch(SQLException exPedido) {
+        JOptionPane.showMessageDialog(null, "Error al cargar pedidos", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JPanel panelPedidoSeleccion = new JPanel(new GridLayout(0, 1));
+    panelPedidoSeleccion.add(new JLabel("Selecciona un pedido:"));
+    panelPedidoSeleccion.add(comboBoxPedido);
+
+    int resultPanelPedidoSeleccion = JOptionPane.showConfirmDialog(null, panelPedidoSeleccion, "Ver estado de pedidos", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if(resultPanelPedidoSeleccion != JOptionPane.OK_OPTION) return;
+
+    String pedidoSeleccionado = (String) comboBoxPedido.getSelectedItem();
+    if(pedidoSeleccionado == null) return;
+
+    int idPedido = mapIdPedido.get(pedidoSeleccionado);
+
+    try(Connection connPedido = DBConnection.getConnection()){
+        String sqlPedido = """
+            SELECT p.id_pedido, p.fecha_pedido, p.fecha_entrega,
+                   p.pais, p.ciudad, p.calle, p.postal,
+                   c.mail AS cliente_mail, p.fk_tienda
+            FROM pedidos p
+            JOIN clientes c ON p.fk_id_user = c.id_user
+            WHERE p.id_pedido = ?
+            """;
+
+        PreparedStatement stmtPedido = connPedido.prepareStatement(sqlPedido);
+        stmtPedido.setInt(1, idPedido);
+        ResultSet rsPedido = stmtPedido.executeQuery();
+
+        if(!rsPedido.next()) {
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JPanel panelPedido = new JPanel(new GridLayout(0, 1));
+        panelPedido.add(new JLabel("ID Pedido: " + rsPedido.getInt("id_pedido")));
+        panelPedido.add(new JLabel("Fecha del pedido: " + rsPedido.getTimestamp("fecha_pedido")));
+
+        Timestamp entrega = rsPedido.getTimestamp("fecha_entrega");
+        panelPedido.add(new JLabel("Fecha de entrega: " + (entrega != null ? entrega.toString() : "Pendiente")));
+
+        panelPedido.add(new JLabel("Dirección:"));
+        panelPedido.add(new JLabel("- Calle: " + rsPedido.getString("calle")));
+        panelPedido.add(new JLabel("- Ciudad: " + rsPedido.getString("ciudad")));
+        panelPedido.add(new JLabel("- País: " + rsPedido.getString("pais")));
+        panelPedido.add(new JLabel("- Código Postal: " + rsPedido.getString("postal")));
+        panelPedido.add(new JLabel("Cliente (correo): " + rsPedido.getString("cliente_mail")));
+        panelPedido.add(new JLabel("ID Tienda: " + rsPedido.getInt("fk_tienda")));
+        panelPedido.add(new JLabel("Productos:"));
+
+        String sqlProducto = """
+            SELECT pr.marca, pr.modelo, pp.cantidad,
+                   co.color, ta.talla, ca.categoria
+            FROM productos_pedidos pp
+            JOIN productos pr ON pp.fk_producto = pr.id_producto
+            LEFT JOIN colores co ON pr.fk_color = co.id_color
+            LEFT JOIN tallas ta ON pr.fk_talla = ta.id_talla
+            LEFT JOIN categorias ca ON pr.fk_categoria = ca.id_categoria
+            WHERE pp.fk_pedido = ?
+            """;
+
+        PreparedStatement stmtProducto = connPedido.prepareStatement(sqlProducto);
+        stmtProducto.setInt(1, idPedido);
+        ResultSet rsProducto = stmtProducto.executeQuery();
+
+        while(rsProducto.next()) {
+            String marca = rsProducto.getString("marca");
+            String modelo = rsProducto.getString("modelo");
+            int cantidad = rsProducto.getInt("cantidad");
+            String color = rsProducto.getString("color");
+            String talla = rsProducto.getString("talla");
+            String categoria = rsProducto.getString("categoria");
+
+            String productoInfo = String.format("    - (Categoría: %s) %s %s | Color: %s | Talla: %s | Cantidad: %d ", 
+            		categoria != null ? categoria : "", 
+            		marca, 
+            		modelo, 
+                    color != null ? color : "",
+                    talla != null ? talla : "",
+                    cantidad
+                    );
+
+            panelPedido.add(new JLabel(productoInfo));
+        }
+
+        JOptionPane.showMessageDialog(null, panelPedido, "Información del pedido", JOptionPane.PLAIN_MESSAGE);
+
+    } catch(SQLException exPedido) {
+        JOptionPane.showMessageDialog(null, "Error al obtener el pedido", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
+}

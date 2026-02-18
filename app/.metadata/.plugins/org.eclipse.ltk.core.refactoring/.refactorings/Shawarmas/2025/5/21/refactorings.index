@@ -1,0 +1,65 @@
+1747737016687	Rename local variable 'tiendaBox'
+1747737050757	Rename local variable 'calleToIdMap'
+1747737093345	Rename local variable 'conn'
+1747737106979	Rename local variable 'sql'
+1747737119738	Rename local variable 'stmt'
+1747737137715	Rename local variable 'ex'
+1747737163091	Rename local variable 'panel'
+1747737174899	Rename local variable 'result'
+1747737204021	Rename local variable 'conn'
+1747737214818	Rename local variable 'sql'
+1747737225320	Rename local variable 'stmt'
+1747737260853	Rename local variable 'panel'
+1747737281732	Rename local variable 'result'
+1747737297597	Rename local variable 'conn'
+1747737303274	Rename local variable 'sql'
+1747737310580	Rename local variable 'stmt'
+1747737321171	Rename local variable 'ex'
+1747737362335	Rename local variable 'paisBox'
+1747737381826	Rename local variable 'ciudadBox'
+1747737433881	Rename local variable 'selectedPais'
+1747737465016	Rename local variable 'panel'
+1747737474228	Rename local variable 'result'
+1747737517940	Rename local variable 'conn'
+1747737523592	Rename local variable 'sql'
+1747737529873	Rename local variable 'stmt'
+1747737537592	Rename local variable 'ex'
+1747737607982	Rename local variable 'conn'
+1747737627615	Rename local variable 'connEmpleado'
+1747737674759	Rename local variable 'panel'
+1747737688860	Rename local variable 'panelEmpleado'
+1747737703776	Rename local variable 'displayPedidoId'
+1747737735165	Rename local variable 'result'
+1747898094274	Rename local variable 'rs'
+1747898102488	Rename local variable 'ex'
+1747898119362	Rename local variable 'conn'
+1747898136356	Rename local variable 'panel'
+1747898157660	Rename local variable 'ex'
+1747898461444	Rename local variable 'connEmpleado'
+1747898467617	Rename local variable 'sqlEmpleado'
+1747898475323	Rename local variable 'stmtEmpleado'
+1747898483809	Rename local variable 'rsEmpleado'
+1747898490994	Rename local variable 'exEmpleado'
+1747899064953	Rename local variable 'categoriaSeleccionada'
+1747899325441	Rename local variable 'sqlCategorias'
+1747899337009	Rename local variable 'categoriaSeleccionada'
+1747902145444	Delete element
+1747902189639	Delete element
+1747902227897	Delete element
+1747902299912	Rename resource 'resouces'
+1747903343190	Delete element
+1747903346881	Delete element
+1747903349840	Delete element
+1747903352804	Delete element
+1747903593754	Rename resource 'icon2.png'
+1747903669696	Delete element
+1747903742662	Delete element
+1747903765061	Rename resource 'airMax.jpg'
+1747903771220	Rename resource 'airMax.pngg'
+1747903778803	Rename resource 'pumaClassic.jpg'
+1747903788387	Rename resource 'ultraboost.jpg'
+1747989795840	Delete element
+1747989799498	Delete element
+1747989836139	Delete element
+1747990185414	Delete element
+1747990417696	Delete element
