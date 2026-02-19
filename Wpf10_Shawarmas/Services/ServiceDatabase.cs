@@ -12,7 +12,7 @@ namespace Wpf10_Shawarmas.Services
     {
         public ServiceDatabase()
         {
-            _connectionString = "Server=localhost;Port=3306;Database=shawarmas;Uid=root;Pwd=1234;";
+            _connectionString = "Server=localhost;Port=3309;Database=shawarmas;Uid=root;Pwd=1234;";
         }
 
         private readonly string _connectionString;
