@@ -10,8 +10,8 @@
 
     <Grid Background="#1C1C1C">
         <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -82,123 +82,239 @@
 
         <Border 
             Grid.Row="1"
+            Grid.Column="0"
             Background="#2C2C2C"
             CornerRadius="10"
-            Padding="20"
-            Margin="10,10,30,10">
-            
-            <StackPanel HorizontalAlignment="Center">
+            Padding="10"
+            Margin="10">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.75*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
                 <TextBlock 
-                    Text="Grid Configuration"
+                    Text="Add Products"
                     FontWeight="Bold"
-                    FontSize="18"
+                    FontSize="16"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="4"
                     Foreground="#FFF"
                     HorizontalAlignment="Center"
-                    Margin="0,0,0,15"/> <!-- Title -->
+                    VerticalAlignment="Top"/> <!-- Title -->
 
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel
-                        Margin="0,0,10,0">
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Margin="0,0,0,10">
+                <TextBlock 
+                    Text="Brand:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="0"/>
 
-                            <TextBlock 
-                                Text="Initial Probability:"
-                                Foreground="#CCC"
-                                Width="120"/>
+                <TextBox
+                    x:Name="TxtBrand"
+                    Width="Auto"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="#FFF"
+                    BorderBrush="#666"/>
 
-                            <TextBox 
-                                Text="{Binding ProbInicial, UpdateSourceTrigger=PropertyChanged}"
-                                Width="80"
-                                HorizontalContentAlignment="Center"
-                                Background="#444"
-                                Foreground="#FFF"
-                                BorderBrush="#666"/>
+                <TextBlock 
+                    Text="Model:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="2"/>
 
-                        </StackPanel>
+                <TextBox
+                    x:Name="TxtModel"
+                    Width="Auto"
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="#FFF"
+                    BorderBrush="#666"/>
+                
+                <TextBlock 
+                    Text="Stock:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="4"/>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock 
-                                Text="Initial State (0/1):"
-                                Foreground="#CCC"
-                                Width="120"/>
+                <TextBox
+                    x:Name="TxtStock"
+                    Width="Auto"
+                    Grid.Row="1"
+                    Grid.Column="5"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="#FFF"
+                    BorderBrush="#666"/>
+                
+                <TextBlock 
+                    Text="Category:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="0"/>
 
-                            <TextBox 
-                                Text="{Binding EstadoInicial, UpdateSourceTrigger=PropertyChanged}"
-                                Width="80"
-                                HorizontalContentAlignment="Center"
-                                Background="#444"
-                                Foreground="#FFF"
-                                BorderBrush="#666"
-                                MaxLength="1"/>
+                <ComboBox
+                    x:Name="CmbCategory"
+                    Width="Auto"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="Black"
+                    BorderBrush="#666"/>
 
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Vertical">
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Margin="0,0,0,10">
+                <TextBlock 
+                    Text="Colour:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="2"/>
+                
+                <ComboBox
+                    x:Name="CmbColour"
+                    Width="Auto"
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="Black"
+                    BorderBrush="#666"/>
 
-                            <TextBlock 
-                                Text="Rows:"
-                                Foreground="#CCC"
-                                Width="80"/>
+                <TextBlock 
+                    Text="Size:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="4"/>
 
-                            <TextBox
-                                x:Name="TxtFilas"
-                                Text="{Binding NumFilas}"
-                                Width="80"
-                                HorizontalContentAlignment="Center"
-                                Background="#444"
-                                Foreground="#FFF"
-                                BorderBrush="#666"/>
+                <ComboBox
+                    x:Name="CmbSize"
+                    Width="Auto"
+                    Grid.Row="2"
+                    Grid.Column="5"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="Black"
+                    BorderBrush="#666"/>
 
-                        </StackPanel>
+                <TextBlock 
+                    Text="Price:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="0"/>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock 
-                                Text="Columns:"
-                                Foreground="#CCC"
-                                Width="80"/>
+                <TextBox
+                    x:Name="TxtPrice"
+                    Width="Auto"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="#FFF"
+                    BorderBrush="#666"/>
 
-                            <TextBox
-                                x:Name="TxtColumnas"
-                                Text="{Binding NumColumnas}"
-                                Width="80"
-                                HorizontalContentAlignment="Center"
-                                Background="#444"
-                                Foreground="#FFF"
-                                BorderBrush="#666"/>
-
-                        </StackPanel>
-                    </StackPanel>
-                </StackPanel> <!-- Inputs -->
+                <TextBlock 
+                    Text="Image:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="2"/>
 
                 <Button
-                    x:Name="BtnInitialize"
-                    Command="{Binding InicializarGrillaCommand}"
-                    Content="Initialize Grid"
+                    Content="Browse..."
                     Style="{StaticResource DefaultButton}"
-                    Width="150"
-                    Height="35"
+                    Width="80"
+                    x:Name="BtnBrowseImage"
+                    Height="20"
+                    Grid.Row="3"
+                    Grid.Column="3"
                     HorizontalAlignment="Center"
-                    Margin="0,20,0,0"
                     Background="#FFF0F0F0"
                     Foreground="Black"
                     BorderThickness="0"
-                    Cursor="Hand" 
-                    Click="BtnInitialize_Click"/> <!-- Initialize Button -->
+                    Cursor="Hand" Click="BtnBrowseImage_Click"/> <!-- Browse Button -->
 
-            </StackPanel>
-        </Border> <!-- Grid Configuration -->
+                <Button
+                    Content="Add Product"
+                    Style="{StaticResource DefaultButton}"
+                    Width="100"
+                    Height="20"
+                    Grid.Row="3"
+                    x:Name="BtnAddProduct"
+                    Grid.Column="4"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    Background="#FFF0F0F0"
+                    Foreground="Black"
+                    BorderThickness="0"
+                    Cursor="Hand" Click="BtnAddProduct_Click"/>
+                <!-- Add Button -->
+            </Grid>
+
+        </Border> <!-- Add Products -->
 
         <ContentControl 
             Grid.Column="1" 
             Content="{Binding PedidoSeleccionado}" 
-            Margin="2,10,10,10" Cursor=""
-            Grid.RowSpan="2">
+            Margin="10">
 
             <ContentControl.ContentTemplate>
                 <DataTemplate>
@@ -221,12 +337,12 @@
                                 HorizontalAlignment="Center"
                                 FontSize="16" 
                                 Foreground="#FFF" 
-                                Margin="0,0,0,10"/>
+                                Margin="0,0,0,5"/>
 
                             <ScrollViewer 
                                 Grid.Row="1"
                                 VerticalScrollBarVisibility="Auto"
-                                Margin="0,0,0,10">
+                                Margin="5">
 
                                 <ItemsControl ItemsSource="{Binding Productos}">
                                     <ItemsControl.ItemTemplate>
@@ -294,18 +410,18 @@
                                     Background="#3A3A3A" 
                                     CornerRadius="8" 
                                     Padding="12" 
-                                    Margin="0,0,0,10">
+                                    Margin="0">
 
                                     <StackPanel>
                                         <TextBlock 
                                             Text="Details" 
                                             FontWeight="Bold" 
                                             HorizontalAlignment="Center"
-                                            FontSize="14" 
+                                            FontSize="11" 
                                             Foreground="#FFF" 
-                                            Margin="0,0,0,8"/>
+                                            Margin="0,0,0,5"/>
 
-                                        <TextBlock Foreground="#FFF" FontSize="12" Margin="0,0,0,6" TextWrapping="Wrap">
+                                        <TextBlock Foreground="#FFF" FontSize="9" Margin="0,0,0,0" TextWrapping="Wrap">
                                             <Run Text="{Binding Cliente.Nombre, FallbackValue='Name'}"/>
                                             <Run Text="{Binding Cliente.Apellido1}"/>
                                             <Run Text="{Binding Cliente.Apellido2}"/>
@@ -324,7 +440,7 @@
                                         <TextBlock 
                                             Text="{Binding FechaPedido, StringFormat='Date: {0:dd/MM/yyyy}', FallbackValue='Date: Pending'}" 
                                             Foreground="#CCC" 
-                                            FontSize="11"/>
+                                            FontSize="9"/>
                                         
                                     </StackPanel>
                                 </Border>
@@ -335,8 +451,9 @@
                                     CommandParameter="{Binding}"
                                     Content="Mark as completed"
                                     HorizontalAlignment="Center"
-                                    Width="140" 
-                                    Height="35"/> <!-- Completed Button -->
+                                    Margin="0,5,0,0"
+                                    Width="110" 
+                                    Height="25" Cursor="Hand"/> <!-- Completed Button -->
                                 
                             </StackPanel> <!-- Client Details & Completed Button -->
                         </Grid>
@@ -344,5 +461,106 @@
                 </DataTemplate>
             </ContentControl.ContentTemplate>
         </ContentControl> <!-- Orders Details -->
+
+        <Border 
+            Grid.Row="1"
+            Grid.Column="1"
+            Background="#2C2C2C"
+            CornerRadius="10"
+            Padding="10"
+            Margin="10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock 
+                    Text="Grid Configuration"
+                    FontWeight="Bold"
+                    FontSize="16"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Foreground="#FFF"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"/> <!-- Title -->
+
+
+                <TextBlock 
+                    Text="Rows:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Column="0"/>
+
+                <TextBox
+                    x:Name="TxtFilas"
+                    Text="{Binding NumFilas}"
+                    Width="Auto"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    MaxWidth="150"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    MaxHeight="20"
+                    Foreground="#FFF"
+                    BorderBrush="#666" Cursor=""/>
+
+
+                <TextBlock 
+                    Text="Columns:"
+                    Foreground="#CCC"
+                    Width="Auto"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.Row="2"
+                    Grid.Column="0"/>
+
+                <TextBox
+                    x:Name="TxtColumnas"
+                    Text="{Binding NumColumnas}"
+                    Width="Auto" 
+                    MinWidth="80"
+                    MaxWidth="150"
+                    MaxHeight="20"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalContentAlignment="Center"
+                    Background="#444"
+                    Foreground="#FFF"
+                    BorderBrush="#666"/> <!-- Inputs -->
+
+                <Button
+                    x:Name="BtnInitialize"
+                    Command="{Binding InicializarGrillaCommand}"
+                    Content="Initialize Grid"
+                    Style="{StaticResource DefaultButton}"
+                    Width="100"
+                    Height="25"
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    Background="#FFF0F0F0"
+                    Foreground="Black"
+                    BorderThickness="0"
+                    Cursor="Hand" 
+                    Click="BtnInitialize_Click"/> <!-- Initialize Button -->
+                
+            </Grid>
+        </Border> <!-- Grid Configuration -->
     </Grid>
 </Page>
