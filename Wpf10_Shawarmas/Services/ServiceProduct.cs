@@ -36,7 +36,7 @@ namespace Wpf10_Shawarmas.Services
                 System.Diagnostics.Debug.WriteLine($"Error GetAllSizes: {ex.Message}");
                 return new List<string>();
             }
-        }
+        } // Recibir una lista de las tallas
 
         public List<string> GetAllCategories()
         {
@@ -56,7 +56,7 @@ namespace Wpf10_Shawarmas.Services
                 System.Diagnostics.Debug.WriteLine($"Error GetAllSizes: {ex.Message}");
                 return new List<string>();
             }
-        }
+        } // Recibir una lista de las categorias
 
         public List<string> GetAllColours()
         {
@@ -76,84 +76,52 @@ namespace Wpf10_Shawarmas.Services
                 System.Diagnostics.Debug.WriteLine($"Error GetAllColours: {ex.Message}");
                 return new List<string>();
             }
-        }
+        } // Recibir una lista de los colores
 
-        public bool InsertProducto(string marca, string modelo, string categoria, string color, string talla, int stock, decimal precio, string rutaImagen)
+        public async Task<bool> InsertProduct(string marca, string modelo, string categoria, string color, string talla, int stock, decimal precio, string rutaImagen)
         {
             try
             {
-                string connectionString = "Server=localhost;Port=3309;Database=shawarmas;Uid=root;Pwd=1234;";
-                using var conn = new MySqlConnection(connectionString);
-                conn.Open();
+                var db = new ServiceDatabase();
 
-                // 1. ID CATEGORÍA (Verifica NULL)
-                int idCategoria;
-                using (var cmd = new MySqlCommand("SELECT id FROM categorias WHERE categoria = @cat LIMIT 1", conn))
+                string sqlCat = $"SELECT id_categoria FROM categorias WHERE TRIM(categoria) = '{categoria?.Trim().Replace("'", "''")}' LIMIT 1";
+                var dtCat = await Task.Run(() => db.ExecuteQuery(sqlCat));
+                if (dtCat.Rows.Count == 0)
                 {
-                    cmd.Parameters.AddWithValue("@cat", categoria ?? "");
-                    var result = cmd.ExecuteScalar();
-                    if (result == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"❌ CATEGORÍA NO ENCONTRADA: {categoria}");
-                        return false;
-                    }
-                    idCategoria = Convert.ToInt32(result);
+                    return false;
                 }
+                int idCategoria = Convert.ToInt32(dtCat.Rows[0]["id_categoria"]);
 
-                // 2. ID COLOR (Verifica NULL)
-                int idColor;
-                using (var cmd = new MySqlCommand("SELECT id FROM colores WHERE color = @color LIMIT 1", conn))
+                string sqlColor = $"SELECT id_color FROM colores WHERE TRIM(color) = '{color?.Trim().Replace("'", "''")}' LIMIT 1";
+                var dtColor = await Task.Run(() => db.ExecuteQuery(sqlColor));
+                if (dtColor.Rows.Count == 0)
                 {
-                    cmd.Parameters.AddWithValue("@color", color ?? "");
-                    var result = cmd.ExecuteScalar();
-                    if (result == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"❌ COLOR NO ENCONTRADO: {color}");
-                        return false;
-                    }
-                    idColor = Convert.ToInt32(result);
+                    return false;
                 }
+                int idColor = Convert.ToInt32(dtColor.Rows[0]["id_color"]);
 
-                // 3. ID TALLA (Verifica NULL)
-                int idTalla;
-                using (var cmd = new MySqlCommand("SELECT id FROM tallas WHERE talla = @talla LIMIT 1", conn))
+                string sqlTalla = $"SELECT id_talla FROM tallas WHERE TRIM(talla) = '{talla?.Trim().Replace("'", "''")}' LIMIT 1";
+                var dtTalla = await Task.Run(() => db.ExecuteQuery(sqlTalla));
+                if (dtTalla.Rows.Count == 0)
                 {
-                    cmd.Parameters.AddWithValue("@talla", talla ?? "");
-                    var result = cmd.ExecuteScalar();
-                    if (result == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"❌ TALLA NO ENCONTRADA: {talla}");
-                        return false;
-                    }
-                    idTalla = Convert.ToInt32(result);
+                    return false;
                 }
+                int idTalla = Convert.ToInt32(dtTalla.Rows[0]["id_talla"]);
 
-                // 4. INSERT FINAL (Usa los IDs obtenidos)
-                string sql = @"INSERT INTO productos (marca, modelo, categoria_id, color_id, talla_id, stock, precio, imagen) 
-                       VALUES (@marca, @modelo, @cat_id, @color_id, @talla_id, @stock, @precio, @imagen)";
+                string sqlInsert = $@"INSERT INTO productos (marca, modelo, fk_categoria, fk_color, fk_talla, stock, precio, imagen) 
+                              VALUES ('{marca?.Trim().Replace("'", "''")}', 
+                                      '{modelo?.Trim().Replace("'", "''")}', 
+                                      {idCategoria}, {idColor}, {idTalla}, {stock}, {precio}, 
+                                      '{rutaImagen?.Replace("'", "''")}')";
 
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@marca", marca ?? "");
-                    cmd.Parameters.AddWithValue("@modelo", modelo ?? "");
-                    cmd.Parameters.AddWithValue("@cat_id", idCategoria);
-                    cmd.Parameters.AddWithValue("@color_id", idColor);
-                    cmd.Parameters.AddWithValue("@talla_id", idTalla);
-                    cmd.Parameters.AddWithValue("@stock", stock);
-                    cmd.Parameters.AddWithValue("@precio", precio);
-                    cmd.Parameters.AddWithValue("@imagen", rutaImagen ?? "");
-
-                    int filas = cmd.ExecuteNonQuery();
-                    return filas > 0;
-                }
+                await Task.Run(() => db.ExecuteCommand(sqlInsert));
+                return true;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"💥 ERROR CRÍTICO: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"💥 CRITICAL ERROR: {ex.Message}");
                 return false;
             }
-        }
-
-
+        } // Crear un nuevo producto
     }
 }

@@ -35,7 +35,7 @@ namespace Wpf10_Shawarmas
             if (bloqueo.HasValue && DateTime.Now < bloqueo.Value)
             {
                 TimeSpan resto = bloqueo.Value - DateTime.Now;
-                MessageBox.Show($"Espera {resto.Minutes}m {resto.Seconds}s");
+                MessageBox.Show($"Wait {resto.Minutes}m {resto.Seconds}s");
                 PwdPassword.Clear();
                 return;
             }
@@ -45,7 +45,7 @@ namespace Wpf10_Shawarmas
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) // Validacion de campos vacios
             {
-                MessageBox.Show("Introduce usuario y contraseña");
+                MessageBox.Show("Enter username and password");
                 return;
             }
 
@@ -78,12 +78,12 @@ namespace Wpf10_Shawarmas
                 if (intentos >= 3)
                 {
                     bloqueo = DateTime.Now.AddMinutes(1);
-                    MessageBox.Show("3 intentos fallidos. Espera 1 minuto.");
+                    MessageBox.Show("3 failed attempts. Wait 1 minute.");
                     PwdPassword.Clear();
                 }
                 else
                 {
-                    MessageBox.Show($"Credenciales incorrectas. Intentos restantes: {3 - intentos}");
+                    MessageBox.Show($"Invalid credentials. Attempts remaining: {3 - intentos}");
                 }
                 PwdPassword.Clear();
             }
@@ -115,7 +115,7 @@ namespace Wpf10_Shawarmas
             }
             else
             {
-                MessageBox.Show("Usuario o contraseña incorrectos");
+                MessageBox.Show("Invalid username or password");
                 PwdPassword.Clear();
             }
         }
