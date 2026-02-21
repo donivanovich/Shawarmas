@@ -45,7 +45,7 @@ namespace Wpf10_Shawarmas.Services
                 }
                 return lista;
             });
-        }
+        } // Recibir una lista con todos los empleados
 
         public async Task<bool> CreateEmpleyee(Empleado nuevoEmpleado)
         {
@@ -75,7 +75,7 @@ namespace Wpf10_Shawarmas.Services
             {
                 return false;
             }
-        }
+        } // Crear un nuevo empleado
 
         public async Task<bool> EmailExists(string mail)
         {
@@ -92,7 +92,7 @@ namespace Wpf10_Shawarmas.Services
             {
                 return false;
             }
-        }
+        } // Verificar duplicados de email
 
         public bool UpdateEmployeeConfig(Empleado empleado)
         {
@@ -115,7 +115,7 @@ namespace Wpf10_Shawarmas.Services
                 MessageBox.Show($"ID {empleado.Id}\n{ex.Message}");
                 return false;
             }
-        }
+        } // Actualizar la configuracion del empleado
 
         private static string GeneratePasswordHash(string password)
         {
@@ -137,7 +137,7 @@ namespace Wpf10_Shawarmas.Services
                 Array.Copy(hash, 0, result, 16, 16);
                 return Convert.ToBase64String(result);
             }
-        }
+        } // Hash de contrasenas
 
         public static bool VerifyPassword(string password, string storedHash)
         {
@@ -160,6 +160,6 @@ namespace Wpf10_Shawarmas.Services
                 }
             }
             catch { return false; }
-        }
+        } // Unhash de contrasenas
     }
 }

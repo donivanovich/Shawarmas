@@ -95,7 +95,7 @@
 
                 <MediaElement 
                     x:Name="bgMusic"
-                    Source="Resources/Music/music.mp" 
+                    Source="Resources/Music/music.m3" 
                     LoadedBehavior="Play"
                     UnloadedBehavior="Stop"
                     Visibility="Hidden"

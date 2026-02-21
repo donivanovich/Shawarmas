@@ -81,7 +81,7 @@ namespace Wpf10_Shawarmas.MVVM.View
         {
             if (_usuario == null || _usuario.Id == 0)
             {
-                MessageBox.Show("No hay usuario logueado");
+                MessageBox.Show("No user logged in");
                 return;
             }
 
@@ -93,7 +93,8 @@ namespace Wpf10_Shawarmas.MVVM.View
 
             if (service.UpdateEmployeeConfig(_usuario))
             {
-                MessageBox.Show("Se ha guardado la configuración");
+                MessageBox.Show("Configuration saved successfully");
+
 
                 if (WindowsMainMenu.BgMusicInstance != null)
                 {
@@ -103,7 +104,7 @@ namespace Wpf10_Shawarmas.MVVM.View
             }
             else
             {
-                MessageBox.Show("Error al guardar");
+                MessageBox.Show("Error saving");
             }
 
         } // Boton para guardar la configuracion en la BBDD

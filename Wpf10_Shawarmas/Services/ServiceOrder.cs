@@ -115,13 +115,13 @@ namespace Wpf10_Shawarmas.Services
             }
 
             return new List<Pedido>(pedidos.Values);
-        }
+        } // Recibir una lista de los pedidos
 
         public void UpdateOrderDeliveredStatus(int idPedido, bool entregado)
         {
             string sql = $"UPDATE pedidos SET entregado = {(entregado ? 1 : 0)} WHERE id_pedido = {idPedido}";
             _db.ExecuteQuery(sql);
-        }
+        } // Settear una fecha de entrega (entregado)
 
     }
 }

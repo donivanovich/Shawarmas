@@ -33,7 +33,7 @@ namespace Wpf10_Shawarmas.MVVM.View
                 string.IsNullOrWhiteSpace(TxtEmail.Text) ||
                 string.IsNullOrWhiteSpace(PwdPassword.Password))
             {
-                MessageBox.Show("Debes rellenar todos los campos");
+                MessageBox.Show("Please fill all fields");
                 return;
             }
 
@@ -59,21 +59,21 @@ namespace Wpf10_Shawarmas.MVVM.View
 
             if (await service.EmailExists(nuevoEmpleado.Mail))
             {
-                MessageBox.Show("Ese email ya está registrado");
+                MessageBox.Show("That email is already registered");
                 TxtEmail.Focus();
                 return;
             }
 
             if (await service.CreateEmpleyee(nuevoEmpleado))
             {
-                MessageBox.Show("¡Empleado registrado!");
+                MessageBox.Show("Employee registered successfully");
                 ViewLogin loginWindow = new ViewLogin();
                 loginWindow.Show();
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Error al registrar. Revisa los datos.");
+                MessageBox.Show("Registration error. Please check your data.");
             }
 
             BtnSignUp.IsEnabled = true;

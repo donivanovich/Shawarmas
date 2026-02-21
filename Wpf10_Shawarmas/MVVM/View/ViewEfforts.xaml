@@ -170,6 +170,8 @@
 
                 <TextBox
                     x:Name="TxtStock"
+                    PreviewTextInput="NumberValidationHandler"
+                    PreviewKeyDown="NumberKeyDownHandler"
                     Width="Auto"
                     Grid.Row="1"
                     Grid.Column="5"
@@ -258,6 +260,9 @@
 
                 <TextBox
                     x:Name="TxtPrice"
+                    PreviewTextInput="NumberValidationHandler"
+                    PreviewKeyDown="NumberKeyDownHandler"
+                    Language="es-ES"
                     Width="Auto"
                     Grid.Row="3"
                     Grid.Column="1"

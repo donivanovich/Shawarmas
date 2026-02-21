@@ -51,11 +51,8 @@ namespace Wpf10_Shawarmas
 
         private void BtnExit_Click(object sender, RoutedEventArgs e) // Boton para salir
         {
-            MessageBoxResult result = MessageBox.Show(
-                "¿Seguro que quieres salir de Shawarmas?",
-                "Confirmar Salida",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to exit Shawarmas?", "Confirm Exit", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
 
             if (result == MessageBoxResult.Yes)
             {

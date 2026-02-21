@@ -12,7 +12,7 @@ namespace Wpf10_Shawarmas.Services
     {
         public ServiceDatabase()
         {
-            _connectionString = "Server=localhost;Port=3309;Database=shawarmas;Uid=root;Pwd=1234;";
+            _connectionString = "Server=localhost;Port=3306;Database=shawarmas;Uid=root;Pwd=1234;";
         }
 
         private readonly string _connectionString;
@@ -28,7 +28,7 @@ namespace Wpf10_Shawarmas.Services
             adapter.Fill(dt);
 
             return dt;
-        }
+        } // Para consultas SELECT
 
         public void ExecuteCommand(string sql)
         {
@@ -36,6 +36,6 @@ namespace Wpf10_Shawarmas.Services
             conn.Open();
             using var cmd = new MySqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
-        }
+        } // Para comandos INSERT, UPDATE, DELETE
     }
 }
