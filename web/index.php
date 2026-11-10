@@ -54,7 +54,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 <body>
     <header class="alternative-header">
         <a class="alternative-brand" href="index.php" aria-label="Shawarmas, inicio">
-            <img src="assets/img/logo-shawarmas.png?v=20261110-2" alt="Shawarmas" style="transform: scale(1.5);">
+            <img src="assets/img/logo.png?v=20261110-2" alt="Shawarmas" style="transform: scale(1.5);">
         </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="alternative-nav">
             <i class="bi bi-list"></i><span>Menú</span>
