@@ -1,66 +1,27 @@
 # Shawarmas
 
-Repositorio unificado del proyecto **Shawarmas**, organizado por plataforma para mantener en un solo lugar las tres versiones de la aplicación.
+Shawarmas es una tienda de ropa con tres clientes que comparten una única base de datos MySQL:
 
-## Estructura
+- `web/`: cliente PHP para Apache.
+- `app/`: cliente Java Swing para Eclipse.
+- `wpf/`: cliente WPF para Visual Studio 2022.
+- `db/`: esquema y configuración común de la base de datos.
 
-```text
-Shawarmas/
-├── web/
-├── app/
-└── wpf/
-```
+## Puesta en marcha rápida
 
-## Proyectos incluidos
+1. Copia `db/.env.example` como `db/.env` y cambia las contraseñas. Compose leerá ese archivo automáticamente.
+2. Ejecuta `docker compose up --build`.
+3. Abre `http://localhost:8080`.
+4. Para Java y WPF desde el equipo, usa `DB_HOST=127.0.0.1` y `DB_PORT=3307`. Dentro de Docker la web usa automáticamente `db:3306`.
 
-### Web
-Versión web del proyecto Shawarmas.
+El esquema se inicializa desde [db/schema.sql](db/schema.sql). No se mantienen copias SQL dentro de los clientes.
 
-Contenido esperado dentro de `web/`:
-- Código fuente de la aplicación web.
-- Scripts SQL relacionados con base de datos.
-- Recursos específicos del frontend o backend web.
+## Seguridad
 
-### App
-Versión de aplicación de escritorio o Java del proyecto Shawarmas.
+Las contraseñas nuevas se almacenan con funciones de derivación seguras, las consultas de acceso a datos usan parámetros, las sesiones web se regeneran al iniciar sesión y los formularios que modifican datos requieren CSRF. Las credenciales se obtienen del entorno y no se guardan en el código.
 
-Contenido esperado dentro de `app/`:
-- Código fuente principal de la app.
-- Archivo ejecutable o compilado si se conserva.
-- Scripts SQL y recursos asociados.
+Consulta la guía específica de cada cliente:
 
-### WPF
-Versión desarrollada con WPF.
-
-Contenido esperado dentro de `wpf/`:
-- Solución y proyecto WPF.
-- Scripts SQL asociados.
-- Recursos de interfaz y configuración propios del proyecto.
-
-## Objetivo
-
-Este repositorio agrupa las tres implementaciones de Shawarmas para:
-- Centralizar el desarrollo en un único repositorio.
-- Separar claramente cada tecnología en su propia carpeta.
-- Facilitar el mantenimiento, revisión y presentación del proyecto.
-
-## Organización recomendada
-
-Cada carpeta debe contener únicamente los archivos necesarios del proyecto. Se recomienda evitar incluir archivos generados por el IDE o temporales, por ejemplo:
-- `.vs/`
-- `.metadata/`
-- `bin/`
-- `obj/`
-
-## Base de datos
-
-Si varias versiones comparten la misma estructura de base de datos, conviene:
-- Mantener un único script común en una carpeta dedicada, o
-- Dejar una copia en cada subproyecto si cada versión tiene diferencias propias.
-
-## Notas
-
-- `web/` contiene la implementación web.
-- `app/` contiene la implementación de aplicación.
-- `wpf/` contiene la implementación en WPF.
-- Los repositorios originales pueden mantenerse como copia histórica o archivarse tras comprobar que la migración es correcta.
+- [Aplicación Java](app/README.md)
+- [Aplicación web](web/README.md)
+- [Aplicación WPF](wpf/README.md)

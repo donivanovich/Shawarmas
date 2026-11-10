@@ -1,80 +1,35 @@
-# ShawarmasWeb
+# Cliente web de Shawarmas
 
-🚀 **ShawarmasWeb** es un proyecto web enfocado a la gestión de productos, clientes, pedidos y tiendas para una tienda de shawarmas (o tienda de productos en general), con una base de datos SQL y lógica de backend.
+## Estructura
 
-Este repositorio contiene la base de datos (`shawarmas.sql`) y los archivos necesarios para arrancar y desarrollar la aplicación.
+Los PHP y CSS están directamente en `web/`. Las imágenes, fuentes y JavaScript están en `assets/`. El contenedor se construye con `Dockerfile` y sirve Apache en el puerto 8080 mediante el compose de la raíz.
 
----
+## Requisitos
 
-## 📌 Tecnologías
+Para Docker solo se necesita Docker Desktop. Para WAMPServer se requiere Apache, PHP 8.3 o superior, la extensión `mysqli` y MySQL 8.0 o superior.
 
-El proyecto contiene principalmente:
+## Docker
 
-- 🗄️ Base de datos en SQL (`shawarmas.sql`) con tablas para:
-  - Categorías
-  - Productos
-  - Clientes
-  - Empleados
-  - Pedidos
-  - Tiendas  
-- 🧠 Componentes front-end y back-end (PHP, CSS, JavaScript).  
+Desde la raíz ejecuta:
 
----
-
-## 🛠️ Requisitos previos
-
-Antes de correr el proyecto, asegúrate de tener:
-
-- 🐘 Servidor local con PHP (por ejemplo: Apache + PHP)
-- 🛢️ MySQL o MariaDB
-- 🧰 Editor de código (VSCode, Sublime, PHPStorm…)
-
----
-
-## 🚀 Instalación
-
-1. **Clona el repositorio**  
-
-```bash
-git clone https://github.com/donivanovich/ShawarmasWeb.git
+```text
+docker compose up --build
 ```
 
-Importa la base de datos
+La base de datos se inicializa desde `db/schema.sql` y se publica en `127.0.0.1:3307` para no interferir con WAMP/MySQL en `3306`. El inventario se guarda en `producto_variantes`, con stock independiente por producto, talla y color. Para aplicar el esquema inicial actualizado a una base de datos existente, detén los servicios y elimina únicamente el volumen `shawarmas_shawarmas-db` cuando no necesites conservar datos.
 
-Abre tu gestor de bases de datos (phpMyAdmin, DBeaver, etc.)
+## WAMPServer
 
-Importa el archivo shawarmas.sql
+Configura las variables de entorno de PHP con los mismos valores de `db/.env.example`, coloca el contenido de `web/` como raíz pública y ejecuta el esquema común. No copies credenciales en `database-connection.php`.
 
-Configura tu proyecto web
+## Flujo funcional
 
-Coloca los archivos PHP/HTML en tu servidor local (por ejemplo: htdocs, www)
+El cliente ofrece acceso, registro, catálogo, selección de cantidad, carrito y compra. La compra verifica el stock dentro de una transacción y crea líneas de pedido consistentes.
 
-Configura las credenciales de base de datos si usas un archivo de configuración
+## Portada
 
-Ejecuta tu servidor y accede a la app
+`index.php` ofrece la portada editorial en blanco y negro de Shawarmas. Comparte el catálogo, el carrito y el resto del flujo de compra.
 
-Abre el navegador en: http://localhost/<tu_carpeta_del_proyecto>
+## Seguridad aplicada
 
-## 📚 Contribuir
-
-Haz un fork del repositorio
-
-Crea una rama para tu feature (git checkout -b feature/nueva-funcionalidad)
-
-Haz commit de tus cambios (git commit -m "Agrega algo genial")
-
-Haz push a tu rama
-
-Abre un Pull Request
-
-## ❓ Soporte
-
-Si tienes dudas o problemas:
-
-Abre un issue en este repositorio
-
-Menciona qué paso te causa problemas
-
-## 🧠 Créditos
-
-Desarrollado por donivanovich
+Se eliminaron las consultas construidas con datos de usuario y se sustituyeron por consultas preparadas. Se añadieron `password_hash`, `password_verify`, regeneración de sesión, cookies HttpOnly/SameSite, tokens CSRF, validación de cantidades y control de stock. Los errores mostrados al cliente no exponen SQL ni credenciales.

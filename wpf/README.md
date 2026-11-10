@@ -1,123 +1,26 @@
-## 📄 INFORMACIÓN DEL PROYECTO  
-👤 Nombre del Proyecto: Shawarmas  
-👨‍💻 Autor: Ivan Kosolovskyy Fetsyk & Javier Jimenez Simon  
+# Cliente WPF de Shawarmas
 
----
+## Estructura
 
-## 1️⃣ MÓDULO AUTENTICACIÓN Y ACCESO (Login/Registro)
+La solución `Shawarmas.sln` y `Shawarmas.csproj` están en esta carpeta. Las vistas MVVM están en `MVVM/`, los servicios de datos en `Services/` y los recursos visuales en `Resources/`. `bin/` y `obj/` son salidas locales de compilación.
 
-### ELEMENTOS FUNCIONALES
-- ✅ Campos entrada (Usuario/Email + Contraseña) `21/01`
-- ✅ Botón Validar (Login) `21/01`
-- ✅ Botón ir a Registro `21/01`
-- ✅ Flujo Registro→Login `21/01`
-- ✅ Modo Desarrollador/Invitado `21/01`
+## Requisitos
 
-### CRITERIOS TÉCNICOS
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|----------|--------|-------|
-| ★★☆ | Diseño Layout (Grid) | ✅ | `24/01` |
-| ★★☆ | Contenedores (Panels) | ✅ | `11/02` |
-| ★★☆ | Criptografía (Hash) | ✅ | `11/02` |
-| ★★☆/★★★ | Navegación (Básico/Avanzado) | ✅ | `24/01` |
-| ★★★ | Lógica Seguridad | ✅ | `11/02` |
-| ★★★★ | Validación Datos | ✅ | `24/01` |
-| ★★★★★ | SMTP Recuperación | [ ] | `DD/MM` |
+- Visual Studio 2022 con .NET 8 Desktop Runtime y la carga de trabajo de escritorio .NET.
+- MySQL 8.0 o superior.
 
----
+## Configuración y ejecución
 
-## 2️⃣ DASHBOARD PRINCIPAL (Menú Principal) ✅
+La aplicación usa por defecto `DB_HOST=127.0.0.1`, `DB_PORT=3307`, `DB_NAME=shawarmas`, `DB_USER=shawarmas_app` y `DB_PASSWORD=1234`, que coinciden con Docker. Puedes sobrescribirlos en el perfil de depuración de Visual Studio. Levanta primero el servicio `db` de Docker. Abre `wpf/Shawarmas.sln` y compila en Debug.
 
-### ELEMENTOS FUNCIONALES
-- ✅ Título/Logo visible `22/01`
-- ✅ Menú 4 ítems:
-  - ✅ Iniciar Proceso `22/01`
-  - ✅ Configuración `22/01`
-  - ✅ Acerca de/Info `22/01`
-  - ✅ Salir `22/01`
-- ✅ Audio de fondo `26/01`
-- ✅ Widget mute `26/01`
+## Funcionalidad
 
-### CRITERIOS TÉCNICOS
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|----------|--------|-------|
-| ★★☆ | Layout Estructural | ✅ | `24/01` |
-| ★★☆ | Organización Controles | ✅ | `25/01` |
-| ★★☆/★★★ | Navegación | ✅ | `24/01` |
+WPF es la referencia visual y de interacción: inicio de sesión, registro, menú, configuración, catálogo, pedidos, información y control de audio. Los textos visibles están en español y los nombres de tipos y miembros siguen en inglés.
 
----
+## Seguridad aplicada
 
-## 3️⃣ MÓDULO CONFIGURACIÓN (Settings) ✅
+`ServiceDatabase` centraliza una conexión configurada por entorno y admite parámetros MySQL. Los servicios de empleados, productos y pedidos ya no interpolan entradas en SQL. Las contraseñas nuevas usan PBKDF2-HMAC-SHA256 con sal aleatoria y comparación en tiempo constante. Se eliminó el uso de MD5 y la contraseña de administrador embebida.
 
-### ELEMENTOS FUNCIONALES
-- ✅ Control ventana `26/01`
-- ✅ Selector modo `26/01`
-- ✅ Slider volumen `26/01`
-- ✅ Botón Guardar `26/01`
-- ✅ Botón Cancelar `26/01`
+## Diagnóstico en Visual Studio
 
-### CRITERIOS TÉCNICOS
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|-------------------|--------|-------|
-| ★★☆ | Controles Complejos | ✅ | `26/01` |
-| ★☆☆ | Persistencia Básica | ✅ | `26/01` |
-| ★★★ | Persistencia Archivos | [ ] | `DD/MM` |
-| ★★★★ | Persistencia BBDD | ✅ | `26/01` |
-
----
-
-## 4️⃣ SECCIÓN INFORMATIVA (Acerca de) ✅
-
-### ELEMENTOS FUNCIONALES
-- ✅ Info autor `23/01`
-- ✅ Navegación retorno `27/01`
-
-### CRITERIOS TÉCNICOS
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|----------|--------|-------|
-| ★★☆ | Animación texto | ✅ | `27/01` |
-
----
-
-## 5️⃣ NÚCLEO FUNCIONAL (Workspace) ✅
-
-### ELEMENTOS FUNCIONALES 
-- ✅ Formulario parámetros `16/02`
-- ✅ Variables inicialización `16/02`
-- ✅ Botón generar grilla `16/02`
-- ✅ Interacción celdas `11/02`
-- ✅ Botón simulación `11/02`
-
-### CRITERIOS TÉCNICOS
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|-------------------|--------|-------|
-| ★★☆ | Feedback Visual | ✅ | `16/02` |
-| ★★★ | Transformaciones | ✅ | `16/02` |
-| ★★☆ | Rendimiento UI | ✅ | `16/02` |
-| ★★☆ | Coherencia Estilos | ✅ | `16/02` |
-
----
-
-## 6️⃣ UX/UI Y XAML AVANZADO ✅
-
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|-------------------------|--------|-------|
-| ★★☆ | Diccionarios Recursos | ✅ | `29/01` |
-| ★★☆ | Control Templates | ✅ | `29/01` |
-| ★☆☆ | Animaciones Estáticas | ✅ | `29/01` |
-| ★★☆ | Animaciones Dinámicas | ✅ | `16/02` |
-| ★★★ | Animaciones Complejas | ✅ | `16/02` |
-| ★★☆ | Look & Feel | ✅ | `16/02` |
-| ★★★★ | Arquitectura MVVM | ✅ | `26/01` |
-
----
-
-## 7️⃣ EXTRAS Y BUENAS PRÁCTICAS ✅
-
-| Complejidad | Concepto | Estado | Fecha |
-|-------------|-------------------------|--------|-------|
-| ★☆☆ | Documentación | ✅ | `23/01` |
-| ★☆☆ | Versionado Manual | ✅ | `20/01` |
-| ★★★ | Git Repository | ✅ | `20/01` |
-| ★★☆ | Control Ejecución | ✅ | `16/02` |
-| ★★★★ | Async/Await | ✅ | `12/02` |
+Si la solución conserva referencias al directorio antiguo, ciérrala, abre de nuevo `Shawarmas.sln` desde `wpf/` y ejecuta `Clean` seguido de `Rebuild`. No incluyas `bin/`, `obj/` ni `.vs/` en entregas.
