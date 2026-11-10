@@ -1,0 +1,6 @@
+.env
+node_modules/
+storage/*
+!storage/products/
+!storage/products/.gitkeep
+test-storage/

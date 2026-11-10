@@ -12,6 +12,21 @@ $conn = new mysqli(
 );
 $conn->set_charset('utf8mb4');
 
+function imagen_url(?string $ruta): string
+{
+    $ruta = trim((string) $ruta);
+    if ($ruta === '') {
+        return '';
+    }
+
+    if (preg_match('/^https?:\/\//i', $ruta)) {
+        return $ruta;
+    }
+
+    $baseUrl = rtrim((string) (getenv('IMAGE_BASE_URL') ?: 'http://localhost:3000'), '/');
+    return $baseUrl . '/' . ltrim($ruta, '/') . '?v=20261110-3';
+}
+
 function escapar(string $valor): string
 {
     return htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');

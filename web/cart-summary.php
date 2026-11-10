@@ -13,7 +13,7 @@ if ($carrito) {
     $ids = array_map('intval', array_keys($carrito));
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
     $types = str_repeat('i', count($ids));
-    $stmt = $conn->prepare("SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen,
+    $stmt = $conn->prepare("SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen,
         v.id_variante, v.stock, t.talla, co.color
         FROM productos p
         INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
@@ -71,7 +71,7 @@ if ($carrito) {
                         <?php if (!isset($carrito[$id_producto][$id_variante]) || (int) $carrito[$id_producto][$id_variante] < 1) { continue; } ?>
                     <?php $cantidad = min((int) $carrito[$id_producto][$id_variante], (int) $producto['stock']); ?>
                     <div class="producto-card">
-                        <img src="<?php echo escapar((string) $producto['imagen']); ?>" alt="<?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?>" loading="lazy">
+                        <img src="<?php echo escapar(imagen_url($producto['variante_imagen'] ?: $producto['imagen'])); ?>" alt="<?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?>" loading="lazy">
                         <h3><?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?></h3>
                         <p><strong>Precio:</strong> <?php echo number_format((float) $producto['precio'], 2, ',', '.'); ?> €</p>
                         <p><strong>Talla:</strong> <?php echo escapar((string) $producto['talla']); ?></p>
