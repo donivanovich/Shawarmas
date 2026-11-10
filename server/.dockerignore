@@ -4,5 +4,7 @@ npm-debug.log
 storage/*
 !storage/brand/
 !storage/brand/*
+!storage/colors/
+!storage/colors/*
 !storage/products/.gitkeep
 test-storage
