@@ -24,13 +24,13 @@ Configura las variables de entorno de PHP con los mismos valores de `db/.env.exa
 
 ## Datos iniciales de demostración
 
-En el primer arranque con un volumen MySQL vacío, Docker ejecuta `db/schema.sql` y después `db/demo-seed.sql`. Se crean cinco clientes y pedidos de ejemplo. Todas las cuentas semilla usan la contraseña `Shawarmas123!`:
+En el primer arranque con un volumen MySQL vacío, Docker ejecuta `db/schema.sql`, que contiene el esquema y los datos de demo. Se crean cinco clientes y pedidos de ejemplo. Todas las cuentas semilla usan la contraseña `Shawarmas123!`:
 
 - Cliente: `cliente@shawarmas.local`
 - Empleado (tabla `empleados`, perfil `writter`): `empleado@shawarmas.local`
 - Clientes: `ana.martinez@gmail.com`, `carlos.rivera@outlook.com`, `laura.gomez@yahoo.com` y `diego.santos@gmail.com`
 
-Los pedidos incluyen productos y direcciones de Madrid, Barcelona, Valencia, Sevilla, Lisboa y Oporto. El antiguo ejemplo `nombre@gmail.com` se elimina junto con sus pedidos. MySQL ejecuta estos scripts solo cuando el volumen está vacío; para la base actual, `db/demo-seed.sql` se puede volver a ejecutar de forma segura.
+Los pedidos incluyen productos y direcciones de Madrid, Barcelona, Valencia, Sevilla, Lisboa y Oporto. El antiguo ejemplo `nombre@gmail.com` se elimina junto con sus pedidos. MySQL ejecuta el archivo de inicialización solo cuando el volumen está vacío.
 
 ## Flujo funcional
 

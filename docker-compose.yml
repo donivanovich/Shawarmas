@@ -9,7 +9,6 @@ services:
     volumes:
       - shawarmas-db:/var/lib/mysql
       - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./db/demo-seed.sql:/docker-entrypoint-initdb.d/02-demo-seed.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
@@ -49,6 +48,7 @@ services:
     volumes:
       - shawarmas-images:/app/storage
       - ./server/storage/brand:/app/storage/brand:ro
+      - ./server/storage/colors:/app/storage/colors:ro
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
       interval: 10s

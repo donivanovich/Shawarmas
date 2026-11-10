@@ -7,6 +7,7 @@ RUN npm ci --omit=dev
 
 COPY src ./src
 COPY storage/brand /app/storage/brand
+COPY storage/colors /app/storage/colors
 RUN mkdir -p /app/storage/products \
     && chown -R node:node /app
 
