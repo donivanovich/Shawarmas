@@ -95,7 +95,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             </div>
             <div class="hero-art" aria-label="Selección de zapatillas y ropa">
                 <span class="hero-index">01 / 04</span>
-                <img src="<?= escapar((string) $heroProducto['imagen']) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>">
+                <img src="<?= escapar(imagen_url($heroProducto['imagen'])) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>">
                 <p>THE EVERYDAY<br><strong>UNIFORM</strong></p>
             </div>
         </section>
@@ -120,7 +120,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                     <a class="alternative-product" href="product.php?id=<?= (int) $producto['id_producto'] ?>">
                         <div class="product-visual">
                             <span><?= str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) ?></span>
-                            <img src="<?= escapar((string) $producto['imagen']) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>" loading="lazy">
+                            <img src="<?= escapar(imagen_url($producto['imagen'])) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>" loading="lazy">
                             <?php if ((int) $producto['stock'] < 10): ?><small>ÚLTIMAS UNIDADES</small><?php endif; ?>
                         </div>
                         <div class="product-meta">
@@ -149,7 +149,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     </main>
 
     <footer class="alternative-footer">
-        <div><img class="footer-logo" src="assets/img/logo-shawarmas.png?v=20261110-2" alt="Shawarmas"><strong>SHAWARMAS</strong></div>
+        <div><img class="footer-logo" src="assets/img/logo-shawarmas.png?v=20261110-2" alt="Shawarmas"></div>
         <p>Ropa urbana para todos los días.</p>
         <a href="products.php">Ir a la colección <i class="bi bi-arrow-right"></i></a>
     </footer>

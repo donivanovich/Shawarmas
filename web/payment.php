@@ -26,7 +26,7 @@ foreach ($carrito as $idProducto => $tallasProducto) {
         $cartCount += max(0, (int) $cantidad);
         $idProducto = (int) $idProducto;
         $idVariante = (int) $idVariante;
-        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.stock, v.id_variante, t.talla, co.color
+        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen, v.stock, v.id_variante, t.talla, co.color
             FROM productos p
             INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
             INNER JOIN tallas t ON t.id_talla = v.fk_talla
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2>Productos</h2>
             <?php foreach ($productosDetalle as $producto): ?>
                 <article class="etiqueta-producto">
-                    <img src="<?= escapar((string) $producto['imagen']) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>">
+                    <img src="<?= escapar(imagen_url($producto['variante_imagen'] ?: $producto['imagen'])) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>">
                     <div><strong><?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?></strong><p>Talla: <?= escapar((string) $producto['talla']) ?></p><p>Color: <?= escapar((string) $producto['color']) ?></p><p>Cantidad: <?= $producto['cantidad'] ?></p><p>Subtotal: <?= number_format($producto['subtotal'], 2, ',', '.') ?> €</p></div>
                 </article>
             <?php endforeach; ?>

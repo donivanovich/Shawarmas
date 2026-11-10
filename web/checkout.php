@@ -26,7 +26,7 @@ foreach ($carrito as $idProducto => $tallasProducto) {
     foreach ($tallasProducto as $idVariante => $cantidad) {
         $idProducto = (int) $idProducto;
         $idVariante = (int) $idVariante;
-        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.stock, v.id_variante, t.talla, co.color
+        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen, v.stock, v.id_variante, t.talla, co.color
             FROM productos p
             INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
             INNER JOIN tallas t ON t.id_talla = v.fk_talla
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $productosDetalle) {
             <?php if ($productosDetalle): ?>
                 <?php foreach ($productosDetalle as $producto): ?>
                     <article class="etiqueta-producto">
-                        <img src="<?php echo escapar((string) $producto['imagen']); ?>" alt="<?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?>">
+                        <img src="<?php echo escapar(imagen_url($producto['variante_imagen'] ?: $producto['imagen'])); ?>" alt="<?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?>">
                         <div>
                             <strong><?php echo escapar($producto['marca'] . ' ' . $producto['modelo']); ?></strong>
                             <p>Talla: <?php echo escapar((string) $producto['talla']); ?></p>

@@ -1,0 +1,6 @@
+node_modules
+npm-debug.log
+.env
+storage/*
+!storage/products/.gitkeep
+test-storage

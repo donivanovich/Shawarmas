@@ -33,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'], $_POST['pa
 
 $categoria = filter_input(INPUT_GET, 'categoria', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $maximo = filter_input(INPUT_GET, 'maximo', FILTER_VALIDATE_FLOAT, ['options' => ['min_range' => 0]]);
+$colorId = filter_input(INPUT_GET, 'color', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+$marca = trim((string) ($_GET['marca'] ?? ''));
 $busqueda = trim((string) ($_GET['buscar'] ?? ''));
 $filtrosActivos = [];
 if ($busqueda !== '') {
@@ -41,15 +43,23 @@ if ($busqueda !== '') {
 if ($categoria) {
     $filtrosActivos['categoria'] = $categoria;
 }
+if ($marca !== '') {
+    $filtrosActivos['marca'] = $marca;
+}
+if ($colorId) {
+    $filtrosActivos['color'] = $colorId;
+}
 if ($maximo !== false && $maximo !== null) {
     $filtrosActivos['maximo'] = $maximo;
 }
 $urlColeccionFiltrada = 'products.php' . ($filtrosActivos ? '?' . http_build_query($filtrosActivos) : '');
 
-$sql = 'SELECT p.id_producto, p.marca, p.modelo, p.precio, COALESCE(SUM(v.stock), 0) AS stock, p.imagen, c.categoria
+$sql = 'SELECT p.id_producto, p.marca, p.modelo, p.precio, COALESCE(SUM(v.stock), 0) AS stock,
+               COALESCE(MAX(v.imagen), p.imagen) AS imagen, c.categoria, co.id_color, co.color
         FROM productos p
         INNER JOIN categorias c ON c.id_categoria = p.fk_categoria
         LEFT JOIN producto_variantes v ON v.fk_producto = p.id_producto
+        LEFT JOIN colores co ON co.id_color = v.fk_color
         WHERE 1 = 1';
 $types = '';
 $params = [];
@@ -57,6 +67,16 @@ if ($categoria) {
     $sql .= ' AND p.fk_categoria = ?';
     $types .= 'i';
     $params[] = $categoria;
+}
+if ($marca !== '') {
+    $sql .= ' AND p.marca = ?';
+    $types .= 's';
+    $params[] = $marca;
+}
+if ($colorId) {
+    $sql .= ' AND co.id_color = ?';
+    $types .= 'i';
+    $params[] = $colorId;
 }
 if ($maximo !== false && $maximo !== null) {
     $sql .= ' AND p.precio <= ?';
@@ -70,7 +90,7 @@ if ($busqueda !== '') {
     $params[] = $like;
     $params[] = $like;
 }
-$sql .= ' GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria ORDER BY p.id_producto';
+$sql .= ' GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria, co.id_color, co.color ORDER BY RAND()';
 
 $stmt = $conn->prepare($sql);
 if ($types !== '') {
@@ -81,11 +101,11 @@ $productos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 $categorias = $conn->query('SELECT id_categoria, categoria FROM categorias ORDER BY categoria')->fetch_all(MYSQLI_ASSOC);
-$variantes = $conn->query('SELECT v.id_variante, v.fk_producto, v.stock, t.talla, co.color
+$marcas = $conn->query('SELECT DISTINCT marca FROM productos ORDER BY marca')->fetch_all(MYSQLI_ASSOC);
+$colores = $conn->query('SELECT DISTINCT co.id_color, co.color
     FROM producto_variantes v
-    INNER JOIN tallas t ON t.id_talla = v.fk_talla
     INNER JOIN colores co ON co.id_color = v.fk_color
-    ORDER BY v.fk_producto, t.id_talla')->fetch_all(MYSQLI_ASSOC);
+    ORDER BY co.color')->fetch_all(MYSQLI_ASSOC);
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     foreach ((array) $sizes as $quantity) {
@@ -101,7 +121,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     <title>Productos</title>
     <link rel="icon" href="assets/img/favicon/favicon.ico?v=20261110-1" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-1">
-    <link rel="stylesheet" href="products.css?v=20261110-1">
+    <link rel="stylesheet" href="products.css?v=20261110-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -143,6 +163,20 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <label for="marca">Marca</label>
+                <select id="marca" name="marca">
+                    <option value="">Todas</option>
+                    <?php foreach ($marcas as $item): ?>
+                        <option value="<?= escapar((string) $item['marca']) ?>" <?= $marca === (string) $item['marca'] ? 'selected' : '' ?>><?= escapar((string) $item['marca']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="color">Color</label>
+                <select id="color" name="color">
+                    <option value="">Todos</option>
+                    <?php foreach ($colores as $item): ?>
+                        <option value="<?= (int) $item['id_color'] ?>" <?= $colorId === (int) $item['id_color'] ? 'selected' : '' ?>><?= escapar((string) $item['color']) ?></option>
+                    <?php endforeach; ?>
+                </select>
                 <label for="maximo">Precio máximo</label>
                 <input id="maximo" name="maximo" type="number" min="0" step="0.01" value="<?= $maximo !== false && $maximo !== null ? escapar((string) $maximo) : '' ?>">
                 <button type="submit">Aplicar filtros</button>
@@ -158,31 +192,17 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             <?php else: ?>
                 <section class="grilla-productos">
                     <?php foreach ($productos as $producto): ?>
-                        <article class="tarjeta-producto <?= (int) $producto['stock'] < 1 ? 'is-sold-out' : '' ?>" data-detail-url="product.php?id=<?= (int) $producto['id_producto'] ?>&return=<?= rawurlencode($urlColeccionFiltrada) ?>" tabindex="0">
+                        <?php $colorTarjeta = (int) ($producto['id_color'] ?? 0); ?>
+                        <article class="tarjeta-producto <?= (int) $producto['stock'] < 1 ? 'is-sold-out' : '' ?>" data-detail-url="product.php?id=<?= (int) $producto['id_producto'] ?><?= $colorTarjeta ? '&color=' . $colorTarjeta : '' ?>&return=<?= rawurlencode($urlColeccionFiltrada) ?>" tabindex="0">
                             <div class="catalog-image">
                                 <?php if ((int) $producto['stock'] < 1): ?><span class="diagonal-ribbon">FUERA DE STOCK</span><?php endif; ?>
-                                <img src="<?= escapar((string) $producto['imagen']) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>" loading="lazy">
+                                <img src="<?= escapar(imagen_url($producto['imagen'])) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo'] . ($producto['color'] ? ', ' . $producto['color'] : '')) ?>" loading="lazy">
                             </div>
                             <div class="contenido">
                                 <h3><?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?></h3>
+                                <?php if ($producto['color']): ?><small class="product-card-color">Color: <?= escapar((string) $producto['color']) ?></small><?php endif; ?>
                                 <p><?= number_format((float) $producto['precio'], 2, ',', '.') ?> €</p>
                                 <?php if ((int) $producto['stock'] < 1): ?><small class="sold-out-label">Fuera de stock</small><?php endif; ?>
-                                <form class="producto-carrito-form" action="add-to-cart.php" method="post">
-                                    <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
-                                    <input type="hidden" name="id_producto" value="<?= (int) $producto['id_producto'] ?>">
-                                    <label for="talla-<?= (int) $producto['id_producto'] ?>">Talla</label>
-                                    <select id="talla-<?= (int) $producto['id_producto'] ?>" name="id_variante" required>
-                                        <option value="">Selecciona una talla</option>
-                                        <?php foreach ($variantes as $variante): ?>
-                                            <?php if ((int) $variante['fk_producto'] !== (int) $producto['id_producto']) { continue; } ?>
-                                            <option value="<?= (int) $variante['id_variante'] ?>" <?= (int) $variante['stock'] < 1 ? 'disabled' : '' ?>>
-                                                <?= escapar((string) $variante['talla']) ?> · <?= escapar((string) $variante['color']) ?><?= (int) $variante['stock'] < 1 ? ' — Agotada' : '' ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <input type="hidden" name="cantidad" value="1">
-                                    <button type="button" class="carrito-icono" aria-label="Elegir talla y añadir al carrito" title="Elegir talla y añadir al carrito" <?= (int) $producto['stock'] < 1 ? 'disabled' : '' ?>><i class="bi bi-bag-plus"></i></button>
-                                </form>
                             </div>
                         </article>
                     <?php endforeach; ?>
@@ -208,34 +228,11 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         filterToggle.addEventListener('click', () => setFilters(!filterPanel.classList.contains('is-hidden')));
         filterClose.addEventListener('click', () => setFilters(true));
         document.querySelectorAll('.tarjeta-producto').forEach(card => {
-            const form = card.querySelector('.producto-carrito-form');
-            const button = card.querySelector('.carrito-icono');
-            const openDetail = event => {
-                if (!event.target.closest('button, select, option, form')) {
-                    window.location.href = card.dataset.detailUrl;
-                }
-            };
-            card.addEventListener('click', openDetail);
+            card.addEventListener('click', () => { window.location.href = card.dataset.detailUrl; });
             card.addEventListener('keydown', event => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    openDetail(event);
-                }
-            });
-            button.addEventListener('click', event => {
-                event.stopPropagation();
-                if (form.classList.contains('is-open')) {
-                    form.requestSubmit();
-                    return;
-                }
-                form.classList.add('is-open');
-                form.querySelector('select').focus();
-            });
-            form.addEventListener('click', event => event.stopPropagation());
-            form.addEventListener('submit', event => {
-                if (!form.querySelector('select').value) {
-                    event.preventDefault();
-                    form.querySelector('select').focus();
+                    window.location.href = card.dataset.detailUrl;
                 }
             });
         });

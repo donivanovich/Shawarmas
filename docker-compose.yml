@@ -28,10 +28,31 @@ services:
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: shawarmas
+      IMAGE_BASE_URL: ${IMAGE_BASE_URL:-http://localhost:3000}
     ports:
       - "8080:80"
     volumes:
       - ./web:/var/www/html:ro
 
+  image-server:
+    build:
+      context: ./server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      PORT: ${IMAGE_SERVER_PORT:-3000}
+      IMAGE_STORAGE_PATH: /app/storage
+    ports:
+      - "${IMAGE_SERVER_PORT:-3000}:${IMAGE_SERVER_PORT:-3000}"
+    volumes:
+      - shawarmas-images:/app/storage
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   shawarmas-db:
+  shawarmas-images:

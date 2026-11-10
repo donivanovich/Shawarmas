@@ -4,6 +4,7 @@ session_start();
 require_once __DIR__ . '/database-connection.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+$colorSolicitado = filter_input(INPUT_GET, 'color', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $urlRetorno = (string) ($_GET['return'] ?? '');
 if (!preg_match('/^products\.php(?:\?.*)?$/', $urlRetorno)) {
     $urlRetorno = 'products.php';
@@ -26,17 +27,57 @@ if ($result && $result->num_rows > 0) {
 }
 $stmt->close();
 $stmt = $conn->prepare(
-    'SELECT v.id_variante, v.stock, t.talla, co.color
+    "SELECT v.id_variante, v.fk_producto, COALESCE(v.imagen, p.imagen) AS imagen_producto, v.stock, t.talla, co.id_color, co.color, co.imagen AS color_imagen
      FROM producto_variantes v
+     INNER JOIN productos p ON p.id_producto = v.fk_producto
      INNER JOIN tallas t ON t.id_talla = v.fk_talla
      INNER JOIN colores co ON co.id_color = v.fk_color
-     WHERE v.fk_producto = ?
-     ORDER BY t.id_talla, co.id_color'
+     WHERE p.marca = ? AND p.modelo = ? AND p.fk_categoria = ?
+       AND NOT (p.marca = 'Adidas' AND p.modelo = 'Samba OG' AND co.color = 'Panda')
+      ORDER BY p.id_producto, t.id_talla"
 );
-$stmt->bind_param('i', $id);
+$stmt->bind_param('ssi', $producto['marca'], $producto['modelo'], $producto['fk_categoria']);
 $stmt->execute();
 $variantes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+$colores = [];
+foreach ($variantes as $variante) {
+    $colorId = (int) $variante['id_color'];
+    if (!isset($colores[$colorId])) {
+        $colores[$colorId] = [
+            'id_color' => $colorId,
+            'color' => (string) $variante['color'],
+            'imagen' => (string) $variante['color_imagen'],
+            'id_producto' => (int) $variante['fk_producto'],
+            'imagen_producto' => (string) $variante['imagen_producto'],
+            'stock' => 0
+        ];
+    }
+    $enCarritoColor = (int) ($_SESSION['carrito'][(int) $variante['fk_producto']][(int) $variante['id_variante']] ?? 0);
+    $colores[$colorId]['stock'] += max(0, (int) $variante['stock'] - $enCarritoColor);
+}
+$colorInicial = null;
+if ($colorSolicitado !== false && $colorSolicitado !== null && isset($colores[$colorSolicitado]) && $colores[$colorSolicitado]['stock'] > 0) {
+    $colorInicial = $colorSolicitado;
+}
+foreach ($variantes as $variante) {
+    if ($colorInicial !== null) {
+        break;
+    }
+    $enCarrito = (int) ($_SESSION['carrito'][(int) $variante['fk_producto']][(int) $variante['id_variante']] ?? 0);
+    if ((int) $variante['fk_producto'] === (int) $id && (int) $variante['stock'] > $enCarrito) {
+        $colorInicial = (int) $variante['id_color'];
+        break;
+    }
+}
+if ($colorInicial === null) {
+    foreach ($colores as $color) {
+        if ($color['stock'] > 0) {
+            $colorInicial = (int) $color['id_color'];
+            break;
+        }
+    }
+}
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     foreach ((array) $sizes as $quantity) {
@@ -45,7 +86,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 }
 $agotado = true;
 foreach ($variantes as $variante) {
-    $enCarrito = (int) ($_SESSION['carrito'][$id][(int) $variante['id_variante']] ?? 0);
+    $enCarrito = (int) ($_SESSION['carrito'][(int) $variante['fk_producto']][(int) $variante['id_variante']] ?? 0);
     if ((int) $variante['stock'] > $enCarrito) {
         $agotado = false;
         break;
@@ -77,14 +118,14 @@ foreach ($variantes as $variante) {
             <section class="product-media" aria-label="Imagen del producto">
                 <?php if ($agotado): ?><span class="diagonal-ribbon">FUERA DE STOCK</span><?php endif; ?>
                 <span class="media-index">SHAWARMAS / <?= str_pad((string) $producto['id_producto'], 2, '0', STR_PAD_LEFT) ?></span>
-                <img src="<?= escapar((string) $producto['imagen']) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>">
+                <img src="<?= escapar(imagen_url($producto['imagen'])) ?>" alt="<?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?>">
             </section>
 
             <section class="product-information">
                 <p class="product-kicker"><?= escapar((string) $producto['categoria']) ?> / <?= escapar((string) $producto['marca']) ?></p>
                 <h1><?= escapar((string) $producto['modelo']) ?></h1>
                 <p class="product-price"><?= number_format((float) $producto['precio'], 2, ',', '.') ?> €</p>
-                <p class="product-intro">Una pieza pensada para acompañarte todos los días. Elige tu talla y añádela a tu selección.</p>
+                <p class="product-intro"><?= escapar((string) ($producto['descripcion'] ?? '')) ?></p>
 
                         <div class="product-details">
                             <div><span>Marca</span><strong><?= escapar((string) $producto['marca']) ?></strong></div>
@@ -95,14 +136,35 @@ foreach ($variantes as $variante) {
                     <p class="stock-message">Este producto está fuera de stock.</p>
                 <?php else: ?>
                     <div class="purchase-controls">
+                        <div class="color-control">
+                            <span class="control-label">Selecciona color</span>
+                            <div class="color-picker" role="radiogroup" aria-label="Colores disponibles">
+                                <?php foreach ($colores as $color): ?>
+                                    <?php $disponibleColor = $color['stock'] > 0; ?>
+                                    <button
+                                        class="color-option<?= !$disponibleColor ? ' is-unavailable' : '' ?>"
+                                        type="button"
+                                        role="radio"
+                                        aria-label="<?= escapar($color['color'] . (!$disponibleColor ? ', fuera de stock' : '')) ?>"
+                                        aria-checked="false"
+                                        data-color-id="<?= (int) $color['id_color'] ?>"
+                                        data-color-image="<?= escapar(imagen_url($color['imagen'])) ?>"
+                                        data-product-id="<?= (int) $color['id_producto'] ?>"
+                                        data-product-image="<?= escapar(imagen_url($color['imagen_producto'])) ?>"
+                                        <?= !$disponibleColor ? 'disabled' : '' ?>>
+                                        <img src="<?= escapar(imagen_url($color['imagen'])) ?>" alt="" aria-hidden="true">
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                         <div class="size-control">
-                            <label for="id_variante">Selecciona talla y color</label>
+                            <label for="id_variante">Selecciona talla</label>
                             <select id="id_variante" name="id_variante" form="form-carrito" required>
                                 <option value="">Elegir talla</option>
                                 <?php foreach ($variantes as $variante): ?>
-                                    <?php $enCarrito = (int) ($_SESSION['carrito'][$id][(int) $variante['id_variante']] ?? 0); $disponible = max(0, (int) $variante['stock'] - $enCarrito); ?>
-                                    <option value="<?= (int) $variante['id_variante'] ?>" data-stock="<?= $disponible ?>" <?= $disponible < 1 ? 'disabled' : '' ?>>
-                                        <?= escapar((string) $variante['talla']) ?> · <?= escapar((string) $variante['color']) ?><?= $disponible < 1 ? ' — Agotada' : '' ?>
+                                    <?php $enCarrito = (int) ($_SESSION['carrito'][(int) $variante['fk_producto']][(int) $variante['id_variante']] ?? 0); $disponible = max(0, (int) $variante['stock'] - $enCarrito); ?>
+                                    <option value="<?= (int) $variante['id_variante'] ?>" data-color-id="<?= (int) $variante['id_color'] ?>" data-product-id="<?= (int) $variante['fk_producto'] ?>" data-stock="<?= $disponible ?>" <?= $disponible < 1 ? 'disabled' : '' ?>>
+                                        <?= escapar((string) $variante['talla']) ?><?= $disponible < 1 ? ' — Agotada' : '' ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -118,7 +180,7 @@ foreach ($variantes as $variante) {
                 <?php endif; ?>
                 <form id="form-carrito" action="add-to-cart.php" method="post">
                     <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
-                    <input type="hidden" name="id_producto" value="<?= (int) $producto['id_producto'] ?>">
+                    <input type="hidden" name="id_producto" id="id_producto" value="<?= (int) $producto['id_producto'] ?>">
                     <input type="hidden" name="cantidad" id="cantidad-hidden" value="1">
                 </form>
             </section>
@@ -164,6 +226,32 @@ foreach ($variantes as $variante) {
                 precioTotalElement.textContent = (precioUnitario * currentValue).toFixed(2).replace('.', ',') + ' €';
             }
             const varianteSelect = document.getElementById('id_variante');
+            const colorOptions = [...document.querySelectorAll('.color-option:not(:disabled)')];
+            const productImage = document.querySelector('.product-media img');
+            const productIdInput = document.getElementById('id_producto');
+            const initialColorId = <?= json_encode($colorInicial) ?>;
+            function seleccionarColor(colorId) {
+                colorOptions.forEach(option => {
+                    const selected = Number(option.dataset.colorId) === Number(colorId);
+                    option.classList.toggle('is-selected', selected);
+                    option.setAttribute('aria-checked', String(selected));
+                });
+                const colorOption = colorOptions.find(option => Number(option.dataset.colorId) === Number(colorId));
+                if (colorOption) {
+                    productImage.src = colorOption.dataset.productImage;
+                    productIdInput.value = colorOption.dataset.productId;
+                }
+                [...varianteSelect.options].forEach(option => {
+                    const visible = option.value === '' || Number(option.dataset.colorId) === Number(colorId);
+                    option.hidden = !visible;
+                    option.disabled = !visible || Number(option.dataset.stock) < 1;
+                });
+                varianteSelect.value = '';
+                stockDisponible = 0;
+                currentValue = 0;
+                actualizarContador();
+            }
+            colorOptions.forEach(option => option.addEventListener('click', () => seleccionarColor(option.dataset.colorId)));
             varianteSelect.addEventListener('change', () => {
                 stockDisponible = Number(varianteSelect.selectedOptions[0]?.dataset.stock || 0);
                 currentValue = stockDisponible > 0 ? 1 : 0;
@@ -175,6 +263,7 @@ foreach ($variantes as $variante) {
                 if (!varianteSelect.value) { varianteSelect.focus(); return; }
                 formCarrito.submit();
             });
+            if (initialColorId !== null) seleccionarColor(initialColorId);
             actualizarContador();
         </script>
     <?php endif; ?>
