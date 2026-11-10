@@ -44,7 +44,7 @@ public class Customer {
 		frameCustomer = new JFrame();
 		frameCustomer.getContentPane().setBackground(new Color(255, 255, 255));
 		frameCustomer.setTitle("Bienvenido, " + customerName);
-		frameCustomer.setIconImage(new ImageIcon(getClass().getResource("/images/favicon.png")).getImage());
+		frameCustomer.setIconImage(BrandAssets.load("favicon.ico"));
 		frameCustomer.setBounds(100, 100, 570, 450);
 		frameCustomer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameCustomer.getContentPane().setLayout(null);

@@ -20,6 +20,8 @@ namespace Shawarmas
         public LoginWindow()
         {
             InitializeComponent();
+            BrandAssets.SetWindowIcon(this, "favicon.ico");
+            BrandAssets.SetLogo(BrandLogo);
         }
 
         string? username;

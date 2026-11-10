@@ -36,6 +36,11 @@ $maximo = filter_input(INPUT_GET, 'maximo', FILTER_VALIDATE_FLOAT, ['options' =>
 $colorId = filter_input(INPUT_GET, 'color', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $marca = trim((string) ($_GET['marca'] ?? ''));
 $busqueda = trim((string) ($_GET['buscar'] ?? ''));
+$opcionesPorPagina = [12, 25, 36, 50];
+$porPaginaSolicitado = filter_input(INPUT_GET, 'por_pagina', FILTER_VALIDATE_INT);
+$porPagina = in_array($porPaginaSolicitado, $opcionesPorPagina, true) ? $porPaginaSolicitado : 25;
+$paginaSolicitada = filter_input(INPUT_GET, 'pagina', FILTER_VALIDATE_INT);
+$pagina = $paginaSolicitada !== false && $paginaSolicitada !== null ? max(1, $paginaSolicitada) : 1;
 $filtrosActivos = [];
 if ($busqueda !== '') {
     $filtrosActivos['buscar'] = $busqueda;
@@ -52,7 +57,7 @@ if ($colorId) {
 if ($maximo !== false && $maximo !== null) {
     $filtrosActivos['maximo'] = $maximo;
 }
-$urlColeccionFiltrada = 'products.php' . ($filtrosActivos ? '?' . http_build_query($filtrosActivos) : '');
+$urlColeccionFiltrada = '';
 
 $sql = 'SELECT p.id_producto, p.marca, p.modelo, p.precio, COALESCE(SUM(v.stock), 0) AS stock,
                COALESCE(MAX(v.imagen), p.imagen) AS imagen, c.categoria, co.id_color, co.color
@@ -90,7 +95,33 @@ if ($busqueda !== '') {
     $params[] = $like;
     $params[] = $like;
 }
-$sql .= ' GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria, co.id_color, co.color ORDER BY RAND()';
+$inicioFrom = strpos($sql, 'FROM productos p');
+$fromConFiltros = substr($sql, $inicioFrom);
+$sqlTotal = 'SELECT COUNT(*) AS total FROM (
+    SELECT p.id_producto, co.id_color ' . $fromConFiltros . '
+    GROUP BY p.id_producto, co.id_color
+) AS productos_filtrados';
+$stmtTotal = $conn->prepare($sqlTotal);
+if ($types !== '') {
+    $stmtTotal->bind_param($types, ...$params);
+}
+$stmtTotal->execute();
+$totalProductos = (int) $stmtTotal->get_result()->fetch_assoc()['total'];
+$stmtTotal->close();
+
+$totalPaginas = max(1, (int) ceil($totalProductos / $porPagina));
+$pagina = min($pagina, $totalPaginas);
+$offset = ($pagina - 1) * $porPagina;
+$semillaAleatoria = (int) sprintf('%u', crc32(date('Y-m-d') . '|' . http_build_query($filtrosActivos)));
+$urlParametros = $filtrosActivos + ['por_pagina' => $porPagina, 'pagina' => $pagina];
+$urlColeccionFiltrada = 'products.php?' . http_build_query($urlParametros);
+
+$sql .= ' GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria, co.id_color, co.color
+          ORDER BY RAND(?) LIMIT ? OFFSET ?';
+$types .= 'iii';
+$params[] = $semillaAleatoria;
+$params[] = $porPagina;
+$params[] = $offset;
 
 $stmt = $conn->prepare($sql);
 if ($types !== '') {
@@ -99,6 +130,13 @@ if ($types !== '') {
 $stmt->execute();
 $productos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+$primerProducto = $totalProductos > 0 ? $offset + 1 : 0;
+$ultimoProducto = min($offset + $porPagina, $totalProductos);
+$paginaInicio = max(1, $pagina - 2);
+$paginaFin = min($totalPaginas, $pagina + 2);
+$urlPagina = static function (int $numeroPagina) use ($filtrosActivos, $porPagina): string {
+    return 'products.php?' . http_build_query($filtrosActivos + ['por_pagina' => $porPagina, 'pagina' => $numeroPagina]);
+};
 
 $categorias = $conn->query('SELECT id_categoria, categoria FROM categorias ORDER BY categoria')->fetch_all(MYSQLI_ASSOC);
 $marcas = $conn->query('SELECT DISTINCT marca FROM productos ORDER BY marca')->fetch_all(MYSQLI_ASSOC);
@@ -119,14 +157,14 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Productos</title>
-    <link rel="icon" href="assets/img/favicon/favicon.ico?v=20261110-1" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-1">
-    <link rel="stylesheet" href="products.css?v=20261110-2">
+    <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
+    <link rel="stylesheet" href="alternative.css?v=20261110-4">
+    <link rel="stylesheet" href="products.css?v=20261110-6">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
     <header class="alternative-header">
-        <a class="alternative-brand" href="index.php" aria-label="Shawarmas, inicio"><img src="assets/img/logo.png?v=20261110-2" alt="Shawarmas" style="transform: scale(1.5);"></a>
+        <a class="alternative-brand" href="index.php" aria-label="Shawarmas, inicio"><img src="<?= escapar(imagen_url('/brand/logo.png')) ?>" alt="Shawarmas"></a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="alternative-nav"><i class="bi bi-list"></i><span>Menú</span></button>
         <nav id="alternative-nav" aria-label="Navegación principal"><a href="index.php">Inicio</a><a class="active" href="products.php">Colección</a><a href="index.php#categorias">Categorías</a></nav>
         <div class="alternative-actions">
@@ -137,7 +175,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                 <?php if (!empty($_SESSION['id_user'])): ?>
                     <strong><?= escapar((string) $_SESSION['nombre_completo']) ?></strong>
                     <span><?= escapar((string) $_SESSION['mail']) ?></span>
-                    <a href="logout.php">Cerrar sesión</a>
+                    <a href="account.php">Cuenta</a><a href="logout.php">Cerrar sesión</a>
                 <?php else: ?>
                     <strong>Tu perfil</strong>
                     <span>Inicia sesión para ver tus datos y comprar.</span>
@@ -152,6 +190,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         <aside class="filtro-lateral">
             <div class="filtro-titulo"><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button><h2>Filtrar productos</h2><button class="filtro-cerrar" type="button" aria-label="Ocultar filtros"><i class="bi bi-chevron-up"></i></button></div>
             <form method="get">
+                <input type="hidden" name="por_pagina" value="<?= $porPagina ?>">
                 <label for="buscar">Buscar</label>
                 <input id="buscar" name="buscar" value="<?= escapar($busqueda) ?>" maxlength="100">
                 <label for="categoria">Categoría</label>
@@ -207,6 +246,40 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                         </article>
                     <?php endforeach; ?>
                 </section>
+                <div class="catalog-pagination-footer">
+                    <div class="catalog-pagination-toolbar">
+                        <p>Mostrando <?= $primerProducto ?>–<?= $ultimoProducto ?> de <?= $totalProductos ?> productos</p>
+                        <form method="get" class="page-size-form">
+                            <?php foreach ($filtrosActivos as $nombreFiltro => $valorFiltro): ?>
+                                <input type="hidden" name="<?= escapar((string) $nombreFiltro) ?>" value="<?= escapar((string) $valorFiltro) ?>">
+                            <?php endforeach; ?>
+                            <label for="por_pagina">Mostrar</label>
+                            <select id="por_pagina" name="por_pagina" onchange="this.form.submit()">
+                                <?php foreach ($opcionesPorPagina as $opcion): ?>
+                                    <option value="<?= $opcion ?>" <?= $porPagina === $opcion ? 'selected' : '' ?>><?= $opcion ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span>productos</span>
+                        </form>
+                    </div>
+                    <?php if ($totalPaginas > 1): ?>
+                    <nav class="pagination-nav" aria-label="Paginación de productos">
+                        <?php if ($pagina > 1): ?><a class="pagination-arrow" href="<?= escapar($urlPagina($pagina - 1)) ?>" aria-label="Página anterior"><i class="bi bi-arrow-left"></i> Anterior</a><?php endif; ?>
+                        <?php if ($paginaInicio > 1): ?>
+                            <a class="pagination-page" href="<?= escapar($urlPagina(1)) ?>">1</a>
+                            <?php if ($paginaInicio > 2): ?><span class="pagination-ellipsis">…</span><?php endif; ?>
+                        <?php endif; ?>
+                        <?php for ($numeroPagina = $paginaInicio; $numeroPagina <= $paginaFin; $numeroPagina++): ?>
+                            <a class="pagination-page <?= $numeroPagina === $pagina ? 'is-current' : '' ?>" href="<?= escapar($urlPagina($numeroPagina)) ?>" <?= $numeroPagina === $pagina ? 'aria-current="page"' : '' ?>><?= $numeroPagina ?></a>
+                        <?php endfor; ?>
+                        <?php if ($paginaFin < $totalPaginas): ?>
+                            <?php if ($paginaFin < $totalPaginas - 1): ?><span class="pagination-ellipsis">…</span><?php endif; ?>
+                            <a class="pagination-page" href="<?= escapar($urlPagina($totalPaginas)) ?>"><?= $totalPaginas ?></a>
+                        <?php endif; ?>
+                        <?php if ($pagina < $totalPaginas): ?><a class="pagination-arrow" href="<?= escapar($urlPagina($pagina + 1)) ?>" aria-label="Página siguiente">Siguiente <i class="bi bi-arrow-right"></i></a><?php endif; ?>
+                    </nav>
+                    <?php endif; ?>
+                </div>
             <?php endif; ?>
         </section>
     </main>

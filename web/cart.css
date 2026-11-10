@@ -1,4 +1,4 @@
-@import url('products.css?v=20261110-1');
+@import url('products.css?v=20261110-6');
 .page-return,.page-return:visited{color:var(--gray);border-color:var(--line)}
 .page-return:hover,.page-return:focus,.page-return:active{color:var(--black);border-color:var(--black)}
 .product-page{width:min(1240px,calc(100% - 40px));margin:0 auto;padding:34px 0 90px}

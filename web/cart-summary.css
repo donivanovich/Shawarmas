@@ -1,4 +1,4 @@
-@import url('products.css?v=20261110-1');
+@import url('products.css?v=20261110-6');
 .enlace-secundario,.enlace-secundario:visited{color:var(--black)}
 .enlace-secundario:hover,.enlace-secundario:focus,.enlace-secundario:active{color:var(--black)}
 .page-return,.page-return:visited{color:var(--gray);border-color:var(--line)}

@@ -32,10 +32,11 @@ public class Employee {
 	}
 
 	private void initialize() {
-		logo = new ImageIcon(new ImageIcon(getClass().getResource("/images/logo.png")).getImage().getScaledInstance(239, 239, Image.SCALE_SMOOTH));
+		Image logoImage = BrandAssets.load("logo.png");
+		logo = new ImageIcon(logoImage == null ? new ImageIcon().getImage() : logoImage.getScaledInstance(239, 239, Image.SCALE_SMOOTH));
 		frmEmployee = new JFrame();
 		frmEmployee.setTitle("Employee Management");
-		frmEmployee.setIconImage(new ImageIcon(getClass().getResource("/images/favicon.png")).getImage());
+		frmEmployee.setIconImage(BrandAssets.load("favicon.ico"));
 	    frmEmployee.setBounds(100, 100, 462, 300);
 	    frmEmployee.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frmEmployee.getContentPane().setLayout(null);

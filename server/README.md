@@ -19,6 +19,10 @@ UUID filenames avoid collisions and do not expose the original local filename.
 Only PNG, JPG, JPEG and WebP files whose MIME type and file signature agree are
 accepted.
 
+The shared brand files live in `storage/brand` and are served publicly at
+`/brand/logo.png` and `/brand/favicon.ico`. Web, Java and WPF read them from
+`IMAGE_BASE_URL` (default `http://localhost:3000`).
+
 ## Structure
 
 ```text

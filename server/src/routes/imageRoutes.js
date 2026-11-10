@@ -21,6 +21,31 @@ export const createImageRouter = ({ config }) => {
     }
   });
 
+  router.get('/brand/:filename', async (req, res, next) => {
+    const filename = req.params.filename;
+    const brandFiles = new Map([
+      ['logo.png', 'image/png'],
+      ['favicon.ico', 'image/x-icon']
+    ]);
+    const contentType = brandFiles.get(filename);
+    if (!contentType) return res.status(404).json({ error: 'Brand image not found' });
+
+    const brandPath = path.join(config.storagePath, 'brand', filename);
+    try {
+      await access(brandPath, fsConstants.R_OK);
+      res.set('Cache-Control', 'public, max-age=3600');
+      res.type(contentType);
+      return res.sendFile(brandPath, { dotfiles: 'deny' }, (error) => {
+        if (error && !res.headersSent) next(error);
+      });
+    } catch (error) {
+      if (error.code === 'ENOENT' || error.code === 'EACCES') {
+        return res.status(404).json({ error: 'Brand image not found' });
+      }
+      return next(error);
+    }
+  });
+
   router.get('/products/:filename', async (req, res, next) => {
     const filename = filenameParam(req);
     const productPath = getProductPath(config.storagePath, filename);

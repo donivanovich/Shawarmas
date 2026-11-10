@@ -11,9 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Icons\favicon.ico" />
-    <None Remove="Resources\Icons\favicon2.ico" />
-    <None Remove="Resources\Images\logo.png" />
     <None Remove="Resources\Music\music.mp3" />
     <None Remove="Resources\products\air-max.png" />
     <None Remove="Resources\products\puma-classic.png" />
@@ -23,15 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Icons\favicon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Icons\favicon2.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\logo.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
     <Content Include="Resources\Music\music.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

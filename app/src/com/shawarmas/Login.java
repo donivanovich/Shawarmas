@@ -32,9 +32,10 @@ public class Login {
 	}
 	
 	private void initialize() {
-		logo = new ImageIcon(new ImageIcon(getClass().getResource("/images/logo.png")).getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH));
+		Image logoImage = BrandAssets.load("logo.png");
+		logo = new ImageIcon(logoImage == null ? new ImageIcon().getImage() : logoImage.getScaledInstance(176, 176, Image.SCALE_SMOOTH));
 		frmShawarSignIn = new JFrame();
-		frmShawarSignIn.setIconImage(new ImageIcon(getClass().getResource("/images/favicon.png")).getImage());
+		frmShawarSignIn.setIconImage(BrandAssets.load("favicon.ico"));
 		frmShawarSignIn.setTitle("Login");
 		frmShawarSignIn.setBackground(new Color(255, 255, 255));
 		frmShawarSignIn.getContentPane().setForeground(new Color(0, 0, 0));

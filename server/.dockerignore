@@ -2,5 +2,7 @@ node_modules
 npm-debug.log
 .env
 storage/*
+!storage/brand/
+!storage/brand/*
 !storage/products/.gitkeep
 test-storage
