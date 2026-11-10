@@ -1,0 +1,8 @@
+app/bin/
+app/.metadata/
+wpf/bin/
+wpf/obj/
+wpf/.vs/
+web/.env
+db/.env
+*.user

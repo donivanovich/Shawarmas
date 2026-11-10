@@ -1,40 +1,29 @@
-# Shawarmas 👗🛒
+# Cliente Java de Shawarmas
 
-Proyecto de una tienda de ropa online que incluye una aplicación y su base de datos correspondiente.
+## Estructura
 
-## Descripción
+El código Java está en `src/`, los recursos en `resources/` y la configuración de Eclipse en `.project`, `.classpath` y `.settings/`. La carpeta `bin/` contiene compilación local y no forma parte del código fuente.
 
-Este proyecto consiste en:
+## Requisitos
 
-- Una **app** en Java con sistema de login, que ofrece dos tipos de acceso:
-  - **Empleados:** acceso a la gestión interna de la tienda (inventario, pedidos, administración). 👩‍💼👨‍💼
-  - **Clientes:** acceso para visualizar y hacer pedidos. 🛍️
-- Una **base de datos SQL** que almacena información de productos, usuarios, pedidos, etc. 💾
+- Eclipse IDE con Java 17 o superior.
+- MySQL Connector/J 8.3 o superior.
+- MySQL 8.0 o MariaDB compatible.
 
-## Funcionalidades principales
+## Configuración
 
-### App
+Importa `app/` como proyecto Maven existente de Eclipse. Eclipse debe usar un JDK 17 o superior y Maven debe estar habilitado mediante m2e. La aplicación usa por defecto `DB_HOST=127.0.0.1`, `DB_PORT=3307`, `DB_NAME=shawarmas`, `DB_USER=shawarmas_app` y `DB_PASSWORD=1234`, que coinciden con Docker. Puedes sobrescribirlos en la configuración de ejecución. Usa el mismo usuario de aplicación configurado en Docker; no uses `root`.
 
-- Login con dos tipos de usuarios (empleado y cliente). 🔑
-- Panel de gestión para empleados: inventario, pedidos y usuarios. 📊
-- Visualización de catálogo y pedidos para clientes. 📋
-- Interfaz intuitiva. 🎨
+La base se crea ejecutando una sola vez `db/schema.sql`. La aplicación no crea ni modifica el esquema automáticamente.
 
-### Base de datos
+## Funcionalidad
 
-- Tablas para usuarios (clientes y empleados), productos, pedidos, etc. 🗃️
-- Relaciones adecuadas para mantener integridad de datos. 🔗
+El cliente permite iniciar sesión, registrar clientes, consultar productos y gestionar pedidos según el perfil. La interfaz está en español y las clases mantienen nombres en inglés para conservar una API coherente entre plataformas.
 
-## Tecnologías usadas
+## Seguridad aplicada
 
-- App: Java ☕
-- Base de datos: MySQL 🛢️
+`DatabaseConnection` no contiene credenciales personales. Las operaciones de registro y autenticación usan sentencias preparadas y PBKDF2-HMAC-SHA256 con sal aleatoria y 120000 iteraciones. Las contraseñas nunca se comparan directamente con SQL.
 
-## Uso
+## Diagnóstico en Eclipse
 
-- Usuarios clientes pueden registrarse y comprar ropa desde la app. 🛍️
-- Empleados se autentican en la app para gestionar inventario y pedidos. 👔
-
----
-
-Este proyecto es parte de un trabajo de fin de curso 🎓
+Si Eclipse conserva rutas antiguas, elimina el proyecto del espacio de trabajo sin borrar archivos. Después usa `File > Import > Maven > Existing Maven Projects`, selecciona la carpeta `app/`, marca `pom.xml` y finaliza. Si no aparece Maven, instala Eclipse IDE for Java Developers o el complemento m2e. Ejecuta `Project > Clean` antes de iniciar `com.shawarmas.Login`.
