@@ -21,6 +21,7 @@ namespace Shawarmas.MVVM.View
         public SignUpWindow()
         {
             InitializeComponent();
+            BrandAssets.SetWindowIcon(this, "favicon.ico");
         }
 
         private async void BtnSignUp_Click(object sender, RoutedEventArgs e)

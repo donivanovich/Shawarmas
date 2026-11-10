@@ -5,7 +5,6 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Shawarmas"
         mc:Ignorable="d"
-        Icon="/Resources/Icons/favicon2.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Title="Inicio de sesión" Height="300" Width="475">
@@ -22,10 +21,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image 
+        <Image x:Name="BrandLogo"
             Grid.Column="1"
-            Grid.Row="1"
-            Source="/Resources/Images/logo.png"/> 
+            Grid.Row="1" />
 
         <Grid
             Grid.Row="1"

@@ -22,6 +22,7 @@ namespace Shawarmas
         public MainWindow(Empleado? usuario = null)
         {
             InitializeComponent();
+            BrandAssets.SetWindowIcon(this, "favicon.ico");
             _usuarioLogueado = usuario ?? new Empleado();
             BgMusicInstance = bgMusic;
             ApplyUserConfig();

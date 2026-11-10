@@ -5,7 +5,6 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Shawarmas.MVVM.View"
         mc:Ignorable="d"
-        Icon="/Resources/Icons/favicon2.ico"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Title="Registro" Height="300" Width="450">

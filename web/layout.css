@@ -1,4 +1,4 @@
-@import url('products.css?v=20261110-1');
+@import url('products.css?v=20261110-6');
 .hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 70px);padding:0;text-align:left;background:var(--soft)}
 .hero:before{content:"";grid-column:2;grid-row:1;background:url("assets/img/jordan-4-retro.png") center/contain no-repeat;filter:grayscale(1);mix-blend-mode:multiply;order:2}
 .hero>*{grid-column:1;position:relative;z-index:1;margin-left:clamp(28px,9vw,140px)}

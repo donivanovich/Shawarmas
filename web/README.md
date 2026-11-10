@@ -22,6 +22,16 @@ La base de datos se inicializa desde `db/schema.sql` y se publica en `127.0.0.1:
 
 Configura las variables de entorno de PHP con los mismos valores de `db/.env.example`, coloca el contenido de `web/` como raíz pública y ejecuta el esquema común. No copies credenciales en `database-connection.php`.
 
+## Datos iniciales de demostración
+
+En el primer arranque con un volumen MySQL vacío, Docker ejecuta `db/schema.sql` y después `db/demo-seed.sql`. Se crean cinco clientes y pedidos de ejemplo. Todas las cuentas semilla usan la contraseña `Shawarmas123!`:
+
+- Cliente: `cliente@shawarmas.local`
+- Empleado (tabla `empleados`, perfil `writter`): `empleado@shawarmas.local`
+- Clientes: `ana.martinez@gmail.com`, `carlos.rivera@outlook.com`, `laura.gomez@yahoo.com` y `diego.santos@gmail.com`
+
+Los pedidos incluyen productos y direcciones de Madrid, Barcelona, Valencia, Sevilla, Lisboa y Oporto. El antiguo ejemplo `nombre@gmail.com` se elimina junto con sus pedidos. MySQL ejecuta estos scripts solo cuando el volumen está vacío; para la base actual, `db/demo-seed.sql` se puede volver a ejecutar de forma segura.
+
 ## Flujo funcional
 
 El cliente ofrece acceso, registro, catálogo, selección de cantidad, carrito y compra. La compra verifica el stock dentro de una transacción y crea líneas de pedido consistentes.

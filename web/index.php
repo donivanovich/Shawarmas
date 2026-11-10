@@ -47,14 +47,14 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shawarmas</title>
-    <link rel="icon" href="assets/img/favicon/favicon.ico?v=20261110-1" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-1">
+    <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
+    <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
     <header class="alternative-header">
         <a class="alternative-brand" href="index.php" aria-label="Shawarmas, inicio">
-            <img src="assets/img/logo.png?v=20261110-2" alt="Shawarmas" style="transform: scale(1.5);">
+            <img src="<?= escapar(imagen_url('/brand/logo.png')) ?>" alt="Shawarmas">
         </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="alternative-nav">
             <i class="bi bi-list"></i><span>Menú</span>
@@ -74,7 +74,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                 <?php if (!empty($_SESSION['id_user'])): ?>
                     <strong><?= escapar((string) $_SESSION['nombre_completo']) ?></strong>
                     <span><?= escapar((string) $_SESSION['mail']) ?></span>
-                    <a href="logout.php">Cerrar sesión</a>
+                    <a href="account.php">Cuenta</a><a href="logout.php">Cerrar sesión</a>
                 <?php else: ?>
                     <strong>Tu perfil</strong>
                     <span>Inicia sesión para ver tus datos y comprar.</span>
@@ -149,7 +149,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     </main>
 
     <footer class="alternative-footer">
-        <div><img class="footer-logo" src="assets/img/logo-shawarmas.png?v=20261110-2" alt="Shawarmas"></div>
+        <div><img class="footer-logo" src="<?= escapar(imagen_url('/brand/logo.png')) ?>" alt="Shawarmas"></div>
         <p>Ropa urbana para todos los días.</p>
         <a href="products.php">Ir a la colección <i class="bi bi-arrow-right"></i></a>
     </footer>
