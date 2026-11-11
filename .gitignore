@@ -1,8 +1,43 @@
-app/bin/
-app/.metadata/
-wpf/bin/
-wpf/obj/
-wpf/.vs/
-web/.env
-db/.env
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+
+# Java and Maven
+**/target/
+**/bin/
+*.class
+*.jar
+
+# Eclipse
+.metadata/
+.classpath.local
+.project.local
+.settings/
+
+# .NET, Visual Studio and WPF
+**/obj/
+**/.vs/
 *.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Operating systems and temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.swp
+*.swo
+*~

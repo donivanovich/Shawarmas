@@ -1,6 +1,6 @@
 <?php
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit('Método no permitido.');
@@ -13,11 +13,15 @@ if (!$id_producto || !$cantidad || !$id_variante) {
     http_response_code(400);
     exit('Producto, talla o cantidad no válidos.');
 }
-$stmt = $conn->prepare('SELECT v.stock FROM producto_variantes v WHERE v.id_variante = ? AND v.fk_producto = ?');
-$stmt->bind_param('ii', $id_variante, $id_producto);
-$stmt->execute();
-$variante = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$productoApi = api_try('GET', '/products/' . $id_producto, null, false);
+$variantesApi = $productoApi['variants'] ?? [];
+$variante = null;
+foreach ($variantesApi as $candidate) {
+    if ((int) ($candidate['id_variante'] ?? 0) === $id_variante) {
+        $variante = $candidate;
+        break;
+    }
+}
 if (!$variante) {
     http_response_code(400);
     exit('La talla seleccionada no es válida.');
@@ -30,7 +34,7 @@ if (!isset($_SESSION['carrito'][$id_producto]) || !is_array($_SESSION['carrito']
     $_SESSION['carrito'][$id_producto] = [];
 }
 $cantidadEnCarrito = (int) ($_SESSION['carrito'][$id_producto][$id_variante] ?? 0);
-$cantidadDisponible = max(0, (int) $variante['stock'] - $cantidadEnCarrito);
+    $cantidadDisponible = max(0, (int) $variante['stock'] - $cantidadEnCarrito);
 if ($cantidadDisponible < 1) {
     http_response_code(400);
     exit('El producto ya no tiene unidades disponibles.');

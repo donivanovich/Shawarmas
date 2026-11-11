@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start([
-    'cookie_httponly' => true,
-    'cookie_samesite' => 'Lax',
-    'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
-]);
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 $mensaje = "";
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
@@ -24,20 +20,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($nombre === '' || $apellido1 === '' || $mail === false || strlen($passwPlano) < 8) {
         $mensaje = 'Completa los datos correctamente. La contraseña debe tener al menos 8 caracteres.';
     } else {
-        $passw = hash_password_shared($passwPlano);
-        $stmt = $conn->prepare('INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $nombre, $apellido1, $apellido2, $mail, $passw);
         try {
-            $stmt->execute();
+            api_request('POST', '/auth/register', ['nombre' => $nombre, 'apellido1' => $apellido1, 'apellido2' => $apellido2 ?: null, 'email' => $mail, 'password' => $passwPlano], false);
             $mensaje = 'Registro realizado correctamente.';
-        } catch (mysqli_sql_exception) {
+        } catch (ApiClientException) {
             $mensaje = 'No se pudo completar el registro. Comprueba que el correo no esté registrado.';
         }
-        $stmt->close();
     }
 }
 
-$conn->close();
 ?>
 
 <!DOCTYPE html>

@@ -86,6 +86,7 @@
 
                     <Button
                         x:Name="BtnSignUp"
+                        IsEnabled="False"
                         Grid.Column="0"
                         FontSize="8"
                         Style="{StaticResource DefaultButton}"

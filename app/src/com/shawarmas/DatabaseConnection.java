@@ -17,7 +17,10 @@ public class DatabaseConnection {
         String port = System.getenv().getOrDefault("DB_PORT", "3307");
         String database = System.getenv().getOrDefault("DB_NAME", "shawarmas");
         String user = System.getenv().getOrDefault("DB_USER", "shawarmas_app");
-        String password = System.getenv().getOrDefault("DB_PASSWORD", "1234");
+		String password = System.getenv("DB_PASSWORD");
+		if (password == null || password.isBlank()) {
+			throw new SQLException("DB_PASSWORD must be set in the application environment");
+		}
 
         return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, password);
     }

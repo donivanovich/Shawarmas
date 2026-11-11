@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 if (empty($_SESSION['id_user'])) {
     header('Location: login.php?redirect=account.php');
@@ -24,37 +24,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newPassword = (string) ($_POST['new_password'] ?? '');
     $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
-    $stmt = $conn->prepare('SELECT passw FROM clientes WHERE id_user = ? LIMIT 1');
-    $stmt->bind_param('i', $userId);
-    $stmt->execute();
-    $credential = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    if (!$credential || !verify_password_shared($currentPassword, (string) $credential['passw'])) {
+    if ($currentPassword === '') {
         $mensaje = 'La contraseña actual no es correcta.';
     } elseif (strlen($newPassword) < 8) {
         $mensaje = 'La nueva contraseña debe tener al menos 8 caracteres.';
     } elseif ($newPassword !== $confirmPassword) {
         $mensaje = 'La confirmación no coincide con la nueva contraseña.';
     } else {
-        $newHash = hash_password_shared($newPassword);
-        $stmt = $conn->prepare('UPDATE clientes SET passw = ? WHERE id_user = ?');
-        $stmt->bind_param('si', $newHash, $userId);
-        $stmt->execute();
-        $stmt->close();
+        $passwordChange = api_try('PATCH', '/auth/me/password', ['currentPassword' => $currentPassword, 'newPassword' => $newPassword]);
         $mensaje = 'La contraseña se ha actualizado correctamente.';
-        $estadoMensaje = 'exito';
+        $mensaje = $passwordChange['_error'] ?? $mensaje;
+        $estadoMensaje = isset($passwordChange['_error']) ? 'error' : 'exito';
     }
 }
 
-$stmt = $conn->prepare('SELECT nombre, apellido1, apellido2, mail, creado_en FROM clientes WHERE id_user = ? LIMIT 1');
-$stmt->bind_param('i', $userId);
-$stmt->execute();
-$usuario = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-$conn->close();
+$profile = api_try('GET', '/auth/me');
+$usuario = isset($profile['_error']) ? [
+    'nombre' => $_SESSION['nombre'] ?? '', 'apellido1' => $_SESSION['apellido1'] ?? '',
+    'apellido2' => $_SESSION['apellido2'] ?? '', 'mail' => $_SESSION['mail'] ?? '', 'creado_en' => null
+] : $profile;
 
-if (!$usuario) {
+if (($profile['_status'] ?? 0) === 401) {
     $_SESSION = [];
     session_destroy();
     header('Location: login.php');
@@ -99,7 +89,7 @@ if (!$usuario) {
                     <div><dt>Primer apellido</dt><dd><?= escapar((string) $usuario['apellido1']) ?></dd></div>
                     <div><dt>Segundo apellido</dt><dd><?= escapar(trim((string) ($usuario['apellido2'] ?? '')) ?: '—') ?></dd></div>
                     <div><dt>Correo electrónico</dt><dd><?= escapar((string) $usuario['mail']) ?></dd></div>
-                    <div><dt>Miembro desde</dt><dd><?= escapar(date('d/m/Y', strtotime((string) $usuario['creado_en']))) ?></dd></div>
+                    <div><dt>Miembro desde</dt><dd><?= !empty($usuario['creado_en']) ? escapar(date('d/m/Y', strtotime((string) $usuario['creado_en']))) : '—' ?></dd></div>
                 </dl>
                 <a class="account-orders-button" href="orders.php">Tus pedidos <i class="bi bi-arrow-right"></i></a>
             </section>

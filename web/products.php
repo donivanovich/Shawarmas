@@ -1,30 +1,28 @@
 <?php
 declare(strict_types=1);
 
-session_start([
-    'cookie_httponly' => true,
-    'cookie_samesite' => 'Lax',
-    'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
-]);
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 $errorLogin = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'], $_POST['password'])) {
     $email = trim((string) $_POST['usuario']);
     $pass = (string) $_POST['password'];
-    $stmt = $conn->prepare('SELECT id_user, nombre, apellido1, apellido2, mail, passw FROM clientes WHERE mail = ? LIMIT 1');
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $cliente = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    try {
+        $login = api_request('POST', '/auth/login', ['email' => $email, 'password' => $pass], false);
+        $cliente = $login['user'] ?? [];
+    } catch (ApiClientException) {
+        $cliente = [];
+    }
 
-    if ($cliente && verify_password_shared($pass, (string) $cliente['passw'])) {
+    if (($cliente['type'] ?? '') === 'customer') {
         session_regenerate_id(true);
-        $_SESSION['id_user'] = (int) $cliente['id_user'];
+        $_SESSION['api_token'] = (string) $login['token'];
+        $_SESSION['id_user'] = (int) $cliente['id'];
         $_SESSION['nombre'] = (string) $cliente['nombre'];
         $_SESSION['apellido1'] = (string) $cliente['apellido1'];
         $_SESSION['apellido2'] = (string) ($cliente['apellido2'] ?? '');
-        $_SESSION['mail'] = (string) $cliente['mail'];
+        $_SESSION['mail'] = (string) $cliente['email'];
         $_SESSION['nombre_completo'] = trim($_SESSION['nombre'] . ' ' . $_SESSION['apellido1'] . ' ' . $_SESSION['apellido2']);
     } else {
         $errorLogin = 'Usuario o contraseña incorrectos.';
@@ -59,77 +57,22 @@ if ($maximo !== false && $maximo !== null) {
 }
 $urlColeccionFiltrada = '';
 
-$sql = 'SELECT p.id_producto, p.marca, p.modelo, p.precio, COALESCE(SUM(v.stock), 0) AS stock,
-               COALESCE(MAX(v.imagen), p.imagen) AS imagen, c.categoria, co.id_color, co.color
-        FROM productos p
-        INNER JOIN categorias c ON c.id_categoria = p.fk_categoria
-        LEFT JOIN producto_variantes v ON v.fk_producto = p.id_producto
-        LEFT JOIN colores co ON co.id_color = v.fk_color
-        WHERE 1 = 1';
-$types = '';
-$params = [];
-if ($categoria) {
-    $sql .= ' AND p.fk_categoria = ?';
-    $types .= 'i';
-    $params[] = $categoria;
-}
-if ($marca !== '') {
-    $sql .= ' AND p.marca = ?';
-    $types .= 's';
-    $params[] = $marca;
-}
-if ($colorId) {
-    $sql .= ' AND co.id_color = ?';
-    $types .= 'i';
-    $params[] = $colorId;
-}
-if ($maximo !== false && $maximo !== null) {
-    $sql .= ' AND p.precio <= ?';
-    $types .= 'd';
-    $params[] = $maximo;
-}
-if ($busqueda !== '') {
-    $sql .= ' AND (p.marca LIKE ? OR p.modelo LIKE ?)';
-    $types .= 'ss';
-    $like = '%' . $busqueda . '%';
-    $params[] = $like;
-    $params[] = $like;
-}
-$inicioFrom = strpos($sql, 'FROM productos p');
-$fromConFiltros = substr($sql, $inicioFrom);
-$sqlTotal = 'SELECT COUNT(*) AS total FROM (
-    SELECT p.id_producto, co.id_color ' . $fromConFiltros . '
-    GROUP BY p.id_producto, co.id_color
-) AS productos_filtrados';
-$stmtTotal = $conn->prepare($sqlTotal);
-if ($types !== '') {
-    $stmtTotal->bind_param($types, ...$params);
-}
-$stmtTotal->execute();
-$totalProductos = (int) $stmtTotal->get_result()->fetch_assoc()['total'];
-$stmtTotal->close();
-
-$totalPaginas = max(1, (int) ceil($totalProductos / $porPagina));
-$pagina = min($pagina, $totalPaginas);
-$offset = ($pagina - 1) * $porPagina;
 $semillaAleatoria = (int) sprintf('%u', crc32(date('Y-m-d') . '|' . http_build_query($filtrosActivos)));
 $urlParametros = $filtrosActivos + ['por_pagina' => $porPagina, 'pagina' => $pagina];
 $urlColeccionFiltrada = 'products.php?' . http_build_query($urlParametros);
-
-$sql .= ' GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria, co.id_color, co.color
-          ORDER BY RAND(?) LIMIT ? OFFSET ?';
-$types .= 'iii';
-$params[] = $semillaAleatoria;
-$params[] = $porPagina;
-$params[] = $offset;
-
-$stmt = $conn->prepare($sql);
-if ($types !== '') {
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$productos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+$apiFilters = ['page' => $pagina, 'pageSize' => $porPagina, 'sort' => 'shuffle', 'seed' => $semillaAleatoria];
+if ($busqueda !== '') $apiFilters['q'] = $busqueda;
+if ($categoria) $apiFilters['category'] = $categoria;
+if ($marca !== '') $apiFilters['brand'] = $marca;
+if ($colorId) $apiFilters['color'] = $colorId;
+if ($maximo !== false && $maximo !== null) $apiFilters['maxPrice'] = $maximo;
+$productos = api_try('GET', '/products?' . http_build_query($apiFilters), null, false);
+$apiMeta = $GLOBALS['api_last_meta'] ?? [];
+$totalProductos = isset($productos['_error']) ? 0 : (int) ($apiMeta['total'] ?? count($productos));
+$productos = isset($productos['_error']) ? [] : $productos;
+$totalPaginas = max(1, (int) ceil($totalProductos / $porPagina));
+$pagina = min($pagina, $totalPaginas);
+$offset = ($pagina - 1) * $porPagina;
 $primerProducto = $totalProductos > 0 ? $offset + 1 : 0;
 $ultimoProducto = min($offset + $porPagina, $totalProductos);
 $paginaInicio = max(1, $pagina - 2);
@@ -138,12 +81,12 @@ $urlPagina = static function (int $numeroPagina) use ($filtrosActivos, $porPagin
     return 'products.php?' . http_build_query($filtrosActivos + ['por_pagina' => $porPagina, 'pagina' => $numeroPagina]);
 };
 
-$categorias = $conn->query('SELECT id_categoria, categoria FROM categorias ORDER BY categoria')->fetch_all(MYSQLI_ASSOC);
-$marcas = $conn->query('SELECT DISTINCT marca FROM productos ORDER BY marca')->fetch_all(MYSQLI_ASSOC);
-$colores = $conn->query('SELECT DISTINCT co.id_color, co.color
-    FROM producto_variantes v
-    INNER JOIN colores co ON co.id_color = v.fk_color
-    ORDER BY co.color')->fetch_all(MYSQLI_ASSOC);
+$categorias = api_try('GET', '/categories', null, false);
+$marcas = api_try('GET', '/brands', null, false);
+$colores = api_try('GET', '/colors', null, false);
+$categorias = isset($categorias['_error']) ? [] : $categorias;
+$marcas = isset($marcas['_error']) ? [] : $marcas;
+$colores = isset($colores['_error']) ? [] : $colores;
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     foreach ((array) $sizes as $quantity) {

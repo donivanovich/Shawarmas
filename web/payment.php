@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 if (empty($_SESSION['id_user'])) {
     header('Location: login.php?redirect=checkout.php');
@@ -16,7 +16,9 @@ if (!is_array($envio)) {
 
 $carrito = $_SESSION['carrito'] ?? [];
 $cartCount = 0;
+$mensaje = '';
 $productosDetalle = [];
+$cartItems = [];
 $total = 0.0;
 foreach ($carrito as $idProducto => $tallasProducto) {
     if (!is_array($tallasProducto)) {
@@ -26,24 +28,31 @@ foreach ($carrito as $idProducto => $tallasProducto) {
         $cartCount += max(0, (int) $cantidad);
         $idProducto = (int) $idProducto;
         $idVariante = (int) $idVariante;
-        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen, v.stock, v.id_variante, t.talla, co.color
-            FROM productos p
-            INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
-            INNER JOIN tallas t ON t.id_talla = v.fk_talla
-            INNER JOIN colores co ON co.id_color = v.fk_color
-            WHERE v.id_variante = ? AND p.id_producto = ?');
-        $stmt->bind_param('ii', $idVariante, $idProducto);
-        $stmt->execute();
-        $producto = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        if (!$producto || (int) $cantidad < 1 || (int) $cantidad > (int) $producto['stock']) {
+        $product = api_try('GET', '/products/' . $idProducto, null, false);
+        $producto = null;
+        foreach ($product['variants'] ?? [] as $variant) {
+            if ((int) $variant['id_variante'] === $idVariante) {
+                $producto = array_merge($product, $variant);
+                break;
+            }
+        }
+        if (!$producto || (int) $cantidad < 1) {
             continue;
         }
         $producto['id_variante'] = $idVariante;
         $producto['cantidad'] = (int) $cantidad;
-        $producto['subtotal'] = (float) $cantidad * (float) $producto['precio'];
-        $total += $producto['subtotal'];
+        $cartItems[] = ['productId' => $idProducto, 'variantId' => $idVariante, 'quantity' => (int) $cantidad];
         $productosDetalle[] = $producto;
+    }
+}
+
+if ($cartItems) {
+    $quote = api_try('POST', '/cart/quote', ['items' => $cartItems]);
+    if (isset($quote['_error'])) {
+        $mensaje = $quote['_error'];
+    } else {
+        $productosDetalle = $quote['items'] ?? [];
+        $total = (float) ($quote['total'] ?? 0);
     }
 }
 
@@ -52,7 +61,6 @@ if (!$productosDetalle) {
     exit;
 }
 
-$mensaje = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validar_csrf();
     $tarjeta = preg_replace('/\D/', '', (string) ($_POST['tarjeta'] ?? ''));
@@ -71,36 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje = 'Revisa la tarjeta, la fecha de caducidad y el CVC.';
     } else {
         try {
-            $conn->begin_transaction();
-            $tienda = 1;
-            $userId = (int) $_SESSION['id_user'];
-            $pais = (string) $envio['pais'];
-            $ciudad = (string) $envio['ciudad'];
-            $calle = (string) $envio['calle'];
-            $postal = (string) $envio['postal'];
-            $stmtPedido = $conn->prepare('INSERT INTO pedidos (fecha_entrega, pais, ciudad, calle, postal, fk_id_user, fk_tienda) VALUES (DATE_ADD(NOW(), INTERVAL 3 DAY), ?, ?, ?, ?, ?, ?)');
-            $stmtPedido->bind_param('ssssii', $pais, $ciudad, $calle, $postal, $userId, $tienda);
-            $stmtPedido->execute();
-            $idPedido = $conn->insert_id;
-            $stmtLinea = $conn->prepare('INSERT INTO productos_pedidos (fk_variante, fk_pedido, cantidad) VALUES (?, ?, ?)');
-            $stmtStock = $conn->prepare('UPDATE producto_variantes SET stock = stock - ? WHERE id_variante = ? AND stock >= ?');
-            foreach ($productosDetalle as $producto) {
-                $cantidad = (int) $producto['cantidad'];
-                $idVariante = (int) $producto['id_variante'];
-                $stmtStock->bind_param('iii', $cantidad, $idVariante, $cantidad);
-                $stmtStock->execute();
-                if ($stmtStock->affected_rows !== 1) {
-                    throw new RuntimeException('Stock no disponible.');
-                }
-                $stmtLinea->bind_param('iii', $idVariante, $idPedido, $cantidad);
-                $stmtLinea->execute();
-            }
-            $conn->commit();
+            $result = api_request('POST', '/orders', [
+                'pais' => (string) $envio['pais'], 'ciudad' => (string) $envio['ciudad'],
+                'calle' => (string) $envio['calle'], 'postal' => (string) $envio['postal'], 'items' => $cartItems
+            ]);
             unset($_SESSION['carrito'], $_SESSION['envio']);
+            $_SESSION['last_order_id'] = (int) ($result['id_pedido'] ?? 0);
             header('Location: cart-summary.php?pedido=ok');
             exit;
-        } catch (mysqli_sql_exception|RuntimeException) {
-            $conn->rollback();
+        } catch (ApiClientException) {
             $mensaje = 'No se pudo completar el pedido. Comprueba el stock e inténtalo de nuevo.';
         }
     }
