@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 if (empty($_SESSION['id_user'])) {
     header('Location: login.php?redirect=orders.php');
@@ -16,40 +16,18 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     }
 }
 
-$stmt = $conn->prepare('SELECT p.id_pedido, p.fecha_pedido, p.fecha_entrega, p.entregado, p.pais, p.ciudad, p.calle, p.postal,
-        COALESCE(SUM(pr.precio * pp.cantidad), 0) AS total, COALESCE(SUM(pp.cantidad), 0) AS unidades
-    FROM pedidos p
-    LEFT JOIN productos_pedidos pp ON pp.fk_pedido = p.id_pedido
-    LEFT JOIN producto_variantes v ON v.id_variante = pp.fk_variante
-    LEFT JOIN productos pr ON pr.id_producto = v.fk_producto
-    WHERE p.fk_id_user = ?
-    GROUP BY p.id_pedido, p.fecha_pedido, p.fecha_entrega, p.entregado, p.pais, p.ciudad, p.calle, p.postal
-    ORDER BY p.fecha_pedido DESC');
-$stmt->bind_param('i', $userId);
-$stmt->execute();
-$pedidos = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
-
+$result = api_try('GET', '/orders');
+$pedidos = $result['data'] ?? $result;
 $lineasPorPedido = [];
-if ($pedidos) {
-    $stmtLineas = $conn->prepare('SELECT pp.fk_pedido, pr.marca, pr.modelo, pr.precio, pp.cantidad,
-            COALESCE(v.imagen, pr.imagen) AS imagen, t.talla, co.color
-        FROM productos_pedidos pp
-        INNER JOIN producto_variantes v ON v.id_variante = pp.fk_variante
-        INNER JOIN productos pr ON pr.id_producto = v.fk_producto
-        INNER JOIN tallas t ON t.id_talla = v.fk_talla
-        INNER JOIN colores co ON co.id_color = v.fk_color
-        INNER JOIN pedidos p ON p.id_pedido = pp.fk_pedido
-        WHERE p.fk_id_user = ?
-        ORDER BY pp.fk_pedido DESC, pr.marca, pr.modelo');
-    $stmtLineas->bind_param('i', $userId);
-    $stmtLineas->execute();
-    foreach ($stmtLineas->get_result()->fetch_all(MYSQLI_ASSOC) as $linea) {
-        $lineasPorPedido[(int) $linea['fk_pedido']][] = $linea;
+foreach ($pedidos as &$pedido) {
+    $details = api_try('GET', '/orders/' . (int) $pedido['id_pedido']);
+    $pedido['total'] = (float) ($details['total'] ?? $pedido['total'] ?? 0);
+    $pedido['unidades'] = array_sum(array_map(static fn(array $item): int => (int) $item['cantidad'], $details['items'] ?? []));
+    foreach ($details['items'] ?? [] as $item) {
+        $lineasPorPedido[(int) $pedido['id_pedido']][] = $item;
     }
-    $stmtLineas->close();
 }
-$conn->close();
+unset($pedido);
 ?>
 <!DOCTYPE html>
 <html lang="es">

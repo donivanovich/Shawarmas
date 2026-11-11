@@ -1,8 +1,8 @@
 # Centralized image server
 
 This service provides one public HTTP location for product images used by the
-web, Java and WPF clients. Image binaries live on a Docker volume, not in
-MySQL or in any client application. Product records should store only the
+web, Java and WPF clients. Image binaries live in `storage/` in the repository
+and on the persistent Docker volume, not in MySQL or in a client application. Product records should store only the
 relative path returned by the upload endpoint, such as
 `/products/550e8400-e29b-41d4-a716-446655440000.png`.
 
@@ -94,7 +94,7 @@ Multipart field: image
 
 ```powershell
 curl -X POST http://localhost:3000/api/products `
-  -H "X-API-Key: change_me" `
+  -H "X-API-Key: <UPLOAD_API_KEY>" `
   -F "image=@.\product.png"
 ```
 
@@ -135,7 +135,7 @@ Header: X-API-Key: <UPLOAD_API_KEY>
 
 ```powershell
 curl -X DELETE http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000.png `
-  -H "X-API-Key: change_me"
+  -H "X-API-Key: <UPLOAD_API_KEY>"
 ```
 
 Returns `204` on success, `401` without the API key and `404` if the image

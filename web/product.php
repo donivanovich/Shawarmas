@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $colorSolicitado = filter_input(INPUT_GET, 'color', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -9,37 +9,13 @@ $urlRetorno = (string) ($_GET['return'] ?? '');
 if (!preg_match('/^products\.php(?:\?.*)?$/', $urlRetorno)) {
     $urlRetorno = 'products.php';
 }
-$stmt = $conn->prepare(
-    '    SELECT p.*, c.categoria
-    FROM productos p
-    INNER JOIN categorias c ON c.id_categoria = p.fk_categoria
-    WHERE p.id_producto = ?'
-);
-$stmt->bind_param('i', $id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result && $result->num_rows > 0) {
-    $producto = $result->fetch_assoc();
-} else {
+$result = $id ? api_try('GET', '/products/' . (int) $id, null, false) : [];
+if (!$id || isset($result['_error'])) {
     http_response_code(404);
     exit('Producto no encontrado.');
 }
-$stmt->close();
-$stmt = $conn->prepare(
-    "SELECT v.id_variante, v.fk_producto, COALESCE(v.imagen, p.imagen) AS imagen_producto, v.stock, t.talla, co.id_color, co.color, co.imagen AS color_imagen
-     FROM producto_variantes v
-     INNER JOIN productos p ON p.id_producto = v.fk_producto
-     INNER JOIN tallas t ON t.id_talla = v.fk_talla
-     INNER JOIN colores co ON co.id_color = v.fk_color
-     WHERE p.marca = ? AND p.modelo = ? AND p.fk_categoria = ?
-       AND NOT (p.marca = 'Adidas' AND p.modelo = 'Samba OG' AND co.color = 'Panda')
-      ORDER BY p.id_producto, t.id_talla"
-);
-$stmt->bind_param('ssi', $producto['marca'], $producto['modelo'], $producto['fk_categoria']);
-$stmt->execute();
-$variantes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+$producto = $result;
+$variantes = $producto['variants'] ?? [];
 $colores = [];
 foreach ($variantes as $variante) {
     $colorId = (int) $variante['id_color'];

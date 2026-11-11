@@ -12,9 +12,6 @@
 
   <ItemGroup>
     <None Remove="Resources\Music\music.mp3" />
-    <None Remove="Resources\products\air-max.png" />
-    <None Remove="Resources\products\puma-classic.png" />
-    <None Remove="Resources\products\ultraboost.png" />
     <None Remove="Resources\Images\donivanovich.jpg" />
     <None Remove="Resources\Images\javierJ-S.png" />
   </ItemGroup>
@@ -23,15 +20,6 @@
     <Content Include="Resources\Music\music.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\products\air-max.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\products\puma-classic.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\products\ultraboost.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="Resources\Images\donivanovich.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -41,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="9.6.0" />
   </ItemGroup>
 
 </Project>

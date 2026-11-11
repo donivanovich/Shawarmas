@@ -1,155 +1,95 @@
 # Shawarmas
 
-Tienda de ropa con una web PHP, una base MySQL y un servidor centralizado de imágenes. El repositorio también incluye clientes de escritorio Java y WPF opcionales.
+Shawarmas is a clothing store monorepo with a PHP storefront, a MySQL database, a shared Express image service, and optional Java and WPF desktop clients. This repository keeps the existing applications and their database/image interfaces together.
 
-## Requisitos
+## Features
 
-- Git.
-- Docker Desktop con Docker Compose v2.
-- Para la aplicación Java: JDK 17 o superior, Maven y Eclipse (opcional).
-- Para la aplicación WPF: Windows y .NET 8 SDK con soporte WPF (Visual Studio 2022 es opcional).
+- Product catalog, product variants, customer accounts, cart and order flows in the PHP storefront.
+- MySQL persistence for products, size/color inventory, customers, employees and orders.
+- Shared product, color-swatch and brand image delivery for all three clients.
+- Java and WPF desktop clients for employee workflows.
 
-Para iniciar la tienda web solo hacen falta Git y Docker Desktop.
+## Technology
 
-## Clonar y configurar
+| Area | Technology |
+| --- | --- |
+| Storefront | PHP 8.3, Apache, MySQLi |
+| Database | MySQL 8.4 |
+| Image service | Node.js 20+, Express 5, Multer |
+| Desktop clients | Java 17+, Maven, Swing; .NET 8 WPF |
+| Local services | Docker Compose v2 |
 
-En PowerShell, desde la carpeta donde quieras guardar el proyecto:
+## Repository layout
+
+```text
+web/       PHP storefront, styles, fonts, scripts, Dockerfile
+app/       Java/Maven desktop client and Eclipse project metadata
+wpf/       WPF solution, MVVM views, services and visual/audio resources
+server/    Express image API, tests, Dockerfile and image assets
+db/        Initial schema, ordered incremental SQL migrations, DB env example
+docs/      Architecture, database, deployment and security guides
+```
+
+Existing directory names and image paths are retained so local IDE projects, Docker build contexts, and database references continue to work.
+
+## Architecture
+
+See [Architecture](docs/ARCHITECTURE.md) for the component diagram and client connections. See [Database](docs/DATABASE.md), [Deployment](docs/DEPLOYMENT.md), and [Security](docs/SECURITY.md) for operational details.
+
+## Requirements
+
+- Git and Docker Desktop with Docker Compose v2 for the complete local stack.
+- JDK 17 and Maven to build the Java client.
+- Windows with .NET 8 SDK and WPF targeting support to build the WPF client.
+- Node.js 20+ to run image-server tests outside Docker.
+
+## Configure and start
+
+Copy the examples and set private values before starting. Do not reuse the example passwords or upload key for a shared or public deployment.
 
 ```powershell
-git clone <URL_DEL_REPOSITORIO>
-cd shawarmas
 Copy-Item db\.env.example db\.env
 Copy-Item server\.env.example server\.env
-notepad db\.env
-notepad server\.env
-```
-
-En `db/.env`, cambia `MYSQL_PASSWORD` y `MYSQL_ROOT_PASSWORD` por contraseñas propias. Conserva `MYSQL_DATABASE=shawarmas` y `MYSQL_USER=shawarmas_app` salvo que también actualices la configuración de los clientes.
-
-En `server/.env`, cambia `UPLOAD_API_KEY` por una clave privada. No publiques ni compartas los archivos `.env`; Git los ignora.
-
-En macOS o Linux, las copias iniciales se hacen con:
-
-```bash
-cp db/.env.example db/.env
-cp server/.env.example server/.env
-```
-
-Edita esos dos archivos antes de arrancar.
-
-## Iniciar la web y sus servicios
-
-Desde la raíz del repositorio:
-
-```powershell
+# Edit db/.env and server/.env; use unique values for all secrets.
 docker compose up --build -d
 docker compose ps
 ```
 
-La primera ejecución crea la base desde `db/schema.sql` y puede tardar un poco. Para ver el arranque y diagnosticar errores:
+Services are available at:
 
-```powershell
-docker compose logs -f db web image-server
-```
+- Storefront: <http://localhost:8080>
+- Catalog: <http://localhost:8080/products.php>
+- Image health: <http://localhost:3000/health>
+- MySQL from desktop clients: `127.0.0.1:3307`
 
-Cuando los servicios estén activos, abre:
+Compose binds MySQL to loopback only. Containers use the internal hostname `db:3306`; host applications use `127.0.0.1:3307`. `db/schema.sql` initializes a new, empty database volume only. It contains destructive reset statements and must not be run against an existing database. Apply only the migration(s) appropriate to the database's current state; see [Database](docs/DATABASE.md).
 
-- Tienda web: <http://localhost:8080>
-- Catálogo: <http://localhost:8080/products.php>
-- Estado del servidor de imágenes: <http://localhost:3000/health>
-- MySQL desde el equipo: `127.0.0.1:3307`
+The images under `server/storage/` are preserved in source control. On image-server startup, repository product images seed only missing files in the named image volume. Existing volume files are retained. Color swatches and brand assets remain at their established routes. `docker compose down` preserves both named volumes; `docker compose down -v` deletes database and image data.
 
-Dentro de Docker, la web se conecta a MySQL mediante `db:3306`. Los clientes Java y WPF que se ejecutan en el equipo usan `127.0.0.1:3307`.
+## Run the clients
 
-## Imágenes
-
-Las imágenes se sirven desde el volumen Docker `shawarmas-images`. Los archivos de imagen no se incluyen en Git. Si tienes los recursos del proyecto, colócalos en `server/storage/products/` y `server/storage/colors/`; después de arrancar Docker, cópialos al volumen:
-
-```powershell
-docker compose cp .\server\storage\products\. image-server:/app/storage/products/
-docker compose cp .\server\storage\colors\. image-server:/app/storage/colors/
-```
-
-Puedes comprobar una imagen con `http://localhost:3000/products/<nombre-del-archivo>.png` o `http://localhost:3000/colors/<nombre-del-archivo>.png`.
-
-Para cargar una imagen nueva mediante la API, usa la clave `UPLOAD_API_KEY` de `server/.env`:
-
-```powershell
-curl.exe -X POST http://localhost:3000/api/products `
-  -H "X-API-Key: <UPLOAD_API_KEY>" `
-  -F "image=@C:\ruta\a\imagen.png"
-```
-
-La respuesta contiene la ruta relativa que debe guardarse en MySQL, por ejemplo `/products/<filename>.png`. No guardes la URL completa del servidor en la base.
-
-## Base de datos
-
-El esquema inicial y los datos de ejemplo están en `db/schema.sql`. Docker lo ejecuta únicamente al crear el volumen de base de datos por primera vez. Reiniciar los contenedores no reinicia la base ni vuelve a cargar el esquema.
-
-Para una base existente, haz una copia de seguridad y aplica solamente las migraciones que correspondan a su versión. Los archivos `db/migrate-*.sql` son actualizaciones incrementales; no ejecutes todos sobre una base ya actualizada ni vuelvas a cargar `schema.sql` para intentar migrarla.
-
-El inventario por talla y color se almacena en `producto_variantes`. Las imágenes de variantes usan su ruta en la columna `imagen`, y las descripciones de producto están en `productos.descripcion`.
-
-## Ejecutar los clientes de escritorio (opcional)
-
-Arranca primero MySQL con Docker:
-
-```powershell
-docker compose up -d db
-```
+Start MySQL with `docker compose up -d db` first. Set `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` and `DB_PASSWORD` in the client process environment. Set `IMAGE_BASE_URL` when the default `http://localhost:3000` is not suitable.
 
 ### Java
 
-Configura las variables de conexión del proceso con los valores de `db/.env`:
-
-```text
-DB_HOST=127.0.0.1
-DB_PORT=3307
-DB_NAME=shawarmas
-DB_USER=shawarmas_app
-DB_PASSWORD=<MYSQL_PASSWORD de db/.env>
-```
-
-En Eclipse, importa `app/` como proyecto Maven existente y ejecuta `com.shawarmas.Login`. Para compilar desde una terminal con Maven instalado:
-
-```powershell
-mvn -f app/pom.xml package
-```
+Open `app/` as an existing Maven project in Eclipse and run `com.shawarmas.Login`, or build with `mvn -f app/pom.xml package`. Details: [Java client guide](app/README.md).
 
 ### WPF
 
-Configura las mismas variables de conexión del apartado Java en el entorno desde el que inicies la aplicación. Con Visual Studio, abre `wpf/Shawarmas.sln` y ejecuta el proyecto. También puedes compilar y ejecutar desde PowerShell:
+Open `wpf/Shawarmas.sln` in Visual Studio, or run `dotnet build wpf/Shawarmas.csproj` and `dotnet run --project wpf/Shawarmas.csproj`. Details: [WPF client guide](wpf/README.md).
 
-```powershell
-dotnet build wpf/Shawarmas.csproj
-dotnet run --project wpf/Shawarmas.csproj
-```
+### Web and image service
 
-Las guías específicas están en [app/README.md](app/README.md), [wpf/README.md](wpf/README.md), [web/README.md](web/README.md) y [server/README.md](server/README.md).
+The storefront and image service run through Compose. Their guides are [web/README.md](web/README.md) and [server/README.md](server/README.md). The image API preserves `/products/`, `/colors/`, `/brand/`, `POST /api/products` and `DELETE /api/products/:filename`; database rows continue storing relative paths.
 
-## Parar y volver a iniciar
+## Security and credentials
 
-Detener y conservar contenedores y datos:
+Runtime `.env` files are ignored by Git. Desktop clients require `DB_PASSWORD` and no longer fall back to a source-coded password. PHP receives the database password from its Compose environment. Keep `UPLOAD_API_KEY` private, use HTTPS and a trusted reverse proxy outside local development, and back up the database and image volume. See [Security](docs/SECURITY.md).
 
-```powershell
-docker compose stop
-docker compose start
-```
+## Validation
 
-Eliminar contenedores y redes, conservando los volúmenes:
+The image-server automated suite can be run with `cd server; npm ci; npm test`. Java and WPF build commands are above. Validation depends on Docker, Maven and the Windows WPF toolchain being available; see the final change report for the commands actually run.
 
-```powershell
-docker compose down
-```
+## License
 
-`docker compose down -v` también elimina la base de datos y todas las imágenes del volumen. Úsalo solo si quieres borrar esos datos intencionadamente.
-
-## Estructura
-
-```text
-db/      Esquema, migraciones y ejemplo de configuración MySQL
-web/     Tienda PHP y estilos
-server/  API HTTP y almacenamiento de imágenes
-app/     Cliente Java
-wpf/     Cliente de escritorio WPF
-```
+No license is declared. Contact the repository owner before redistributing this project or its assets.

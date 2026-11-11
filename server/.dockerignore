@@ -6,5 +6,6 @@ storage/*
 !storage/brand/*
 !storage/colors/
 !storage/colors/*
-!storage/products/.gitkeep
+!storage/products/
+!storage/products/**
 test-storage

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 if (empty($_SESSION['id_user'])) {
     header('Location: login.php?redirect=checkout.php');
@@ -17,6 +17,7 @@ foreach ($carrito as $sizes) {
 }
 $mensaje = '';
 $productosDetalle = [];
+$cartItems = [];
 $total = 0.0;
 
 foreach ($carrito as $idProducto => $tallasProducto) {
@@ -26,24 +27,31 @@ foreach ($carrito as $idProducto => $tallasProducto) {
     foreach ($tallasProducto as $idVariante => $cantidad) {
         $idProducto = (int) $idProducto;
         $idVariante = (int) $idVariante;
-        $stmt = $conn->prepare('SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen, v.stock, v.id_variante, t.talla, co.color
-            FROM productos p
-            INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
-            INNER JOIN tallas t ON t.id_talla = v.fk_talla
-            INNER JOIN colores co ON co.id_color = v.fk_color
-            WHERE v.id_variante = ? AND p.id_producto = ?');
-        $stmt->bind_param('ii', $idVariante, $idProducto);
-        $stmt->execute();
-        $producto = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        if (!$producto || (int) $cantidad < 1 || (int) $cantidad > (int) $producto['stock']) {
+        $product = api_try('GET', '/products/' . $idProducto, null, false);
+        $producto = null;
+        foreach ($product['variants'] ?? [] as $variant) {
+            if ((int) $variant['id_variante'] === $idVariante) {
+                $producto = array_merge($product, $variant);
+                break;
+            }
+        }
+        if (!$producto || (int) $cantidad < 1) {
             continue;
         }
         $producto['id_variante'] = $idVariante;
         $producto['cantidad'] = (int) $cantidad;
-        $producto['subtotal'] = (float) $cantidad * (float) $producto['precio'];
-        $total += $producto['subtotal'];
+        $cartItems[] = ['productId' => $idProducto, 'variantId' => $idVariante, 'quantity' => (int) $cantidad];
         $productosDetalle[] = $producto;
+    }
+}
+
+if ($cartItems) {
+    $quote = api_try('POST', '/cart/quote', ['items' => $cartItems]);
+    if (isset($quote['_error'])) {
+        $mensaje = $quote['_error'];
+    } else {
+        $productosDetalle = $quote['items'] ?? [];
+        $total = (float) ($quote['total'] ?? 0);
     }
 }
 

@@ -54,22 +54,19 @@ namespace Shawarmas
 
             try
             {
-                var empleadoService = new ServiceEmployee();
-                var todosEmpleados = await empleadoService.GetAllEmployees();
-                var empleado = todosEmpleados.FirstOrDefault(emp =>
-                    string.Equals(emp.Mail, username, StringComparison.OrdinalIgnoreCase)
-                    && ServiceEmployee.VerifyPassword(password, emp.Passw));
-
-                if (empleado != null)
+                var user = await ApiClient.Login(username, password);
+                if (user["type"]?.GetValue<string>() == "employee")
                 {
                     intentos = 0;
                     bloqueo = null;
-                    var mainmenu = new MainWindow(empleado);
+                    var mainmenu = new MainWindow(ServiceEmployee.FromSession(user));
                     mainmenu.Show();
                     this.Close();
                 }
                 else
                 {
+                    await ApiClient.Logout();
+                    MessageBox.Show("This desktop application requires an employee account.", "Access restricted");
                     intentos++;
                     if (intentos >= 3)
                     {
@@ -90,16 +87,14 @@ namespace Shawarmas
             finally
             {
                 BtnLogin.IsEnabled = true;
-                BtnSignUp.IsEnabled = true;
+                BtnSignUp.IsEnabled = false;
                 BtnGuest.IsEnabled = true;
             }
         }
 
         private void BtnSignUp_Click(object sender, RoutedEventArgs e) 
         {
-            SignUpWindow signUpWindow = new SignUpWindow();
-            signUpWindow.Show();
-            this.Close();
+            MessageBox.Show("Employee accounts are created by an administrator.", "Registration unavailable");
         }
 
         private async void BtnGuest_Click(object sender, RoutedEventArgs e)

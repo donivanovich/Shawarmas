@@ -1,6 +1,6 @@
 <?php
-session_start();
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 $carrito = $_SESSION['carrito'] ?? [];
 $cartCount = 0;
 foreach ($carrito as $sizes) {
@@ -10,22 +10,21 @@ foreach ($carrito as $sizes) {
 }
 $productos = [];
 if ($carrito) {
-    $ids = array_map('intval', array_keys($carrito));
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $types = str_repeat('i', count($ids));
-    $stmt = $conn->prepare("SELECT p.id_producto, p.marca, p.modelo, p.precio, p.imagen, v.imagen AS variante_imagen,
-        v.id_variante, v.stock, t.talla, co.color
-        FROM productos p
-        INNER JOIN producto_variantes v ON v.fk_producto = p.id_producto
-        INNER JOIN tallas t ON t.id_talla = v.fk_talla
-        INNER JOIN colores co ON co.id_color = v.fk_color
-        WHERE p.id_producto IN ($placeholders)");
-    $stmt->bind_param($types, ...$ids);
-    $stmt->execute();
-    foreach ($stmt->get_result()->fetch_all(MYSQLI_ASSOC) as $producto) {
-        $productos[(int) $producto['id_producto']][(int) $producto['id_variante']] = $producto;
+    foreach ($carrito as $productId => $variantsInCart) {
+        $product = api_try('GET', '/products/' . (int) $productId, null, false);
+        if (isset($product['_error'])) continue;
+        foreach ($product['variants'] ?? [] as $variant) {
+            $product['id_producto'] = (int) $product['id_producto'];
+            $product['variante_imagen'] = $variant['imagen'] ?? null;
+            $product['id_variante'] = (int) $variant['id_variante'];
+            $product['stock'] = (int) $variant['stock'];
+            $product['talla'] = $variant['talla'];
+            $product['color'] = $variant['color'];
+            if (isset($variantsInCart[$product['id_variante']])) {
+                $productos[$product['id_producto']][$product['id_variante']] = $product;
+            }
+        }
     }
-    $stmt->close();
 }
 ?>
 

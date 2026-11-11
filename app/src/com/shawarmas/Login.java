@@ -4,8 +4,8 @@ package com.shawarmas;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.*;
-import java.security.GeneralSecurityException;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 public class Login {
 
@@ -122,107 +122,58 @@ private void signIn() {
     JTextField ap2Field = new JTextField();
     JTextField mailField = new JTextField();
     JPasswordField passwField = new JPasswordField();
-
-    while(true) {
+    while (true) {
         JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Nombre:"));
-        panel.add(nombreField);
-        panel.add(new JLabel("Apellido 1:"));
-        panel.add(ap1Field);
-        panel.add(new JLabel("Apellido 2:"));
-        panel.add(ap2Field);
-        panel.add(new JLabel("Email:"));
-        panel.add(mailField);
-        panel.add(new JLabel("Contraseña:"));
-        panel.add(passwField);
-
+        panel.add(new JLabel("Nombre:")); panel.add(nombreField);
+        panel.add(new JLabel("Apellido 1:")); panel.add(ap1Field);
+        panel.add(new JLabel("Apellido 2:")); panel.add(ap2Field);
+        panel.add(new JLabel("Email:")); panel.add(mailField);
+        panel.add(new JLabel("Contraseña:")); panel.add(passwField);
         int result = JOptionPane.showConfirmDialog(null, panel, "Registro", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if(result != JOptionPane.OK_OPTION) break;
-
-        String nombre = nombreField.getText();
-        String ap1 = ap1Field.getText();
-        String ap2 = ap2Field.getText();
+        if (result != JOptionPane.OK_OPTION) return;
+        String nombre = nombreField.getText().trim();
+        String ap1 = ap1Field.getText().trim();
+        String ap2 = ap2Field.getText().trim();
         String mail = mailField.getText().trim();
-        String passw = new String(passwField.getPassword()).trim();
-
-        if(nombre.isEmpty() || ap1.isEmpty() || mail.isEmpty() || passw.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
+        String passw = new String(passwField.getPassword());
+        if (nombre.isEmpty() || ap1.isEmpty() || mail.isEmpty() || passw.length() < 8 || !mail.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            JOptionPane.showMessageDialog(null, "Comprueba los campos y usa una contraseña de al menos 8 caracteres.", "Datos no válidos", JOptionPane.ERROR_MESSAGE);
             continue;
         }
-
-        if(!mail.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-            JOptionPane.showMessageDialog(null, "Introduce un correo electrónico válido", "Email inválido", JOptionPane.ERROR_MESSAGE);
-            continue;
+        try {
+            ApiClient.getInstance().registerCustomer(nombre, ap1, ap2, mail, passw);
+            ApiClient.getInstance().logout();
+            JOptionPane.showMessageDialog(null, "Te has registrado correctamente.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "No se pudo completar el registro", JOptionPane.ERROR_MESSAGE);
         }
-
-        if(passw.length() < 8) {
-            JOptionPane.showMessageDialog(null, "La contraseña debe tener al menos 8 caracteres", "Error Contraseña", JOptionPane.ERROR_MESSAGE);
-            continue;
-        }
-
-        try(Connection conn = DatabaseConnection.getConnection()){
-            String sql = "INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, nombre);
-            stmt.setString(2, ap1);
-            stmt.setString(3, ap2);
-            stmt.setString(4, mail);
-            stmt.setString(5, DatabaseConnection.hashPassword(passw));
-
-            int rowsInserted = stmt.executeUpdate();
-            if(rowsInserted > 0) JOptionPane.showMessageDialog(null, "Te has registrado correctamente.");
-            
-        } catch(SQLException | GeneralSecurityException ex) {
-            JOptionPane.showMessageDialog(null, "Error al insertar registrarse.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-        break;
-    }
-}
-
-	
-private void logIn() {
-    String mail = txtMail.getText().trim();
-    String passw = new String(password.getPassword()).trim();
-
-    if(mail.isEmpty() || passw.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "Por favor, completa todos los campos", "Campos vacíos", JOptionPane.ERROR_MESSAGE);
         return;
     }
-
-    try(Connection conn = DatabaseConnection.getConnection()){
-    	String sqlCliente = "SELECT passw FROM clientes WHERE mail = ?";
-    	PreparedStatement stmtCliente = conn.prepareStatement(sqlCliente);
-    	stmtCliente.setString(1, mail);
-    	ResultSet rsCliente = stmtCliente.executeQuery();
-
-    	if(rsCliente.next() && DatabaseConnection.verifyPassword(passw, rsCliente.getString("passw"))) {
+}
+private void logIn() {
+    String mail = txtMail.getText().trim();
+    String passw = new String(password.getPassword());
+    if (mail.isEmpty() || passw.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Introduce el correo y la contraseña.", "Datos incompletos", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    try {
+        com.fasterxml.jackson.databind.JsonNode user = ApiClient.getInstance().login(mail, passw);
+        if (user.path("type").asText().equals("customer")) {
             frmShawarSignIn.dispose();
             Customer window = new Customer();
             window.customerMail = mail;
             window.main(null);
-            return;
-        }
-        
-        String sqlEmpleado = "SELECT passw FROM empleados WHERE mail = ?";
-        PreparedStatement psEmpleado = conn.prepareStatement(sqlEmpleado);
-        psEmpleado.setString(1, mail);
-        ResultSet rsEmpleado = psEmpleado.executeQuery();
-
-        if(rsEmpleado.next() && DatabaseConnection.verifyPassword(passw, rsEmpleado.getString("passw"))) {
+        } else if (user.path("type").asText().equals("employee")) {
             frmShawarSignIn.dispose();
             Employee window = new Employee();
             window.mail = mail;
             window.main(null);
         } else {
-            JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "La cuenta no tiene acceso a esta aplicación.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
         }
-
-    } catch(SQLException | GeneralSecurityException ex) {
-        JOptionPane.showMessageDialog(null, "Error de conexión", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(null, ex.getMessage(), "No se pudo conectar con el servicio", JOptionPane.ERROR_MESSAGE);
     }
 }
-
-
 }

@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
-session_start([
-    'cookie_httponly' => true,
-    'cookie_samesite' => 'Lax',
-    'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
-]);
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
 $mensaje = '';
 $cartCount = 0;
@@ -19,19 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validar_csrf();
     $email = trim((string) ($_POST['usuario'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
-    $stmt = $conn->prepare('SELECT id_user, nombre, apellido1, apellido2, mail, passw FROM clientes WHERE mail = ? LIMIT 1');
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $cliente = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    try {
+        $session = api_request('POST', '/auth/login', ['email' => $email, 'password' => $password], false);
+        $cliente = $session['user'] ?? [];
+    } catch (ApiClientException) {
+        $cliente = [];
+    }
 
-    if ($cliente && verify_password_shared($password, (string) $cliente['passw'])) {
+    if (($cliente['type'] ?? '') === 'customer') {
         session_regenerate_id(true);
-        $_SESSION['id_user'] = (int) $cliente['id_user'];
+        $_SESSION['api_token'] = (string) $session['token'];
+        $_SESSION['id_user'] = (int) $cliente['id'];
         $_SESSION['nombre'] = (string) $cliente['nombre'];
         $_SESSION['apellido1'] = (string) $cliente['apellido1'];
         $_SESSION['apellido2'] = (string) ($cliente['apellido2'] ?? '');
-        $_SESSION['mail'] = (string) $cliente['mail'];
+        $_SESSION['mail'] = (string) $cliente['email'];
         $_SESSION['nombre_completo'] = trim($_SESSION['nombre'] . ' ' . $_SESSION['apellido1'] . ' ' . $_SESSION['apellido2']);
         $redirect = (string) ($_POST['redirect'] ?? '');
         $redirect = preg_match('/^[a-zA-Z0-9_-]+\.php$/', $redirect) ? $redirect : 'index.php';
@@ -42,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mensaje = 'Usuario o contraseña incorrectos.';
 }
 
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">

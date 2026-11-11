@@ -1,38 +1,15 @@
 <?php
 declare(strict_types=1);
 
-session_start([
-    'cookie_httponly' => true,
-    'cookie_samesite' => 'Lax',
-    'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
-]);
-require_once __DIR__ . '/database-connection.php';
+require_once __DIR__ . '/api-client.php';
+start_store_session();
 
-$productos = $conn->query(
-    'SELECT p.id_producto, p.marca, p.modelo, p.precio, COALESCE(SUM(v.stock), 0) AS stock, p.imagen, c.categoria
-     FROM productos p
-     INNER JOIN categorias c ON c.id_categoria = p.fk_categoria
-     LEFT JOIN producto_variantes v ON v.fk_producto = p.id_producto
-     GROUP BY p.id_producto, p.marca, p.modelo, p.precio, p.imagen, c.categoria
-     ORDER BY RAND()
-     LIMIT 4'
-)->fetch_all(MYSQLI_ASSOC);
-
-$heroProducto = $conn->query(
-    'SELECT marca, modelo, imagen
-     FROM productos
-     ORDER BY RAND()
-     LIMIT 1'
-)->fetch_assoc();
-
-$categorias = $conn->query(
-    'SELECT c.id_categoria, c.categoria, COUNT(p.id_producto) AS total
-     FROM categorias c
-     LEFT JOIN productos p ON p.fk_categoria = c.id_categoria
-     GROUP BY c.id_categoria, c.categoria
-     ORDER BY c.id_categoria
-     LIMIT 6'
-)->fetch_all(MYSQLI_ASSOC);
+$productos = api_try('GET', '/products?pageSize=4&sort=newest', null, false);
+$categorias = api_try('GET', '/categories', null, false);
+$productos = isset($productos['_error']) ? [] : $productos;
+$categorias = isset($categorias['_error']) ? [] : $categorias;
+$heroCandidates = api_try('GET', '/products?pageSize=50&sort=newest', null, false);
+$heroProducto = !isset($heroCandidates['_error']) && $heroCandidates ? $heroCandidates[array_rand($heroCandidates)] : null;
 
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
@@ -95,7 +72,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             </div>
             <div class="hero-art" aria-label="Selección de zapatillas y ropa">
                 <span class="hero-index">01 / 04</span>
-                <img src="<?= escapar(imagen_url($heroProducto['imagen'])) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>">
+                <?php if ($heroProducto): ?><img src="<?= escapar(imagen_url($heroProducto['imagen'])) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>"><?php endif; ?>
                 <p>THE EVERYDAY<br><strong>UNIFORM</strong></p>
             </div>
         </section>
