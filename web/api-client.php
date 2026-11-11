@@ -17,7 +17,21 @@ function api_request(string $method, string $path, ?array $payload = null, bool 
         throw new ApiClientException(503, 'The store service is temporarily unavailable. Please try again.');
     }
     if (!function_exists('curl_init')) {
-        throw new RuntimeException('The PHP cURL extension is required to communicate with the Shawarmas API.');
+        throw new ApiClientException(503, 'The store service is temporarily unavailable. Please try again.');
+    }
+
+    if ($authenticated && $path !== '/auth/refresh' && !empty($_SESSION['api_token']) && (int) ($_SESSION['api_expires_at'] ?? 0) - time() < 300) {
+        try {
+            $refreshed = api_request('POST', '/auth/refresh');
+            $_SESSION['api_token'] = (string) ($refreshed['token'] ?? '');
+            $_SESSION['api_expires_at'] = time() + (int) ($refreshed['expiresIn'] ?? 0);
+            if ($_SESSION['api_token'] === '') {
+                throw new ApiClientException(401, 'Your session has expired. Please sign in again.');
+            }
+        } catch (ApiClientException $error) {
+            unset($_SESSION['api_token'], $_SESSION['api_expires_at'], $_SESSION['id_user'], $_SESSION['nombre'], $_SESSION['apellido1'], $_SESSION['apellido2'], $_SESSION['mail'], $_SESSION['nombre_completo']);
+            throw new ApiClientException(401, 'Your session has expired. Please sign in again.');
+        }
     }
 
     $headers = ['Accept: application/json'];
@@ -63,7 +77,7 @@ function api_request(string $method, string $path, ?array $payload = null, bool 
     }
     if ($status < 200 || $status >= 300) {
         if ($status === 401) {
-            unset($_SESSION['api_token'], $_SESSION['id_user'], $_SESSION['nombre'], $_SESSION['apellido1'], $_SESSION['apellido2'], $_SESSION['mail'], $_SESSION['nombre_completo']);
+            unset($_SESSION['api_token'], $_SESSION['api_expires_at'], $_SESSION['id_user'], $_SESSION['nombre'], $_SESSION['apellido1'], $_SESSION['apellido2'], $_SESSION['mail'], $_SESSION['nombre_completo']);
         }
         $message = $decoded['error']['message'] ?? 'The request could not be completed.';
         throw new ApiClientException($status, is_string($message) ? $message : 'The request could not be completed.');
@@ -127,5 +141,6 @@ function start_store_session(): void
     $secureCookie = filter_var(getenv('SESSION_COOKIE_SECURE') ?: (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'), FILTER_VALIDATE_BOOLEAN);
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
+    ini_set('session.gc_maxlifetime', '86400');
     session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax', 'cookie_secure' => $secureCookie]);
 }

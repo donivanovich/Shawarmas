@@ -3,6 +3,7 @@ package com.shawarmas;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -23,16 +24,26 @@ public final class ApiClient {
     public static ApiClient getInstance() { return INSTANCE; }
 
     public JsonNode login(String email, String password) throws IOException, InterruptedException {
-        JsonNode session = request("POST", "/auth/login", object("email", email, "password", password), false, false);
-        setSession(session);
-        return session.path("user");
+        try {
+            JsonNode session = request("POST", "/auth/login", object("email", email, "password", password), false, false);
+            setSession(session);
+            return session.path("user");
+        } catch (IOException | InterruptedException | RuntimeException error) {
+            logoutLocal();
+            throw error;
+        }
     }
 
     public JsonNode registerCustomer(String name, String surname, String secondSurname, String email, String password) throws IOException, InterruptedException {
-        JsonNode session = request("POST", "/auth/register", object("nombre", name, "apellido1", surname,
-            "apellido2", secondSurname.isBlank() ? null : secondSurname, "email", email, "password", password), false, false);
-        setSession(session);
-        return session.path("user");
+        try {
+            JsonNode session = request("POST", "/auth/register", object("nombre", name, "apellido1", surname,
+                "apellido2", secondSurname.isBlank() ? null : secondSurname, "email", email, "password", password), false, false);
+            setSession(session);
+            return session.path("user");
+        } catch (IOException | InterruptedException | RuntimeException error) {
+            logoutLocal();
+            throw error;
+        }
     }
 
     public JsonNode get(String path) throws IOException, InterruptedException { return request("GET", path, null, true, true); }
@@ -55,6 +66,7 @@ public final class ApiClient {
         }
         return node;
     }
+    public ArrayNode array() { return JSON.createArrayNode(); }
 
     public void logout() {
         try {
@@ -62,12 +74,9 @@ public final class ApiClient {
         } catch (Exception ignored) {
             // Clear local credentials even when the API cannot be reached.
         } finally {
-            token = null;
-            expiresAt = 0;
+            logoutLocal();
         }
     }
-
-    public String getToken() { return token; }
 
     private JsonNode request(String method, String path, JsonNode payload, boolean authenticated, boolean allowRenew) throws IOException, InterruptedException {
         if (authenticated && (token == null || token.isBlank())) throw new IOException("Sign in to the Shawarmas API first.");
@@ -94,9 +103,12 @@ public final class ApiClient {
 
     private synchronized void renew() throws IOException, InterruptedException {
         if (token == null) throw new IOException("Your API session has expired. Sign in again.");
+        if (expiresAt - System.currentTimeMillis() >= 300000) return;
         JsonNode refreshed = request("POST", "/auth/refresh", null, true, false);
         setSession(refreshed);
     }
+
+    private void logoutLocal() { token = null; expiresAt = 0; }
 
     private void setSession(JsonNode session) {
         token = session.path("token").asText();

@@ -5,14 +5,13 @@ namespace Shawarmas.Services
 {
     public class ServiceOrder
     {
-        public List<Pedido> GetAllOrders()
+        public async Task<List<Pedido>> GetAllOrdersAsync()
         {
-            var rows = ApiClient.Get("/orders").GetAwaiter().GetResult().AsArray();
+            var rows = (await ApiClient.Get("/orders?pageSize=100")).AsArray();
             return rows.Select(row =>
             {
                 var order = MapOrder(row!);
-                var detail = ApiClient.Get($"/orders/{order.IdPedido}").GetAwaiter().GetResult();
-                order.Productos = (detail["items"]?.AsArray() ?? new()).Select(item => new Producto
+                order.Productos = (row!["items"]?.AsArray() ?? new()).Select(item => new Producto
                 {
                     IdProducto = item?["id_producto"]?.GetValue<int>() ?? 0,
                     Cantidad = item?["cantidad"]?.GetValue<int>() ?? 0,
@@ -25,8 +24,8 @@ namespace Shawarmas.Services
             }).ToList();
         }
 
-        public void UpdateOrderDeliveredStatus(int idPedido, bool entregado) =>
-            ApiClient.Patch($"/orders/{idPedido}/status", new { entregado }).GetAwaiter().GetResult();
+        public async Task UpdateOrderDeliveredStatusAsync(int idPedido, bool entregado) =>
+            await ApiClient.Patch($"/orders/{idPedido}/status", new { entregado });
 
         private static Pedido MapOrder(JsonNode row) => new()
         {

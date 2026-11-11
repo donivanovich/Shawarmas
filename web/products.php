@@ -4,31 +4,6 @@ declare(strict_types=1);
 require_once __DIR__ . '/api-client.php';
 start_store_session();
 
-$errorLogin = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'], $_POST['password'])) {
-    $email = trim((string) $_POST['usuario']);
-    $pass = (string) $_POST['password'];
-    try {
-        $login = api_request('POST', '/auth/login', ['email' => $email, 'password' => $pass], false);
-        $cliente = $login['user'] ?? [];
-    } catch (ApiClientException) {
-        $cliente = [];
-    }
-
-    if (($cliente['type'] ?? '') === 'customer') {
-        session_regenerate_id(true);
-        $_SESSION['api_token'] = (string) $login['token'];
-        $_SESSION['id_user'] = (int) $cliente['id'];
-        $_SESSION['nombre'] = (string) $cliente['nombre'];
-        $_SESSION['apellido1'] = (string) $cliente['apellido1'];
-        $_SESSION['apellido2'] = (string) ($cliente['apellido2'] ?? '');
-        $_SESSION['mail'] = (string) $cliente['email'];
-        $_SESSION['nombre_completo'] = trim($_SESSION['nombre'] . ' ' . $_SESSION['apellido1'] . ' ' . $_SESSION['apellido2']);
-    } else {
-        $errorLogin = 'Usuario o contraseña incorrectos.';
-    }
-}
-
 $categoria = filter_input(INPUT_GET, 'categoria', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $maximo = filter_input(INPUT_GET, 'maximo', FILTER_VALIDATE_FLOAT, ['options' => ['min_range' => 0]]);
 $colorId = filter_input(INPUT_GET, 'color', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);

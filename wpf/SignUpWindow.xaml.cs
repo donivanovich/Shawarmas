@@ -55,28 +55,22 @@ namespace Shawarmas.MVVM.View
 
             var service = new ServiceEmployee();
 
-            if (await service.EmailExists(nuevoEmpleado.Mail))
+            try
             {
-                MessageBox.Show("Ese correo ya está registrado");
-                TxtEmail.Focus();
-                return;
-            }
-
-            if (await service.CreateEmpleyee(nuevoEmpleado))
-            {
-                MessageBox.Show("Empleado registrado correctamente");
+                if (await service.EmailExists(nuevoEmpleado.Mail))
+                {
+                    MessageBox.Show("That email address is already in use.");
+                    TxtEmail.Focus();
+                    return;
+                }
+                await service.CreateEmpleyee(nuevoEmpleado);
+                MessageBox.Show("Employee created successfully.");
                 LoginWindow loginWindow = new LoginWindow();
                 loginWindow.Show();
                 this.Close();
             }
-            else
-            {
-                MessageBox.Show("Error de registro. Comprueba los datos");
-            }
-
-            BtnSignUp.IsEnabled = true;
-            BtnReturn.IsEnabled = true;
-        } 
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Employee could not be created"); }
+            finally { BtnSignUp.IsEnabled = true; BtnReturn.IsEnabled = true; }        } 
 
         private void BtnReturn_Click(object sender, RoutedEventArgs e)
         {

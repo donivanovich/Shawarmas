@@ -57,6 +57,7 @@ namespace Shawarmas
                 var user = await ApiClient.Login(username, password);
                 if (user["type"]?.GetValue<string>() == "employee")
                 {
+                    user = await ApiClient.Get("/auth/me");
                     intentos = 0;
                     bloqueo = null;
                     var mainmenu = new MainWindow(ServiceEmployee.FromSession(user));
