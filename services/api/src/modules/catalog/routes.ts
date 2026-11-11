@@ -74,10 +74,9 @@ router.get('/products/:id', async (request, response) => {
     `SELECT v.id_variante, p.id_producto AS fk_producto, v.stock, COALESCE(v.imagen, p.imagen) AS imagen_producto,
        t.id_talla, t.talla, c.id_color, c.color, c.imagen AS color_imagen
      FROM productos p JOIN producto_variantes v ON v.fk_producto = p.id_producto
-     JOIN tallas t ON t.id_talla = v.fk_talla JOIN colores c ON c.id_color = v.fk_color
-     WHERE p.marca = ? AND p.modelo = ? AND p.fk_categoria = ?
-       AND NOT (p.marca = 'Adidas' AND p.modelo = 'Samba OG' AND c.color = 'Panda')
-     ORDER BY p.id_producto, t.id_talla`, [product[0].marca, product[0].modelo, product[0].fk_categoria]
+      JOIN tallas t ON t.id_talla = v.fk_talla JOIN colores c ON c.id_color = v.fk_color
+     WHERE p.id_producto = ?
+     ORDER BY t.id_talla, c.color`, [id]
   );
   response.json({ data: { ...product[0], variants } });
 });

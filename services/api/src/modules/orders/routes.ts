@@ -35,6 +35,46 @@ const getCart = async (items: z.infer<typeof cartInput>['items'], lock = false) 
   return results;
 };
 
+const createOrder = async (body: z.infer<typeof shippingInput> & z.infer<typeof cartInput>, customerId: number, requestedStoreId?: number) => transaction(async (connection) => {
+  const [customerRows] = await connection.execute<RowDataPacket[]>('SELECT id_user FROM clientes WHERE id_user = ? LIMIT 1', [customerId]);
+  if (!customerRows[0]) throw new ApiError(404, 'CUSTOMER_NOT_FOUND', 'Customer not found');
+  const unique = new Map<string, typeof body.items[number]>();
+  for (const item of body.items) {
+    const key = `${item.productId}:${item.variantId}`;
+    const previous = unique.get(key);
+    unique.set(key, { ...item, quantity: item.quantity + (previous?.quantity ?? 0) });
+  }
+  const lockedItems: { item: typeof body.items[number]; variant: RowDataPacket & { id_variante: number; stock: number } }[] = [];
+  for (const item of [...unique.values()].sort((a, b) => a.variantId - b.variantId)) {
+    if (item.quantity > 100) throw new ApiError(400, 'INVALID_QUANTITY', 'Combined quantity cannot exceed 100 per variant');
+    const [found] = await connection.execute<RowDataPacket[]>(
+      `SELECT p.id_producto, v.id_variante, p.marca, p.modelo, p.precio, v.stock
+       FROM productos p JOIN producto_variantes v ON v.fk_producto = p.id_producto
+       WHERE p.id_producto = ? AND v.id_variante = ? FOR UPDATE`, [item.productId, item.variantId]
+    );
+    const variant = found[0] as (RowDataPacket & { id_variante: number; stock: number }) | undefined;
+    if (!variant) throw new ApiError(400, 'INVALID_VARIANT', 'A selected product variant does not exist');
+    if (item.quantity > variant.stock) throw new ApiError(409, 'INSUFFICIENT_STOCK', 'Stock changed before checkout; review the cart');
+    lockedItems.push({ item, variant });
+  }
+  const [stores] = await connection.execute<RowDataPacket[]>(
+    requestedStoreId === undefined ? 'SELECT id_tienda FROM tiendas ORDER BY id_tienda LIMIT 1' : 'SELECT id_tienda FROM tiendas WHERE id_tienda = ? LIMIT 1',
+    requestedStoreId === undefined ? [] : [requestedStoreId]
+  );
+  if (!stores[0]) throw new ApiError(requestedStoreId === undefined ? 503 : 404, requestedStoreId === undefined ? 'STORE_UNAVAILABLE' : 'STORE_NOT_FOUND', requestedStoreId === undefined ? 'No fulfillment store is configured' : 'Store not found');
+  const storeId = Number((stores[0] as RowDataPacket & { id_tienda: number }).id_tienda);
+  const [order] = await connection.execute<import('mysql2/promise').ResultSetHeader>(
+    'INSERT INTO pedidos (fecha_entrega, pais, ciudad, calle, postal, fk_id_user, fk_tienda) VALUES (DATE_ADD(NOW(), INTERVAL 3 DAY), ?, ?, ?, ?, ?, ?)',
+    [body.pais, body.ciudad, body.calle, body.postal, customerId, storeId]
+  );
+  for (const { item, variant } of lockedItems) {
+    const [updated] = await connection.execute<import('mysql2/promise').ResultSetHeader>('UPDATE producto_variantes SET stock = stock - ? WHERE id_variante = ? AND stock >= ?', [item.quantity, variant.id_variante, item.quantity]);
+    if (updated.affectedRows !== 1) throw new ApiError(409, 'INSUFFICIENT_STOCK', 'Stock changed before checkout; review the cart');
+    await connection.execute('INSERT INTO productos_pedidos (fk_variante, fk_pedido, cantidad) VALUES (?, ?, ?)', [variant.id_variante, order.insertId, item.quantity]);
+  }
+  return order.insertId;
+});
+
 router.post('/cart/quote', requireAuth, async (request, response) => {
   const input = cartInput.parse(request.body);
   const items = await getCart(input.items);
@@ -45,44 +85,19 @@ router.post('/orders', requireAuth, async (request, response) => {
   const body = z.object({ ...shippingInput.shape, items: cartInput.shape.items }).strict().parse(request.body);
   const principal = (request as AuthedRequest).principal;
   if (principal.type !== 'customer') throw new ApiError(403, 'CUSTOMER_REQUIRED', 'Checkout is available to customer accounts');
-  const orderId = await transaction(async (connection) => {
-    const lockedItems: { item: typeof body.items[number]; variant: RowDataPacket & { id_variante: number; stock: number } }[] = [];
-    const unique = new Map<string, typeof body.items[number]>();
-    for (const item of body.items) {
-      const key = `${item.productId}:${item.variantId}`;
-      const previous = unique.get(key);
-      unique.set(key, { ...item, quantity: item.quantity + (previous?.quantity ?? 0) });
-    }
-    for (const item of unique.values()) {
-      if (item.quantity > 100) throw new ApiError(400, 'INVALID_QUANTITY', 'Combined quantity cannot exceed 100 per variant');
-      const [found] = await connection.execute<RowDataPacket[]>(
-        `SELECT p.id_producto, v.id_variante, p.marca, p.modelo, p.precio, v.stock
-         FROM productos p JOIN producto_variantes v ON v.fk_producto = p.id_producto
-         WHERE p.id_producto = ? AND v.id_variante = ? FOR UPDATE`, [item.productId, item.variantId]
-      );
-      const variant = found[0] as (RowDataPacket & { id_variante: number; stock: number }) | undefined;
-      if (!variant) throw new ApiError(400, 'INVALID_VARIANT', 'A selected product variant does not exist');
-      if (item.quantity > variant.stock) throw new ApiError(409, 'INSUFFICIENT_STOCK', 'Stock changed before checkout; review the cart');
-      lockedItems.push({ item, variant });
-    }
-    const [stores] = await connection.execute<RowDataPacket[]>('SELECT id_tienda FROM tiendas ORDER BY id_tienda LIMIT 1');
-    if (!stores[0]) throw new ApiError(503, 'STORE_UNAVAILABLE', 'No fulfillment store is configured');
-    const storeId = Number((stores[0] as RowDataPacket & { id_tienda: number }).id_tienda);
-    const [order] = await connection.execute<import('mysql2/promise').ResultSetHeader>(
-      'INSERT INTO pedidos (fecha_entrega, pais, ciudad, calle, postal, fk_id_user, fk_tienda) VALUES (DATE_ADD(NOW(), INTERVAL 3 DAY), ?, ?, ?, ?, ?, ?)',
-      [body.pais, body.ciudad, body.calle, body.postal, principal.id, storeId]
-    );
-    for (const { item, variant } of lockedItems) {
-      const [updated] = await connection.execute<import('mysql2/promise').ResultSetHeader>('UPDATE producto_variantes SET stock = stock - ? WHERE id_variante = ? AND stock >= ?', [item.quantity, variant.id_variante, item.quantity]);
-      if (updated.affectedRows !== 1) throw new ApiError(409, 'INSUFFICIENT_STOCK', 'Stock changed before checkout; review the cart');
-      await connection.execute('INSERT INTO productos_pedidos (fk_variante, fk_pedido, cantidad) VALUES (?, ?, ?)', [variant.id_variante, order.insertId, item.quantity]);
-    }
-    return order.insertId;
-  });
+  const orderId = await createOrder(body, principal.id);
+  response.status(201).json({ data: { id_pedido: orderId, status: 'created' } });
+});
+
+router.post('/admin/orders', requireEmployee, async (request, response) => {
+  const body = z.object({ ...shippingInput.shape, customerId: z.number().int().positive(), storeId: z.number().int().positive().optional(), items: cartInput.shape.items }).strict().parse(request.body);
+  const { customerId, storeId, ...shippingAndItems } = body;
+  const orderId = await createOrder(shippingAndItems, customerId, storeId);
   response.status(201).json({ data: { id_pedido: orderId, status: 'created' } });
 });
 
 router.get('/orders', requireAuth, async (request, response) => {
+  const pagination = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(100) }).parse(request.query);
   const principal = (request as AuthedRequest).principal;
   const isCustomer = principal.type === 'customer';
   const sql = `SELECT p.id_pedido, p.fecha_pedido, p.fecha_entrega, p.entregado, p.pais, p.ciudad, p.calle, p.postal,
@@ -94,9 +109,18 @@ router.get('/orders', requireAuth, async (request, response) => {
     LEFT JOIN productos pr ON pr.id_producto = v.fk_producto
     ${isCustomer ? 'WHERE p.fk_id_user = ?' : ''}
     GROUP BY p.id_pedido, p.fecha_pedido, p.fecha_entrega, p.entregado, p.pais, p.ciudad, p.calle, p.postal, p.fk_id_user, c.nombre, c.apellido1, c.apellido2, c.mail
-    ORDER BY p.fecha_pedido DESC`;
-  const orders = await rows<RowDataPacket>(sql, isCustomer ? [principal.id] : []);
-  response.json({ data: orders });
+    ORDER BY p.fecha_pedido DESC LIMIT ? OFFSET ?`;
+  const orders = await rows<RowDataPacket & { id_pedido: number }>(sql, [...(isCustomer ? [principal.id] : []), pagination.pageSize, (pagination.page - 1) * pagination.pageSize]);
+  const ids = orders.map((order) => Number(order.id_pedido));
+  const items = ids.length ? await rows<RowDataPacket & { fk_pedido: number }>(
+    `SELECT pp.fk_pedido, pp.cantidad, pr.id_producto, pr.marca, pr.modelo, pr.precio, COALESCE(v.imagen, pr.imagen) AS imagen, v.id_variante, t.talla, c.color
+     FROM productos_pedidos pp JOIN producto_variantes v ON v.id_variante = pp.fk_variante
+     JOIN productos pr ON pr.id_producto = v.fk_producto JOIN tallas t ON t.id_talla = v.fk_talla JOIN colores c ON c.id_color = v.fk_color
+     WHERE pp.fk_pedido IN (${ids.map(() => '?').join(',')}) ORDER BY pp.fk_pedido, pr.marca, pr.modelo`, ids
+  ) : [];
+  const grouped = new Map<number, RowDataPacket[]>();
+  for (const item of items) grouped.set(Number(item.fk_pedido), [...(grouped.get(Number(item.fk_pedido)) ?? []), item]);
+  response.json({ data: orders.map((order) => ({ ...order, items: grouped.get(Number(order.id_pedido)) ?? [] })), meta: { page: pagination.page, pageSize: pagination.pageSize } });
 });
 
 router.get('/orders/:id', requireAuth, async (request, response) => {

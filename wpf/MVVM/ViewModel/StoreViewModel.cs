@@ -37,9 +37,7 @@ namespace Shawarmas.MVVM.ViewModel
         public StoreViewModel()
         {
             _serviceOrder = new ServiceOrder();
-
-            var pedidosOriginales = _serviceOrder.GetAllOrders();
-            Pedidos = new ObservableCollection<Pedido>(pedidosOriginales);
+            Pedidos = new ObservableCollection<Pedido>();
 
             SeleccionarPedidoCommand = new RelayCommand<Pedido>(SeleccionarPedido);
             MarcarComoCompletadoCommand = new RelayCommand<object>(MarcarComoCompletado, CanMarcarComoCompletadoObj);
@@ -102,6 +100,17 @@ namespace Shawarmas.MVVM.ViewModel
 
         private ServiceOrder _serviceOrder;
 
+        public async Task LoadOrdersAsync()
+        {
+            try
+            {
+                var pedidosOriginales = await _serviceOrder.GetAllOrdersAsync();
+                Pedidos.Clear();
+                foreach (var pedido in pedidosOriginales) Pedidos.Add(pedido);
+            }
+            catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message, "Could not load orders"); }
+        }
+
         private void InicializarGrilla(object obj)
         {
             if (NumFilas <= 0 || NumColumnas <= 0) return;
@@ -129,20 +138,18 @@ namespace Shawarmas.MVVM.ViewModel
             PedidoSeleccionado = pedido;
         }
 
-        private void MarcarComoCompletado(object obj)
+        private async void MarcarComoCompletado(object obj)
         {
             if (obj is Pedido pedido)
             {
-                pedido.Entregado = true;
-                _serviceOrder.UpdateOrderDeliveredStatus(pedido.IdPedido, true);
-
-                var pedidosActualizados = _serviceOrder.GetAllOrders();
-                Pedidos.Clear();
-                foreach (var p in pedidosActualizados)
+                try
                 {
-                    Pedidos.Add(p);
+                    await _serviceOrder.UpdateOrderDeliveredStatusAsync(pedido.IdPedido, true);
+                    pedido.Entregado = true;
+                    await LoadOrdersAsync();
+                    CommandManager.InvalidateRequerySuggested();
                 }
-                CommandManager.InvalidateRequerySuggested();
+                catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message, "Could not update order"); }
             }
         }
 

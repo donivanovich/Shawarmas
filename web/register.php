@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje = 'Completa los datos correctamente. La contraseña debe tener al menos 8 caracteres.';
     } else {
         try {
-            api_request('POST', '/auth/register', ['nombre' => $nombre, 'apellido1' => $apellido1, 'apellido2' => $apellido2 ?: null, 'email' => $mail, 'password' => $passwPlano], false);
+            $registration = api_request('POST', '/auth/register', ['nombre' => $nombre, 'apellido1' => $apellido1, 'apellido2' => $apellido2 ?: null, 'email' => $mail, 'password' => $passwPlano], false);
+            $_SESSION['api_token'] = (string) ($registration['token'] ?? '');
+            api_request('POST', '/auth/logout');
+            unset($_SESSION['api_token']);
             $mensaje = 'Registro realizado correctamente.';
         } catch (ApiClientException) {
             $mensaje = 'No se pudo completar el registro. Comprueba que el correo no esté registrado.';

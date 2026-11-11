@@ -26,18 +26,27 @@ namespace Shawarmas.MVVM.View
         public StoreView()
         {
             InitializeComponent();
-            var serviceProduct = new ServiceProduct();
-            CmbCategory.ItemsSource = serviceProduct.GetAllCategories();
-            CmbColour.ItemsSource = serviceProduct.GetAllColours();
-            CmbSize.ItemsSource = serviceProduct.GetAllSizes();
-            if (CmbCategory.Items.Count > 0) CmbCategory.SelectedIndex = 0;
-            if (CmbColour.Items.Count > 0) CmbColour.SelectedIndex = 0;
-            if (CmbSize.Items.Count > 0) CmbSize.SelectedIndex = 0;
-
             DataContext = new StoreViewModel();
+            Loaded += StoreView_Loaded;
         }
 
-        string imagenNombre = "";
+        private string imagePath = "";
+
+        private async void StoreView_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var serviceProduct = new ServiceProduct();
+                CmbCategory.ItemsSource = await serviceProduct.GetAllCategoriesAsync();
+                CmbColour.ItemsSource = await serviceProduct.GetAllColoursAsync();
+                CmbSize.ItemsSource = await serviceProduct.GetAllSizesAsync();
+                if (CmbCategory.Items.Count > 0) CmbCategory.SelectedIndex = 0;
+                if (CmbColour.Items.Count > 0) CmbColour.SelectedIndex = 0;
+                if (CmbSize.Items.Count > 0) CmbSize.SelectedIndex = 0;
+                if (DataContext is StoreViewModel viewModel) await viewModel.LoadOrdersAsync();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Could not load store data"); }
+        }
 
         private void NumberValidationHandler(object sender, TextCompositionEventArgs e)
         {
@@ -87,42 +96,12 @@ namespace Shawarmas.MVVM.View
             var dialog = new OpenFileDialog
             {
                 Title = "Selecciona imagen del producto",
-                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp|Todos|*.*"
+                Filter = "Images|*.jpg;*.jpeg;*.png;*.webp"
             };
 
             if (dialog.ShowDialog() == true)
             {
-                string nombreNuevo = System.IO.Path.GetFileName(dialog.FileName);
-                imagenNombre = nombreNuevo;
-
-                var directorioActual = new System.IO.DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-                string? rutaProyecto = null;
-
-                while (directorioActual != null && directorioActual.Name != "Shawarmas")
-                {
-                    directorioActual = directorioActual.Parent;
-                }
-
-                if (directorioActual != null)
-                {
-                    rutaProyecto = System.IO.Path.Combine(directorioActual.FullName, "Resources", "productos", nombreNuevo);
-
-                    if (!System.IO.File.Exists(rutaProyecto))
-                    {
-                        string? dirProyecto = System.IO.Path.GetDirectoryName(rutaProyecto);
-                        _ = dirProyecto ?? throw new InvalidOperationException("Directorio inválido");
-                        System.IO.Directory.CreateDirectory(dirProyecto!);
-                        System.IO.File.Copy(dialog.FileName, rutaProyecto, true);
-                    }
-                }
-
-                string rutaEjecutable = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "productos", nombreNuevo);
-                if (!System.IO.File.Exists(rutaEjecutable))
-                {
-                    string? dirEjecutable = System.IO.Path.GetDirectoryName(rutaEjecutable);
-                    System.IO.Directory.CreateDirectory(dirEjecutable ?? throw new ArgumentNullException(nameof(dirEjecutable)));
-                    System.IO.File.Copy(dialog.FileName, rutaEjecutable, true);
-                }
+                imagePath = dialog.FileName;
             }
         } 
 
@@ -140,7 +119,7 @@ namespace Shawarmas.MVVM.View
 
                 int stock = int.TryParse(TxtStock?.Text, out int s) ? s : 0;
                 decimal precio = decimal.TryParse(TxtPrice?.Text, out decimal p) ? p : 0;
-                string rutaImagen = string.IsNullOrEmpty(imagenNombre) ? "" : $"/productos/{imagenNombre}";
+                string rutaImagen = imagePath;
 
                 if (string.IsNullOrWhiteSpace(marca) || string.IsNullOrWhiteSpace(modelo) ||
                     string.IsNullOrWhiteSpace(categoria) || string.IsNullOrWhiteSpace(color) ||
@@ -167,7 +146,7 @@ namespace Shawarmas.MVVM.View
                     CmbColour!.SelectedIndex = -1;
                     CmbSize!.SelectedIndex = -1;
 
-                    imagenNombre = null!;
+                    imagePath = "";
 
                     MessageBox.Show("✅ Product uploaded successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }

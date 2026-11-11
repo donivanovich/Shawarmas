@@ -11,17 +11,29 @@ namespace Shawarmas.Services
             return data.AsArray().Select(row => ToEmployee(row!)).ToList();
         }
 
-        public Task<bool> CreateEmpleyee(Empleado employee) => Task.FromResult(false); // Employee creation requires an administrator account.
-        public Task<bool> EmailExists(string mail) => Task.FromResult(false); // The API returns a conflict if an administrator reuses an address.
-
-        public bool UpdateEmployeeConfig(Empleado employee)
+        public async Task<bool> CreateEmpleyee(Empleado employee)
         {
-            try
+            await ApiClient.Post("/admin/employees", new
             {
-                ApiClient.Patch("/admin/employees/me/preferences", new { fullscreen = employee.Fullscreen, mute = employee.Mute, volume = Math.Clamp(employee.Volume, 0, 100) }).GetAwaiter().GetResult();
-                return true;
-            }
-            catch { return false; }
+                nombre = employee.Nombre.Trim(), apellido1 = employee.Apellido1.Trim(),
+                apellido2 = string.IsNullOrWhiteSpace(employee.Apellido2) ? null : employee.Apellido2.Trim(),
+                email = employee.Mail.Trim(), password = employee.Passw,
+                mode_use = string.IsNullOrWhiteSpace(employee.ModeUse) ? "writter" : employee.ModeUse,
+                fk_tienda = employee.FkTienda, fullscreen = employee.Fullscreen, mute = employee.Mute,
+                volume = Math.Clamp(employee.Volume, 0, 100)
+            });
+            return true;
+        }
+
+        public async Task<bool> EmailExists(string mail)
+        {
+            var result = await ApiClient.Get("/admin/email-availability?email=" + Uri.EscapeDataString(mail.Trim()));
+            return result["available"]?.GetValue<bool>() != true;
+        }
+
+        public async Task UpdateEmployeeConfigAsync(Empleado employee)
+        {
+            await ApiClient.Patch("/admin/employees/me/preferences", new { fullscreen = employee.Fullscreen, mute = employee.Mute, volume = Math.Clamp(employee.Volume, 0, 100) });
         }
 
         public static Empleado FromSession(JsonNode user) => new()
@@ -32,7 +44,10 @@ namespace Shawarmas.Services
             Apellido2 = user["apellido2"]?.GetValue<string>() ?? "",
             Mail = user["email"]?.GetValue<string>() ?? "",
             ModeUse = user["role"]?.GetValue<string>() ?? "",
-            FkTienda = user["fk_tienda"]?.GetValue<int>() ?? 0
+            FkTienda = user["fk_tienda"]?.GetValue<int>() ?? 0,
+            Fullscreen = user["fullscreen"]?.GetValue<bool>() ?? false,
+            Mute = user["mute"]?.GetValue<bool>() ?? false,
+            Volume = user["volume"]?.GetValue<int>() ?? 50
         };
 
         private static Empleado ToEmployee(JsonNode row) => new()

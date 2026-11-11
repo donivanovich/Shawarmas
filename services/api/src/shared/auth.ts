@@ -39,6 +39,17 @@ export const verifyPassword = async (password: string, stored: string): Promise<
   return false;
 };
 
+export const emailInUse = async (email: string, exclude?: { type: 'customer' | 'employee'; id: number }): Promise<boolean> => {
+  const customerSql = `SELECT id_user FROM clientes WHERE mail = ?${exclude?.type === 'customer' ? ' AND id_user <> ?' : ''} LIMIT 1`;
+  const employeeSql = `SELECT id_empleado FROM empleados WHERE mail = ?${exclude?.type === 'employee' ? ' AND id_empleado <> ?' : ''} LIMIT 1`;
+  const customerValues = exclude?.type === 'customer' ? [email, exclude.id] : [email];
+  const employeeValues = exclude?.type === 'employee' ? [email, exclude.id] : [email];
+  const [customers, employees] = await Promise.all([
+    rows<RowDataPacket>(customerSql, customerValues), rows<RowDataPacket>(employeeSql, employeeValues)
+  ]);
+  return customers.length > 0 || employees.length > 0;
+};
+
 type SessionRow = RowDataPacket & { id_session: string; user_type: 'customer' | 'employee'; user_id: number; expires_at: Date; revoked_at: Date | null };
 
 export const issueSession = async (type: Principal['type'], id: number, role: Principal['role']) => {

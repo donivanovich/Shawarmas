@@ -77,7 +77,7 @@ namespace Shawarmas.MVVM.View
 
         } 
 
-        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        private async void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             if (_usuario == null || _usuario.Id == 0)
             {
@@ -86,13 +86,13 @@ namespace Shawarmas.MVVM.View
             }
 
             _usuario.Fullscreen = ToggleFullScreen.IsChecked ?? false;
-            _usuario.ModeUse = ((ComboBoxItem)ComboBoxModeOfUse.SelectedItem)?.Content?.ToString() ?? "writter";
             _usuario.Volume = (int)SliderVolume.Value;
 
             var service = new ServiceEmployee();
 
-            if (service.UpdateEmployeeConfig(_usuario))
+            try
             {
+                await service.UpdateEmployeeConfigAsync(_usuario);
                 MessageBox.Show("Configuration saved successfully");
 
 
@@ -102,9 +102,9 @@ namespace Shawarmas.MVVM.View
                 }
 
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Error saving");
+                MessageBox.Show(ex.Message, "Error saving");
             }
 
         } 
@@ -155,6 +155,7 @@ namespace Shawarmas.MVVM.View
                     ComboBoxModeOfUse.SelectedIndex = 0;
                     break;
             }
+            ComboBoxModeOfUse.IsEnabled = false;
 
             if (MainWindow.BgMusicInstance != null && _usuario != null)
             {

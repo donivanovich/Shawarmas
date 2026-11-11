@@ -3,14 +3,14 @@ import multer from 'multer';
 import { z } from 'zod';
 import type { RowDataPacket } from 'mysql2/promise';
 import { pool, rows } from '../../database.js';
-import { hashPassword, requireAdmin, requireEmployee, requireManager } from '../../shared/auth.js';
+import { emailInUse, hashPassword, requireAdmin, requireEmployee, requireManager } from '../../shared/auth.js';
 import { ApiError } from '../../shared/errors.js';
 import { config } from '../../config.js';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 }, fileFilter: (_request, file, callback) => callback(null, ['image/png', 'image/jpeg', 'image/webp'].includes(file.mimetype)) });
 
-router.post('/images/products', requireManager, upload.single('image'), async (request, response) => {
+router.post('/images/products', requireEmployee, upload.single('image'), async (request, response) => {
   if (!request.file) throw new ApiError(400, 'IMAGE_REQUIRED', 'A PNG, JPEG or WebP image is required');
   if (!config.IMAGE_SERVER_API_KEY) throw new ApiError(503, 'IMAGE_UPLOAD_UNAVAILABLE', 'Image upload is not configured');
   const body = new FormData();
@@ -57,6 +57,22 @@ router.get('/customers', requireManager, async (request, response) => {
   response.json({ data, meta: { page: query.page, pageSize: query.pageSize } });
 });
 
+router.get('/customers/:id', requireManager, async (request, response) => {
+  const id = z.coerce.number().int().positive().parse(request.params.id);
+  const customer = await rows<RowDataPacket>('SELECT id_user, nombre, apellido1, apellido2, mail, creado_en FROM clientes WHERE id_user = ? LIMIT 1', [id]);
+  if (!customer[0]) throw new ApiError(404, 'CUSTOMER_NOT_FOUND', 'Customer not found');
+  response.json({ data: customer[0] });
+});
+
+router.get('/email-availability', requireAdmin, async (request, response) => {
+  const query = z.object({ email: z.string().trim().email().max(255) }).strict().parse(request.query);
+  const email = query.email.toLowerCase();
+  const matches = await rows<RowDataPacket & { total: number }>(
+    'SELECT (SELECT COUNT(*) FROM clientes WHERE mail = ?) + (SELECT COUNT(*) FROM empleados WHERE mail = ?) AS total', [email, email]
+  );
+  response.json({ data: { email, available: Number(matches[0]?.total ?? 0) === 0 } });
+});
+
 router.get('/inventory', requireEmployee, async (request, response) => {
   const query = z.object({ q: z.string().trim().max(100).optional(), pageSize: z.coerce.number().int().min(1).max(500).default(200) }).parse(request.query);
   const term = query.q ? `%${query.q}%` : null;
@@ -75,9 +91,11 @@ router.get('/inventory', requireEmployee, async (request, response) => {
 
 router.post('/customers', requireEmployee, async (request, response) => {
   const input = z.object({ nombre: z.string().trim().min(1).max(50), apellido1: z.string().trim().min(1).max(100), apellido2: z.string().trim().max(100).nullable().optional(), email: z.string().trim().email().max(255), password: z.string().min(8).max(200) }).strict().parse(request.body);
+  const email = input.email.toLowerCase();
+  if (await emailInUse(email)) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
   try {
-    const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)', [input.nombre, input.apellido1, input.apellido2 ?? null, input.email.toLowerCase(), await hashPassword(input.password)]);
-    response.status(201).json({ data: { id_user: result.insertId, nombre: input.nombre, apellido1: input.apellido1, apellido2: input.apellido2 ?? null, mail: input.email.toLowerCase() } });
+    const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)', [input.nombre, input.apellido1, input.apellido2 ?? null, email, await hashPassword(input.password)]);
+    response.status(201).json({ data: { id_user: result.insertId, nombre: input.nombre, apellido1: input.apellido1, apellido2: input.apellido2 ?? null, mail: email } });
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ER_DUP_ENTRY') throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
     throw error;
@@ -87,9 +105,11 @@ router.post('/customers', requireEmployee, async (request, response) => {
 router.patch('/customers/:id', requireManager, async (request, response) => {
   const id = z.coerce.number().int().positive().parse(request.params.id);
   const input = z.object({ nombre: z.string().trim().min(1).max(50), apellido1: z.string().trim().min(1).max(100), apellido2: z.string().trim().max(100).nullable(), email: z.string().trim().email().max(255) }).strict().parse(request.body);
-  const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('UPDATE clientes SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ? WHERE id_user = ?', [input.nombre, input.apellido1, input.apellido2, input.email.toLowerCase(), id]);
+  const email = input.email.toLowerCase();
+  if (await emailInUse(email, { type: 'customer', id })) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
+  const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('UPDATE clientes SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ? WHERE id_user = ?', [input.nombre, input.apellido1, input.apellido2, email, id]);
   if (!result.affectedRows) throw new ApiError(404, 'CUSTOMER_NOT_FOUND', 'Customer not found');
-  response.json({ data: { id_user: id, ...input, email: input.email.toLowerCase() } });
+  response.json({ data: { id_user: id, ...input, email } });
 });
 
 router.patch('/customers/:id/password', requireAdmin, async (request, response) => {
@@ -108,20 +128,39 @@ router.get('/employees', requireManager, async (_request, response) => {
 
 router.post('/employees', requireAdmin, async (request, response) => {
   const input = z.object({ nombre: z.string().trim().min(1).max(50), apellido1: z.string().trim().min(1).max(100), apellido2: z.string().trim().max(100).nullable().optional(), email: z.string().trim().email().max(255), password: z.string().min(8).max(200), mode_use: z.enum(['writter', 'editor', 'admin']), fk_tienda: z.number().int().positive(), fullscreen: z.boolean().default(false), mute: z.boolean().default(false), volume: z.number().int().min(0).max(100).default(50) }).strict().parse(request.body);
-  const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>(
-    'INSERT INTO empleados (nombre, apellido1, apellido2, mail, passw, mode_use, fk_tienda, fullscreen, mute, volume) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [input.nombre, input.apellido1, input.apellido2 ?? null, input.email.toLowerCase(), await hashPassword(input.password), input.mode_use, input.fk_tienda, input.fullscreen, input.mute, input.volume]
-  );
-  response.status(201).json({ data: { id_empleado: result.insertId, ...input, email: input.email.toLowerCase(), password: undefined } });
+  const email = input.email.toLowerCase();
+  if (await emailInUse(email)) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
+  try {
+    const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>(
+      'INSERT INTO empleados (nombre, apellido1, apellido2, mail, passw, mode_use, fk_tienda, fullscreen, mute, volume) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [input.nombre, input.apellido1, input.apellido2 ?? null, email, await hashPassword(input.password), input.mode_use, input.fk_tienda, input.fullscreen, input.mute, input.volume]
+    );
+    response.status(201).json({ data: { id_empleado: result.insertId, nombre: input.nombre, apellido1: input.apellido1, apellido2: input.apellido2 ?? null, email: input.email.toLowerCase(), mode_use: input.mode_use, fk_tienda: input.fk_tienda, fullscreen: input.fullscreen, mute: input.mute, volume: input.volume } });
+  } catch (error) {
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ER_DUP_ENTRY') throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
+    throw error;
+  }
 });
 
 router.patch('/employees/:id', requireAdmin, async (request, response) => {
   const id = z.coerce.number().int().positive().parse(request.params.id);
   const input = z.object({ nombre: z.string().trim().min(1).max(50), apellido1: z.string().trim().min(1).max(100), apellido2: z.string().trim().max(100).nullable(), email: z.string().trim().email().max(255), mode_use: z.enum(['writter', 'editor', 'admin']), fk_tienda: z.number().int().positive() }).strict().parse(request.body);
-  const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('UPDATE empleados SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ?, mode_use = ?, fk_tienda = ? WHERE id_empleado = ?', [input.nombre, input.apellido1, input.apellido2, input.email.toLowerCase(), input.mode_use, input.fk_tienda, id]);
-  if (!result.affectedRows) throw new ApiError(404, 'EMPLOYEE_NOT_FOUND', 'Employee not found');
+  const email = input.email.toLowerCase();
+  if (await emailInUse(email, { type: 'employee', id })) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
+  const current = await rows<RowDataPacket>('SELECT id_empleado FROM empleados WHERE id_empleado = ? LIMIT 1', [id]);
+  if (!current[0]) throw new ApiError(404, 'EMPLOYEE_NOT_FOUND', 'Employee not found');
+  await pool.execute('UPDATE empleados SET nombre = ?, apellido1 = ?, apellido2 = ?, mail = ?, mode_use = ?, fk_tienda = ? WHERE id_empleado = ?', [input.nombre, input.apellido1, input.apellido2, email, input.mode_use, input.fk_tienda, id]);
   await pool.execute('UPDATE api_sessions SET revoked_at = UTC_TIMESTAMP() WHERE user_type = \'employee\' AND user_id = ? AND id_session <> ?', [id, request.principal!.sessionId]);
-  response.json({ data: { id_empleado: id, ...input, email: input.email.toLowerCase() } });
+  response.json({ data: { id_empleado: id, ...input, email } });
+});
+
+router.patch('/employees/:id/password', requireAdmin, async (request, response) => {
+  const id = z.coerce.number().int().positive().parse(request.params.id);
+  const input = z.object({ password: z.string().min(8).max(200) }).strict().parse(request.body);
+  const [result] = await pool.execute<import('mysql2/promise').ResultSetHeader>('UPDATE empleados SET passw = ? WHERE id_empleado = ?', [await hashPassword(input.password), id]);
+  if (!result.affectedRows) throw new ApiError(404, 'EMPLOYEE_NOT_FOUND', 'Employee not found');
+  await pool.execute('UPDATE api_sessions SET revoked_at = UTC_TIMESTAMP() WHERE user_type = \'employee\' AND user_id = ?', [id]);
+  response.json({ data: { id_empleado: id, passwordUpdated: true } });
 });
 
 router.patch('/employees/me/preferences', requireEmployee, async (request, response) => {

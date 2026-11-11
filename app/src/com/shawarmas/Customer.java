@@ -79,6 +79,7 @@ public class Customer {
 			mntmCerrarSesion.setBackground(new Color(255, 255, 255));
 			mntmCerrarSesion.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					ApiClient.getInstance().logout();
 					frameCustomer.dispose(); 
 		    		Login.main(null); 
 				}

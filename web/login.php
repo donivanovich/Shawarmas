@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (($cliente['type'] ?? '') === 'customer') {
         session_regenerate_id(true);
         $_SESSION['api_token'] = (string) $session['token'];
+        $_SESSION['api_expires_at'] = time() + (int) ($session['expiresIn'] ?? 0);
         $_SESSION['id_user'] = (int) $cliente['id'];
         $_SESSION['nombre'] = (string) $cliente['nombre'];
         $_SESSION['apellido1'] = (string) $cliente['apellido1'];

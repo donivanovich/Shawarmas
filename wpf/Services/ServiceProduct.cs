@@ -5,9 +5,9 @@ namespace Shawarmas.Services
 {
     public class ServiceProduct
     {
-        public List<string> GetAllSizes() => Lookup("/catalog/sizes", "talla");
-        public List<string> GetAllCategories() => Lookup("/catalog/categories", "categoria");
-        public List<string> GetAllColours() => Lookup("/catalog/colors", "color");
+        public Task<List<string>> GetAllSizesAsync() => LookupAsync("/sizes", "talla");
+        public Task<List<string>> GetAllCategoriesAsync() => LookupAsync("/categories", "categoria");
+        public Task<List<string>> GetAllColoursAsync() => LookupAsync("/colors", "color");
 
         public async Task<bool> InsertProduct(string marca, string modelo, string categoria, string color, string talla, int stock, decimal precio, string rutaImagen)
         {
@@ -19,20 +19,22 @@ namespace Shawarmas.Services
                 int colorId = colors.AsArray().First(x => string.Equals(x?["color"]?.GetValue<string>(), color, StringComparison.OrdinalIgnoreCase))!["id_color"]!.GetValue<int>();
                 var sizes = await ApiClient.Get("/catalog/sizes");
                 int sizeId = sizes.AsArray().First(x => string.Equals(x?["talla"]?.GetValue<string>(), talla, StringComparison.OrdinalIgnoreCase))!["id_talla"]!.GetValue<int>();
-                await ApiClient.Post("/products", new { marca, modelo, precio, fk_categoria = categoryId, imagen = rutaImagen, variants = new[] { new { fk_color = colorId, fk_talla = sizeId, stock, imagen = rutaImagen } } });
+                string? imagePath = null;
+                if (!string.IsNullOrWhiteSpace(rutaImagen)) imagePath = (await ApiClient.UploadImage(rutaImagen))["path"]?.GetValue<string>();
+                await ApiClient.Post("/products", new { marca, modelo, precio, fk_categoria = categoryId, imagen = imagePath, variants = new[] { new { fk_color = colorId, fk_talla = sizeId, stock, imagen = imagePath } } });
                 return true;
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); return false; }
+            catch (Exception ex) { throw new InvalidOperationException("Could not create the product through the API: " + ex.Message, ex); }
         }
 
-        private static List<string> Lookup(string path, string name)
+        private static async Task<List<string>> LookupAsync(string path, string name)
         {
             try
             {
-                var data = ApiClient.Get(path).GetAwaiter().GetResult();
+                var data = await ApiClient.Get(path);
                 return data.AsArray().Select(x => x?[name]?.GetValue<string>()).Where(x => x is not null).Select(x => x!).ToList();
             }
-            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); return new(); }
+            catch (Exception ex) { throw new InvalidOperationException("Could not load product options from the API: " + ex.Message, ex); }
         }
     }
 }

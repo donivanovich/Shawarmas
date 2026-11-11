@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { config } from '../../config.js';
 import { z } from 'zod';
 import { pool, rows } from '../../database.js';
-import { issueSession, hashPassword, requireAuth, verifyPassword } from '../../shared/auth.js';
+import { issueSession, hashPassword, requireAuth, verifyPassword, emailInUse } from '../../shared/auth.js';
 import { ApiError } from '../../shared/errors.js';
 import type { AuthedRequest } from '../../shared/types.js';
 
@@ -17,11 +17,13 @@ const registrationSchema = z.object({
 
 router.post('/register', async (request, response) => {
   const input = registrationSchema.parse(request.body);
+  const email = input.email.toLowerCase();
+  if (await emailInUse(email)) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
   const passwordHash = await hashPassword(input.password);
   try {
     const [result] = await pool.execute<{ insertId: number } & import('mysql2').ResultSetHeader>(
       'INSERT INTO clientes (nombre, apellido1, apellido2, mail, passw) VALUES (?, ?, ?, ?, ?)',
-      [input.nombre, input.apellido1, input.apellido2 ?? null, input.email.toLowerCase(), passwordHash]
+      [input.nombre, input.apellido1, input.apellido2 ?? null, email, passwordHash]
     );
     const session = await issueSession('customer', result.insertId, 'customer');
     response.status(201).json({ data: { token: session.token, tokenType: 'Bearer', expiresIn: session.expiresInSeconds, user: { id: result.insertId, type: 'customer', role: 'customer', nombre: input.nombre, apellido1: input.apellido1, apellido2: input.apellido2 ?? null, email: input.email.toLowerCase() } } });
@@ -81,6 +83,7 @@ router.get('/me', requireAuth, async (request, response) => {
 router.patch('/me', requireAuth, async (request, response) => {
   const principal = request.principal!;
   const input = z.object({ nombre: z.string().trim().min(1).max(50), apellido1: z.string().trim().min(1).max(100), apellido2: z.string().trim().max(100).nullable().optional(), email: z.string().trim().email().max(255) }).strict().parse(request.body);
+  if (await emailInUse(input.email.toLowerCase(), { type: principal.type, id: principal.id })) throw new ApiError(409, 'EMAIL_IN_USE', 'An account with this email already exists');
   const table = principal.type === 'customer' ? 'clientes' : 'empleados';
   const key = principal.type === 'customer' ? 'id_user' : 'id_empleado';
   try {
