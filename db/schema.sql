@@ -1,3 +1,5 @@
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE DATABASE IF NOT EXISTS shawarmas
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
@@ -21,17 +23,17 @@ CREATE TABLE colores (
     id_color INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     color VARCHAR(50) NOT NULL UNIQUE,
     imagen VARCHAR(255) NOT NULL
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE tallas (
     id_talla INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     talla VARCHAR(20) NOT NULL UNIQUE
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE categorias (
     id_categoria INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     categoria VARCHAR(50) NOT NULL UNIQUE
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE tiendas (
     id_tienda INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +41,7 @@ CREATE TABLE tiendas (
     ciudad VARCHAR(80) NOT NULL,
     calle VARCHAR(200) NOT NULL,
     postal VARCHAR(15) NOT NULL
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE clientes (
     id_user INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -49,7 +51,7 @@ CREATE TABLE clientes (
     mail VARCHAR(255) NOT NULL UNIQUE,
     passw VARCHAR(255) NOT NULL,
     creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE empleados (
     id_empleado INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -65,7 +67,7 @@ CREATE TABLE empleados (
     fk_tienda INT UNSIGNED NOT NULL,
     creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_empleados_tienda FOREIGN KEY (fk_tienda) REFERENCES tiendas(id_tienda)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE productos (
     id_producto INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +79,7 @@ CREATE TABLE productos (
     fk_categoria INT UNSIGNED NOT NULL,
     CONSTRAINT chk_productos_precio CHECK (precio >= 0),
     CONSTRAINT fk_productos_categoria FOREIGN KEY (fk_categoria) REFERENCES categorias(id_categoria)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE producto_variantes (
     id_variante INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -90,7 +92,7 @@ CREATE TABLE producto_variantes (
     CONSTRAINT fk_variantes_producto FOREIGN KEY (fk_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
     CONSTRAINT fk_variantes_talla FOREIGN KEY (fk_talla) REFERENCES tallas(id_talla),
     CONSTRAINT fk_variantes_color FOREIGN KEY (fk_color) REFERENCES colores(id_color)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE pedidos (
     id_pedido INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -105,7 +107,7 @@ CREATE TABLE pedidos (
     fk_tienda INT UNSIGNED NOT NULL,
     CONSTRAINT fk_pedidos_cliente FOREIGN KEY (fk_id_user) REFERENCES clientes(id_user),
     CONSTRAINT fk_pedidos_tienda FOREIGN KEY (fk_tienda) REFERENCES tiendas(id_tienda)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE productos_pedidos (
     id_producto_pedido INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -116,7 +118,7 @@ CREATE TABLE productos_pedidos (
     CONSTRAINT chk_productos_pedidos_cantidad CHECK (cantidad > 0),
     CONSTRAINT fk_productos_pedidos_variante FOREIGN KEY (fk_variante) REFERENCES producto_variantes(id_variante),
     CONSTRAINT fk_productos_pedidos_pedido FOREIGN KEY (fk_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 INSERT INTO colores (color, imagen) VALUES
     ('Blanco', '/colors/white.png'), ('Negro', '/colors/black.png'),

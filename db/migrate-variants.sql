@@ -1,3 +1,4 @@
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE shawarmas;
 
 CREATE TABLE IF NOT EXISTS producto_variantes (
@@ -10,7 +11,7 @@ CREATE TABLE IF NOT EXISTS producto_variantes (
     CONSTRAINT fk_variantes_producto FOREIGN KEY (fk_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
     CONSTRAINT fk_variantes_talla FOREIGN KEY (fk_talla) REFERENCES tallas(id_talla),
     CONSTRAINT fk_variantes_color FOREIGN KEY (fk_color) REFERENCES colores(id_color)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 INSERT INTO producto_variantes (fk_producto, fk_talla, fk_color, stock)
 SELECT p.id_producto, p.fk_talla, p.fk_color, p.stock

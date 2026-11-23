@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
+import path from 'node:path';
 import { pbkdf2Sync, randomBytes } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import test from 'node:test';
@@ -35,15 +36,44 @@ test('password verification supports existing PHP bcrypt hashes', async () => {
 
 test('health and validation responses use the documented safe envelope', async () => {
   const server = createServer(createApp());
-  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-  const address = server.address();
-  assert.ok(address && typeof address !== 'string');
-  const baseUrl = `http://127.0.0.1:${address.port}`;
+  server.on('connection', (socket) => {
+    if (!socket.remoteAddress) {
+      Object.defineProperty(socket, 'remoteAddress', { value: '127.0.0.1', configurable: true });
+    }
+  });
+  const pipePath =
+    process.platform === 'win32'
+      ? `\\\\.\\pipe\\shawarmas-smoke-test-${process.pid}-${Date.now()}`
+      : path.join('/tmp', `shawarmas-smoke-test-${process.pid}-${Date.now()}.sock`);
+  await new Promise<void>((resolve) => server.listen(pipePath, resolve));
+  const callApi = (method: string, urlPath: string, body?: unknown) =>
+    new Promise<{ status: number; json: () => Promise<unknown> }>((resolve, reject) => {
+      const payload = body === undefined ? undefined : JSON.stringify(body);
+      const req = httpRequest(
+        {
+          socketPath: pipePath,
+          path: urlPath,
+          method,
+          headers: payload ? { 'content-type': 'application/json', 'content-length': Buffer.byteLength(payload) } : undefined
+        },
+        (res) => {
+          const chunks: Buffer[] = [];
+          res.on('data', (chunk: Buffer) => chunks.push(Buffer.from(chunk)));
+          res.on('end', () => {
+            const raw = Buffer.concat(chunks).toString('utf8');
+            resolve({ status: res.statusCode ?? 0, json: async () => JSON.parse(raw) });
+          });
+        }
+      );
+      req.on('error', reject);
+      if (payload) req.write(payload);
+      req.end();
+    });
   try {
-    const health = await fetch(`${baseUrl}/health/live`);
+    const health = await callApi('GET', '/health/live');
     assert.equal(health.status, 200);
     assert.deepEqual((await health.json() as { data: unknown }).data, { status: 'ok' });
-    const login = await fetch(`${baseUrl}/api/v1/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'not-an-email', password: 'short' }) });
+    const login = await callApi('POST', '/api/v1/auth/login', { email: 'not-an-email', password: 'short' });
     assert.equal(login.status, 400);
     const payload = await login.json() as { error: { code: string; requestId: string; message: string } };
     assert.equal(payload.error.code, 'VALIDATION_ERROR');

@@ -107,7 +107,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     <main class="contenedor-principal">
         <aside class="filtro-lateral">
             <div class="filtro-titulo"><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button><h2>Filtrar productos</h2><button class="filtro-cerrar" type="button" aria-label="Ocultar filtros"><i class="bi bi-chevron-up"></i></button></div>
-            <form method="get">
+            <form method="get" accept-charset="UTF-8">
                 <input type="hidden" name="por_pagina" value="<?= $porPagina ?>">
                 <label for="buscar">Buscar</label>
                 <input id="buscar" name="buscar" value="<?= escapar($busqueda) ?>" maxlength="100">
@@ -167,7 +167,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
                 <div class="catalog-pagination-footer">
                     <div class="catalog-pagination-toolbar">
                         <p>Mostrando <?= $primerProducto ?>–<?= $ultimoProducto ?> de <?= $totalProductos ?> productos</p>
-                        <form method="get" class="page-size-form">
+                        <form method="get" class="page-size-form" accept-charset="UTF-8">
                             <?php foreach ($filtrosActivos as $nombreFiltro => $valorFiltro): ?>
                                 <input type="hidden" name="<?= escapar((string) $nombreFiltro) ?>" value="<?= escapar((string) $valorFiltro) ?>">
                             <?php endforeach; ?>

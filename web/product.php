@@ -154,7 +154,7 @@ foreach ($variantes as $variante) {
                     <div class="purchase-total"><span>Total</span><strong class="precio-total"><?= number_format((float) $producto['precio'], 2, ',', '.') ?> €</strong></div>
                     <button class="boton-vistoso" type="button">Añadir al carrito <i class="bi bi-arrow-up-right"></i></button>
                 <?php endif; ?>
-                <form id="form-carrito" action="add-to-cart.php" method="post">
+                <form id="form-carrito" action="add-to-cart.php" method="post" accept-charset="UTF-8">
                     <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
                     <input type="hidden" name="id_producto" id="id_producto" value="<?= (int) $producto['id_producto'] ?>">
                     <input type="hidden" name="cantidad" id="cantidad-hidden" value="1">

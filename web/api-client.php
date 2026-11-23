@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+ini_set('default_charset', 'UTF-8');
+if (function_exists('mb_internal_encoding')) {
+    mb_internal_encoding('UTF-8');
+}
+if (!headers_sent()) {
+    header('Content-Type: text/html; charset=UTF-8');
+}
+
 final class ApiClientException extends RuntimeException
 {
     public function __construct(public readonly int $status, string $message)
@@ -36,7 +44,7 @@ function api_request(string $method, string $path, ?array $payload = null, bool 
 
     $headers = ['Accept: application/json'];
     if ($payload !== null) {
-        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Content-Type: application/json; charset=utf-8';
     }
     if ($authenticated && !empty($_SESSION['api_token'])) {
         $headers[] = 'Authorization: Bearer ' . (string) $_SESSION['api_token'];
@@ -56,7 +64,7 @@ function api_request(string $method, string $path, ?array $payload = null, bool 
         CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     if ($payload !== null) {
-        curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($payload, JSON_THROW_ON_ERROR));
+        curl_setopt($handle, CURLOPT_POSTFIELDS, json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
     }
     $raw = curl_exec($handle);
     $status = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
@@ -113,7 +121,7 @@ function imagen_url(?string $ruta): string
 
 function escapar(string $valor): string
 {
-    return htmlspecialchars($valor, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 function token_csrf(): string
@@ -129,7 +137,7 @@ function validar_csrf(): void
     $token = $_POST['token_csrf'] ?? '';
     if (!is_string($token) || !hash_equals($_SESSION['token_csrf'] ?? '', $token)) {
         http_response_code(400);
-        exit('Solicitud no vÃ¡lida.');
+        exit('Solicitud no válida.');
     }
 }
 

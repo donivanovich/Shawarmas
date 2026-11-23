@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $productosDetalle) {
         <section class="panel-izquierdo">
             <a class="page-return" href="cart-summary.php"><i class="bi bi-arrow-left"></i> Volver al carrito</a>
             <h1>Datos de envío</h1>
-            <form method="post">
+            <form method="post" accept-charset="UTF-8">
                 <input type="hidden" name="token_csrf" value="<?php echo escapar(token_csrf()); ?>">
                 <label for="pais">País</label>
                 <input id="pais" name="pais" required>

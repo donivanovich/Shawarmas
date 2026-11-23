@@ -9,7 +9,7 @@ fi
 escaped_user=${API_DB_USER//\'/\'\'}
 escaped_password=${API_DB_PASSWORD//\'/\'\'}
 escaped_database=${MYSQL_DATABASE//\'/\'\'}
-mysql --protocol=socket -uroot -p"${MYSQL_ROOT_PASSWORD}" <<SQL
+mysql --protocol=socket --default-character-set=utf8mb4 -uroot -p"${MYSQL_ROOT_PASSWORD}" <<SQL
 CREATE USER IF NOT EXISTS '${escaped_user}'@'%' IDENTIFIED BY '${escaped_password}';
 ALTER USER '${escaped_user}'@'%' IDENTIFIED BY '${escaped_password}';
 GRANT SELECT, INSERT, UPDATE, DELETE ON \`${escaped_database}\`.* TO '${escaped_user}'@'%';

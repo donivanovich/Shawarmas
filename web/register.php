@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mail = filter_var(trim((string) ($_POST['mail'] ?? '')), FILTER_VALIDATE_EMAIL);
     $passwPlano = (string) ($_POST['passw'] ?? '');
 
-    if ($nombre === '' || $apellido1 === '' || $mail === false || strlen($passwPlano) < 8) {
+    if ($nombre === '' || $apellido1 === '' || $mail === false || (function_exists('mb_strlen') ? mb_strlen($passwPlano, 'UTF-8') : strlen($passwPlano)) < 8) {
         $mensaje = 'Completa los datos correctamente. La contraseña debe tener al menos 8 caracteres.';
     } else {
         try {
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php echo escapar($mensaje); ?>
                 </div>
             <?php endif; ?>
-            <form action="register.php" method="post">
+            <form action="register.php" method="post" accept-charset="UTF-8">
         <input type="hidden" name="token_csrf" value="<?php echo escapar(token_csrf()); ?>">
         <div class="form-group">
             <label for="nombre">Nombre</label>

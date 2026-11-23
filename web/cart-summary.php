@@ -76,7 +76,7 @@ if ($carrito) {
                         <p><strong>Talla:</strong> <?php echo escapar((string) $producto['talla']); ?></p>
                         <p><strong>Color:</strong> <?php echo escapar((string) $producto['color']); ?></p>
                         <p><strong>Cantidad:</strong> <?php echo $cantidad; ?></p>
-                        <form method="POST" action="remove-from-cart.php">
+                        <form method="POST" action="remove-from-cart.php" accept-charset="UTF-8">
                             <input type="hidden" name="token_csrf" value="<?php echo escapar(token_csrf()); ?>">
                             <input type="hidden" name="id_producto" value="<?php echo $id_producto; ?>">
                             <input type="hidden" name="id_variante" value="<?php echo $id_variante; ?>">

@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Pago</h1>
             <p class="ayuda-pago">Introduce los datos de tu tarjeta. No se almacenan.</p>
             <?php if ($mensaje !== ''): ?><p class="mensaje"><?= escapar($mensaje) ?></p><?php endif; ?>
-            <form method="post">
+            <form method="post" accept-charset="UTF-8">
                 <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
                 <label for="tarjeta">Número de tarjeta</label>
                 <input id="tarjeta" name="tarjeta" inputmode="numeric" autocomplete="cc-number" pattern="[0-9 ]{19}" maxlength="19" required>

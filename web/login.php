@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Accede a tu cuenta para continuar.</p>
             </div>
             <?php if ($mensaje !== ''): ?><div class="mensaje error"><?= escapar($mensaje) ?></div><?php endif; ?>
-            <form action="login.php" method="post">
+            <form action="login.php" method="post" accept-charset="UTF-8">
                 <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
                 <input type="hidden" name="redirect" value="<?= escapar((string) ($_GET['redirect'] ?? '')) ?>">
                 <div class="form-group">

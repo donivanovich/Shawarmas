@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($currentPassword === '') {
         $mensaje = 'La contraseña actual no es correcta.';
-    } elseif (strlen($newPassword) < 8) {
+    } elseif ((function_exists('mb_strlen') ? mb_strlen($newPassword, 'UTF-8') : strlen($newPassword)) < 8) {
         $mensaje = 'La nueva contraseña debe tener al menos 8 caracteres.';
     } elseif ($newPassword !== $confirmPassword) {
         $mensaje = 'La confirmación no coincide con la nueva contraseña.';
@@ -97,7 +97,7 @@ if (($profile['_status'] ?? 0) === 401) {
                 <div class="account-card-heading"><h2>Cambiar contraseña</h2></div>
                 <p class="account-intro">Confirma tu contraseña actual antes de elegir una nueva.</p>
                 <?php if ($mensaje !== ''): ?><p class="account-message <?= $estadoMensaje ?>"><?= escapar($mensaje) ?></p><?php endif; ?>
-                <form class="account-form" action="account.php" method="post">
+                <form class="account-form" action="account.php" method="post" accept-charset="UTF-8">
                     <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
                     <label for="current_password">Contraseña actual</label>
                     <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>

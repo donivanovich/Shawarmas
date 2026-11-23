@@ -1,5 +1,7 @@
 -- Additive migration required by services/api for revocable bearer sessions.
 -- Apply once after backing up the database. This does not modify existing data.
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS api_sessions (
     id_session CHAR(36) NOT NULL PRIMARY KEY,
     token_hash CHAR(64) NOT NULL UNIQUE,
@@ -10,4 +12,4 @@ CREATE TABLE IF NOT EXISTS api_sessions (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_api_sessions_owner (user_type, user_id),
     KEY idx_api_sessions_expiry (expires_at)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;

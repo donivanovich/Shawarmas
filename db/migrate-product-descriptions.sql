@@ -1,5 +1,5 @@
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE shawarmas;
-SET NAMES utf8mb4;
 
 SET @tiene_descripcion = (
     SELECT COUNT(*)
@@ -9,7 +9,7 @@ SET @tiene_descripcion = (
       AND column_name = 'descripcion'
 );
 SET @alter_descripcion = IF(@tiene_descripcion = 0,
-    'ALTER TABLE productos ADD COLUMN descripcion TEXT NULL',
+    'ALTER TABLE productos ADD COLUMN descripcion TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL',
     'SELECT 1');
 PREPARE sentencia_descripcion FROM @alter_descripcion;
 EXECUTE sentencia_descripcion;
