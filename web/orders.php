@@ -36,7 +36,7 @@ unset($pedido);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tus pedidos | Shawarmas</title>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-2">
+    <link rel="stylesheet" href="alternative.css?v=20261128-3">
     <link rel="stylesheet" href="orders.css?v=20261110-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>

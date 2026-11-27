@@ -85,8 +85,8 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'image_alt' => 'Catálogo de productos Shawarmas',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-2">
-    <link rel="stylesheet" href="products.css?v=20261128-2">
+    <link rel="stylesheet" href="alternative.css?v=20261128-3">
+    <link rel="stylesheet" href="products.css?v=20261128-3">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -115,7 +115,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 
     <main class="contenedor-principal">
         <aside class="filtro-lateral">
-            <div class="filtro-titulo"><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button><h2>Filtrar productos</h2><button class="filtro-cerrar" type="button" aria-label="Ocultar filtros"><i class="bi bi-chevron-up"></i></button></div>
+            <div class="filtro-titulo"><a class="page-return filtro-return" href="index.php"><i class="bi bi-arrow-left"></i> Volver al inicio</a><h2>Filtrar productos</h2><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button></div>
             <form method="get" accept-charset="UTF-8">
                 <input type="hidden" name="por_pagina" value="<?= $porPagina ?>">
                 <div class="filtro-campo filtro-campo--buscar">
@@ -163,7 +163,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         </aside>
 
         <section class="productos-container">
-            <a class="page-return" href="index.php"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+            <a class="page-return productos-return" href="index.php"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
             <div class="catalogo-barra"><div><p class="eyebrow">TIENDA SHAWARMAS</p><h1>Productos</h1></div></div>
             <?php if (!$productos): ?>
                 <p>No hay productos que coincidan con los filtros.</p>
@@ -231,7 +231,6 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         });
         const filterPanel = document.querySelector('.filtro-lateral');
         const filterToggle = document.querySelector('.filtro-toggle');
-        const filterClose = document.querySelector('.filtro-cerrar');
         const setFilters = (hidden) => {
             filterPanel.classList.toggle('is-hidden', hidden);
             filterToggle.setAttribute('aria-expanded', String(!hidden));
@@ -241,7 +240,6 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         if (collapsibleFilters.matches) setFilters(true);
         collapsibleFilters.addEventListener('change', event => setFilters(event.matches));
         filterToggle.addEventListener('click', () => setFilters(!filterPanel.classList.contains('is-hidden')));
-        filterClose.addEventListener('click', () => setFilters(true));
         document.querySelectorAll('.tarjeta-producto').forEach(card => {
             card.addEventListener('click', () => { window.location.href = card.dataset.detailUrl; });
             card.addEventListener('keydown', event => {
