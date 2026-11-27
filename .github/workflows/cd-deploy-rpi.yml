@@ -1,0 +1,569 @@
+name: CD - Deploy to Raspberry Pi
+
+on:
+  workflow_run:
+    workflows:
+      - CD - Publish Docker Images
+    types:
+      - completed
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'GHCR image tag to deploy (e.g. sha-f61433d or latest)'
+        required: true
+        default: 'latest'
+        type: string
+      skip_ci_check:
+        description: 'Skip CI status check (only for manual rollback to an older tag)'
+        required: false
+        default: false
+        type: boolean
+
+permissions: {}
+
+concurrency:
+  group: cd-deploy-raspberry-pi-production
+  cancel-in-progress: false
+
+jobs:
+  verify-release:
+    name: Verify CI status and ARM64 images in GHCR
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref_name == 'master') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'master' &&
+       github.event.workflow_run.event != 'pull_request')
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+    outputs:
+      should_deploy: ${{ steps.verify.outputs.should_deploy }}
+      image_tag: ${{ steps.verify.outputs.image_tag }}
+      target_sha: ${{ steps.verify.outputs.target_sha }}
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify CI passed and ARM64 manifests exist
+        id: verify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_IMAGE_TAG: ${{ inputs.image_tag || '' }}
+          SKIP_CI_CHECK: ${{ inputs.skip_ci_check || false }}
+          WORKFLOW_RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          GITHUB_SHA_VAL: ${{ github.sha }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "workflow_run" ]]; then
+            TARGET_SHA="$WORKFLOW_RUN_SHA"
+            IMAGE_TAG="sha-${TARGET_SHA:0:7}"
+          else
+            TARGET_SHA="$GITHUB_SHA_VAL"
+            IMAGE_TAG="$INPUT_IMAGE_TAG"
+            if [[ ! "$IMAGE_TAG" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+              echo "::error::Invalid image_tag '${IMAGE_TAG}'. Only alphanumeric characters, '.', '_', and '-' are allowed."
+              exit 1
+            fi
+          fi
+
+          # 1. Defense in depth: confirm CI workflow passed for the target commit
+          if [[ "$EVENT_NAME" == "workflow_run" || "$SKIP_CI_CHECK" != "true" ]]; then
+            if [[ "$EVENT_NAME" == "workflow_run" || "$IMAGE_TAG" == "latest" || "$IMAGE_TAG" == "master" || "$IMAGE_TAG" == "sha-${TARGET_SHA:0:7}" ]]; then
+              echo "Verifying successful CI run for commit ${TARGET_SHA}..."
+              ci_response="$(curl -fsSL \
+                -H "Authorization: Bearer ${GH_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/ci.yml/runs?head_sha=${TARGET_SHA}&per_page=20")"
+
+              ci_ok="$(CI_JSON="$ci_response" node -e '
+                const data = JSON.parse(process.env.CI_JSON);
+                const passed = (data.workflow_runs || []).some(
+                  (run) => run.status === "completed" && run.conclusion === "success"
+                );
+                console.log(passed ? "true" : "false");
+              ')"
+
+              if [[ "$ci_ok" != "true" ]]; then
+                echo "::error::CI has not completed successfully for commit ${TARGET_SHA}. Refusing to deploy."
+                exit 1
+              fi
+              echo "Confirmed: CI completed successfully for ${TARGET_SHA}."
+            fi
+          fi
+
+          # 2. Verify all 3 service images exist in GHCR and support linux/arm64 (Raspberry Pi 5)
+          OWNER_LOWER="$(printf '%s' "$GITHUB_OWNER" | tr '[:upper:]' '[:lower:]')"
+          SERVICES=("api" "image-server" "web")
+          missing_count=0
+
+          for svc in "${SERVICES[@]}"; do
+            image_ref="ghcr.io/${OWNER_LOWER}/shawarmas-${svc}:${IMAGE_TAG}"
+            echo "Inspecting manifest for ${image_ref}..."
+            if ! manifest="$(docker buildx imagetools inspect "$image_ref" 2>&1)"; then
+              if [[ "$EVENT_NAME" == "workflow_run" ]]; then
+                missing_count=$((missing_count + 1))
+                echo "Image ${image_ref} was not published for this commit."
+                continue
+              else
+                echo "::error::Required image ${image_ref} was not found in GHCR."
+                echo "$manifest"
+                exit 1
+              fi
+            fi
+
+            if ! printf '%s\n' "$manifest" | grep -q 'linux/arm64'; then
+              echo "::error::Image ${image_ref} does not include a linux/arm64 manifest required by Raspberry Pi 5."
+              echo "$manifest"
+              exit 1
+            fi
+            echo "Verified linux/arm64 manifest for ${image_ref}."
+          done
+
+          if [[ "$missing_count" -eq "${#SERVICES[@]}" ]]; then
+            echo "No new Docker images were published for ${IMAGE_TAG} (non-container commit). Skipping Raspberry Pi deployment."
+            {
+              echo "should_deploy=false"
+              echo "image_tag=${IMAGE_TAG}"
+              echo "target_sha=${TARGET_SHA}"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$missing_count" -gt 0 ]]; then
+            echo "::error::Only a partial set of images exists for ${IMAGE_TAG}. Refusing inconsistent deployment."
+            exit 1
+          fi
+
+          {
+            echo "should_deploy=true"
+            echo "image_tag=${IMAGE_TAG}"
+            echo "target_sha=${TARGET_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy to Raspberry Pi 5 (SSH + Docker Compose)
+    runs-on: ubuntu-latest
+    needs: verify-release
+    if: needs.verify-release.outputs.should_deploy == 'true'
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Validate Raspberry Pi deployment secrets and settings
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          RPI_SSH_KEY: ${{ secrets.RPI_SSH_KEY }}
+          RPI_SSH_KNOWN_HOSTS: ${{ secrets.RPI_SSH_KNOWN_HOSTS }}
+          RPI_DEPLOY_PATH: ${{ secrets.RPI_DEPLOY_PATH }}
+          RPI_PORT: ${{ secrets.RPI_PORT }}
+          RPI_COMPOSE_FILE: ${{ vars.RPI_COMPOSE_FILE || 'docker-compose.pi.yml' }}
+          RPI_SERVICES: ${{ vars.RPI_SERVICES || 'api image-server web' }}
+          RPI_HEALTH_WAIT_SECONDS: ${{ vars.RPI_HEALTH_WAIT_SECONDS || '90' }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+          [[ -z "${RPI_HOST:-}" ]] && missing+=("RPI_HOST")
+          [[ -z "${RPI_USER:-}" ]] && missing+=("RPI_USER")
+          [[ -z "${RPI_SSH_KEY:-}" ]] && missing+=("RPI_SSH_KEY")
+          [[ -z "${RPI_SSH_KNOWN_HOSTS:-}" ]] && missing+=("RPI_SSH_KNOWN_HOSTS")
+          [[ -z "${RPI_DEPLOY_PATH:-}" ]] && missing+=("RPI_DEPLOY_PATH")
+
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "::error::Missing required GitHub Secrets in the 'production' environment: ${missing[*]}"
+            echo "Configure them under Settings -> Environments -> production."
+            exit 1
+          fi
+
+          if [[ -n "${RPI_PORT:-}" && ! "$RPI_PORT" =~ ^[0-9]{1,5}$ ]]; then
+            echo "::error::RPI_PORT must be a numeric TCP port."
+            exit 1
+          fi
+
+          if [[ ! "$RPI_COMPOSE_FILE" =~ ^[a-zA-Z0-9._/-]+$ ]]; then
+            echo "::error::Invalid RPI_COMPOSE_FILE value."
+            exit 1
+          fi
+
+          if [[ ! "$RPI_SERVICES" =~ ^[a-zA-Z0-9._\ -]+$ ]]; then
+            echo "::error::Invalid RPI_SERVICES value."
+            exit 1
+          fi
+
+          if [[ ! "$RPI_HEALTH_WAIT_SECONDS" =~ ^[0-9]+$ ]]; then
+            echo "::error::RPI_HEALTH_WAIT_SECONDS must be an integer."
+            exit 1
+          fi
+
+      - name: Configure ephemeral SSH credentials
+        env:
+          RPI_SSH_KEY: ${{ secrets.RPI_SSH_KEY }}
+          RPI_SSH_KNOWN_HOSTS: ${{ secrets.RPI_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          mkdir -p "$SSH_DIR"
+          chmod 700 "$SSH_DIR"
+          printf '%s\n' "$RPI_SSH_KEY" > "${SSH_DIR}/deploy_key"
+          chmod 600 "${SSH_DIR}/deploy_key"
+          printf '%s\n' "$RPI_SSH_KNOWN_HOSTS" > "${SSH_DIR}/known_hosts"
+          chmod 600 "${SSH_DIR}/known_hosts"
+
+      - name: Authenticate Raspberry Pi Docker client to GHCR (if private packages)
+        if: ${{ secrets.GHCR_PULL_TOKEN != '' }}
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          RPI_PORT: ${{ secrets.RPI_PORT }}
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          GHCR_PULL_USER: ${{ secrets.GHCR_PULL_USER || github.repository_owner }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$GHCR_PULL_USER" =~ ^[a-zA-Z0-9-]+$ ]]; then
+            echo "::error::Invalid GHCR_PULL_USER value."
+            exit 1
+          fi
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          PORT="${RPI_PORT:-22}"
+          printf '%s\n' "$GHCR_PULL_TOKEN" | ssh \
+            -i "${SSH_DIR}/deploy_key" \
+            -o UserKnownHostsFile="${SSH_DIR}/known_hosts" \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
+            -p "$PORT" \
+            "${RPI_USER}@${RPI_HOST}" \
+            "docker login ghcr.io -u '${GHCR_PULL_USER}' --password-stdin"
+
+      - name: Pull images, update stack, verify health, and roll back on failure
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          RPI_PORT: ${{ secrets.RPI_PORT }}
+          RPI_DEPLOY_PATH: ${{ secrets.RPI_DEPLOY_PATH }}
+          RPI_COMPOSE_FILE: ${{ vars.RPI_COMPOSE_FILE || 'docker-compose.pi.yml' }}
+          RPI_SERVICES: ${{ vars.RPI_SERVICES || 'api image-server web' }}
+          RPI_HEALTH_WAIT_SECONDS: ${{ vars.RPI_HEALTH_WAIT_SECONDS || '90' }}
+          TARGET_TAG: ${{ needs.verify-release.outputs.image_tag }}
+          GHCR_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          PORT="${RPI_PORT:-22}"
+          OWNER_LOWER="$(printf '%s' "$GHCR_OWNER" | tr '[:upper:]' '[:lower:]')"
+
+          ssh \
+            -i "${SSH_DIR}/deploy_key" \
+            -o UserKnownHostsFile="${SSH_DIR}/known_hosts" \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
+            -o ServerAliveInterval=15 \
+            -p "$PORT" \
+            "${RPI_USER}@${RPI_HOST}" \
+            bash -s -- \
+              "$RPI_DEPLOY_PATH" \
+              "$RPI_COMPOSE_FILE" \
+              "$RPI_SERVICES" \
+              "$TARGET_TAG" \
+              "$OWNER_LOWER" \
+              "$RPI_HEALTH_WAIT_SECONDS" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          DEPLOY_PATH="$1"
+          COMPOSE_FILE="$2"
+          APP_SERVICES_STR="$3"
+          TARGET_TAG="$4"
+          GHCR_OWNER="$5"
+          HEALTH_WAIT_SECONDS="$6"
+
+          echo "=== Pre-flight checks on Raspberry Pi ==="
+          HOST_ARCH="$(uname -m)"
+          echo "Host architecture: ${HOST_ARCH}"
+          if [[ "$HOST_ARCH" != "aarch64" && "$HOST_ARCH" != "arm64" && "$HOST_ARCH" != "x86_64" ]]; then
+            echo "Unsupported host architecture: ${HOST_ARCH}. A 64-bit OS (aarch64/arm64) is required." >&2
+            exit 1
+          fi
+
+          command -v docker >/dev/null || { echo "Docker CLI not found." >&2; exit 1; }
+          docker compose version >/dev/null || { echo "Docker Compose v2 plugin not found." >&2; exit 1; }
+
+          if [[ ! -d "$DEPLOY_PATH" ]]; then
+            echo "Deployment directory does not exist: ${DEPLOY_PATH}" >&2
+            exit 1
+          fi
+          cd "$DEPLOY_PATH"
+
+          if [[ ! -f "$COMPOSE_FILE" ]]; then
+            echo "Compose file not found: ${DEPLOY_PATH}/${COMPOSE_FILE}" >&2
+            exit 1
+          fi
+
+          export GHCR_OWNER
+          export IMAGE_TAG="$TARGET_TAG"
+
+          echo "Validating compose configuration (${COMPOSE_FILE})..."
+          docker compose -f "$COMPOSE_FILE" config --quiet
+
+          read -r -a APP_SERVICES <<< "$APP_SERVICES_STR"
+          mapfile -t ALL_SERVICES < <(docker compose -f "$COMPOSE_FILE" config --services)
+
+          if [[ ${#ALL_SERVICES[@]} -eq 0 ]]; then
+            echo "No services found in ${COMPOSE_FILE}." >&2
+            exit 1
+          fi
+
+          # Validate that every configured APP_SERVICE actually exists in COMPOSE_FILE
+          for svc in "${APP_SERVICES[@]}"; do
+            found=false
+            for declared in "${ALL_SERVICES[@]}"; do
+              if [[ "$svc" == "$declared" ]]; then
+                found=true
+                break
+              fi
+            done
+            if [[ "$found" != "true" ]]; then
+              echo "Configured service '${svc}' is not defined in ${COMPOSE_FILE}. Declared services: ${ALL_SERVICES[*]}" >&2
+              exit 1
+            fi
+          done
+
+          STATE_FILE=".deploy-state"
+          PREVIOUS_TAG=""
+          if [[ -f "$STATE_FILE" ]]; then
+            PREVIOUS_TAG="$(grep -E '^IMAGE_TAG=' "$STATE_FILE" | head -n1 | cut -d= -f2- || true)"
+          fi
+          echo "Previous recorded IMAGE_TAG: ${PREVIOUS_TAG:-<none>}"
+          echo "Target IMAGE_TAG: ${TARGET_TAG}"
+
+          # Snapshot currently running container image IDs BEFORE pulling or recreating anything
+          declare -A PREV_IMAGE_IDS=()
+          declare -A PREV_IMAGE_REFS=()
+          for svc in "${APP_SERVICES[@]}"; do
+            cid="$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" 2>/dev/null | head -n1 || true)"
+            if [[ -n "$cid" ]]; then
+              img_id="$(docker inspect --format '{{.Image}}' "$cid" 2>/dev/null || true)"
+              img_ref="$(docker inspect --format '{{.Config.Image}}' "$cid" 2>/dev/null || true)"
+              if [[ -n "$img_id" ]]; then
+                PREV_IMAGE_IDS["$svc"]="$img_id"
+                PREV_IMAGE_REFS["$svc"]="$img_ref"
+                docker tag "$img_id" "shawarmas-rollback-${svc}:previous"
+                echo "Captured rollback snapshot for ${svc}: ${img_id:0:19} (${img_ref})"
+              fi
+            fi
+          done
+
+          verify_stack() {
+            local check_new_images="${1:-false}"
+            local deadline=$(( SECONDS + HEALTH_WAIT_SECONDS ))
+
+            echo "Waiting up to ${HEALTH_WAIT_SECONDS}s for all services (${ALL_SERVICES[*]}) to become healthy..."
+            while true; do
+              local all_ok=true
+              local fatal_error=false
+
+              for svc in "${ALL_SERVICES[@]}"; do
+                local cid
+                cid="$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" 2>/dev/null | head -n1 || true)"
+                if [[ -z "$cid" ]]; then
+                  echo "  [${svc}] container not created yet"
+                  all_ok=false
+                  continue
+                fi
+
+                local status health restarts
+                status="$(docker inspect --format '{{.State.Status}}' "$cid")"
+                health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$cid")"
+                restarts="$(docker inspect --format '{{.RestartCount}}' "$cid")"
+
+                if [[ "$status" == "exited" || "$status" == "dead" ]]; then
+                  echo "  [${svc}] FAILED: status=${status}, restarts=${restarts}" >&2
+                  fatal_error=true
+                  all_ok=false
+                  break
+                fi
+
+                if [[ "$health" == "unhealthy" ]]; then
+                  echo "  [${svc}] FAILED: health=${health}, restarts=${restarts}" >&2
+                  fatal_error=true
+                  all_ok=false
+                  break
+                fi
+
+                if [[ "$status" != "running" || ( "$health" != "healthy" && "$health" != "none" ) ]]; then
+                  echo "  [${svc}] waiting (status=${status}, health=${health}, restarts=${restarts})"
+                  all_ok=false
+                fi
+              done
+
+              if [[ "$fatal_error" == "true" ]]; then
+                return 1
+              fi
+
+              if [[ "$all_ok" == "true" ]]; then
+                break
+              fi
+
+              if (( SECONDS >= deadline )); then
+                echo "Timed out after ${HEALTH_WAIT_SECONDS}s waiting for containers to become healthy." >&2
+                return 1
+              fi
+
+              sleep 3
+            done
+
+            # Active in-container readiness probes (independent of host port mappings)
+            for svc in "${ALL_SERVICES[@]}"; do
+              case "$svc" in
+                image-server)
+                  echo "Probing image-server /health inside container..."
+                  docker compose -f "$COMPOSE_FILE" exec -T image-server \
+                    node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+                  ;;
+                api)
+                  echo "Probing api /health/ready inside container..."
+                  docker compose -f "$COMPOSE_FILE" exec -T api \
+                    node -e "fetch('http://127.0.0.1:3001/health/ready').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+                  ;;
+                web)
+                  echo "Probing web / inside container..."
+                  docker compose -f "$COMPOSE_FILE" exec -T web \
+                    php -r '$c=curl_init("http://127.0.0.1:80/"); curl_setopt_array($c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5]); curl_exec($c); $code=curl_getinfo($c,CURLINFO_HTTP_CODE); exit($code>=200 && $code<400 ? 0 : 1);'
+                  ;;
+                gateway)
+                  echo "Probing gateway /, /gateway-health and /cdn/brand/logo.png inside container..."
+                  docker compose -f "$COMPOSE_FILE" exec -T gateway \
+                    sh -c 'wget -qO- http://127.0.0.1:8080/gateway-health >/dev/null && wget -qO- http://127.0.0.1:8080/ >/dev/null && wget -qO- http://127.0.0.1:8080/cdn/brand/logo.png >/dev/null'
+                  ;;
+              esac
+            done
+
+            # Verify updated services are running the newly pulled image IDs
+            if [[ "$check_new_images" == "true" ]]; then
+              for svc in "${APP_SERVICES[@]}"; do
+                local cid running_img target_ref expected_img
+                cid="$(docker compose -f "$COMPOSE_FILE" ps -q "$svc" | head -n1)"
+                running_img="$(docker inspect --format '{{.Image}}' "$cid")"
+                target_ref="$(docker inspect --format '{{.Config.Image}}' "$cid")"
+                expected_img="$(docker image inspect --format '{{.Id}}' "$target_ref")"
+                if [[ "$running_img" != "$expected_img" ]]; then
+                  echo "Service ${svc} is not running the expected image (${running_img} != ${expected_img})." >&2
+                  return 1
+                fi
+                echo "Verified ${svc} running ${target_ref} (${running_img:0:19})."
+              done
+            fi
+
+            echo "All container health and readiness probes passed."
+            return 0
+          }
+
+          cleanup_rollback_tags() {
+            for svc in "${APP_SERVICES[@]}"; do
+              docker rmi "shawarmas-rollback-${svc}:previous" >/dev/null 2>&1 || true
+            done
+          }
+
+          rollback() {
+            echo "=== DEPLOYMENT FAILED: Starting automatic rollback ===" >&2
+            docker compose -f "$COMPOSE_FILE" ps || true
+            docker compose -f "$COMPOSE_FILE" logs --tail=40 "${APP_SERVICES[@]}" || true
+
+            if [[ -n "$PREVIOUS_TAG" && "$PREVIOUS_TAG" != "$TARGET_TAG" ]]; then
+              echo "Rolling back to previous recorded IMAGE_TAG=${PREVIOUS_TAG}..." >&2
+              IMAGE_TAG="$PREVIOUS_TAG" docker compose -f "$COMPOSE_FILE" up -d --no-build --remove-orphans
+              if IMAGE_TAG="$PREVIOUS_TAG" verify_stack false; then
+                echo "Rollback to ${PREVIOUS_TAG} completed and previous stack is healthy." >&2
+              else
+                echo "CRITICAL: Rollback verification failed. Manual intervention required on Raspberry Pi." >&2
+              fi
+            elif [[ ${#PREV_IMAGE_IDS[@]} -gt 0 ]]; then
+              echo "Restoring local pre-deploy image snapshots..." >&2
+              local fallback_tag="latest"
+              for svc in "${APP_SERVICES[@]}"; do
+                if [[ -n "${PREV_IMAGE_REFS[$svc]:-}" ]]; then
+                  docker tag "shawarmas-rollback-${svc}:previous" "${PREV_IMAGE_REFS[$svc]}"
+                  if [[ "${PREV_IMAGE_REFS[$svc]}" == *:* ]]; then
+                    fallback_tag="${PREV_IMAGE_REFS[$svc]##*:}"
+                  fi
+                fi
+              done
+              IMAGE_TAG="$fallback_tag" docker compose -f "$COMPOSE_FILE" up -d --no-build --force-recreate "${APP_SERVICES[@]}"
+              if IMAGE_TAG="$fallback_tag" verify_stack false; then
+                echo "Rollback from local snapshots (tag ${fallback_tag}) completed and stack is healthy." >&2
+              else
+                echo "CRITICAL: Rollback verification failed. Manual intervention required on Raspberry Pi." >&2
+              fi
+            else
+              echo "No previous running state available for rollback." >&2
+              cleanup_rollback_tags
+              return 1
+            fi
+            cleanup_rollback_tags
+          }
+
+          echo "=== Step 1: Pulling new images (existing services stay online) ==="
+          docker compose -f "$COMPOSE_FILE" pull "${APP_SERVICES[@]}"
+
+          echo "=== Step 2: Updating services with docker compose up -d ==="
+          if ! docker compose -f "$COMPOSE_FILE" up -d --no-build --remove-orphans; then
+            rollback
+            exit 1
+          fi
+
+          echo "=== Step 3: Verifying container health and HTTP readiness ==="
+          if ! verify_stack true; then
+            rollback
+            exit 1
+          fi
+
+          # Persist verified state only after all checks pass
+          umask 077
+          {
+            echo "IMAGE_TAG=${TARGET_TAG}"
+            echo "DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$STATE_FILE"
+
+          cleanup_rollback_tags
+
+          echo "=== Deployment succeeded ==="
+          docker compose -f "$COMPOSE_FILE" ps
+          REMOTE_SCRIPT
+
+      - name: Log out Raspberry Pi Docker client from GHCR (if authenticated)
+        if: ${{ always() && secrets.GHCR_PULL_TOKEN != '' }}
+        env:
+          RPI_HOST: ${{ secrets.RPI_HOST }}
+          RPI_USER: ${{ secrets.RPI_USER }}
+          RPI_PORT: ${{ secrets.RPI_PORT }}
+        run: |
+          set -euo pipefail
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          PORT="${RPI_PORT:-22}"
+          ssh \
+            -i "${SSH_DIR}/deploy_key" \
+            -o UserKnownHostsFile="${SSH_DIR}/known_hosts" \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
+            -p "$PORT" \
+            "${RPI_USER}@${RPI_HOST}" \
+            "docker logout ghcr.io" || true
+
+      - name: Clean up ephemeral SSH credentials
+        if: always()
+        run: rm -rf "${RUNNER_TEMP}/ssh"

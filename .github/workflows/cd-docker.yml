@@ -1,16 +1,14 @@
 name: CD - Publish Docker Images
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - master
       - main
-    paths:
-      - 'services/api/**'
-      - 'server/**'
-      - 'web/**'
-      - 'docker-compose.yml'
-      - '.github/workflows/cd-docker.yml'
   release:
     types:
       - published
@@ -30,25 +28,81 @@ on:
 permissions: {}
 
 concurrency:
-  group: cd-docker-${{ github.ref }}
+  group: cd-docker-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   select-services:
     name: Select target images
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       (github.event.workflow_run.head_branch == 'master' || github.event.workflow_run.head_branch == 'main'))
     permissions:
       contents: read
     outputs:
+      should_publish: ${{ steps.select.outputs.should_publish }}
+      target_sha: ${{ steps.select.outputs.target_sha }}
+      short_sha: ${{ steps.select.outputs.short_sha }}
+      target_branch: ${{ steps.select.outputs.target_branch }}
+      is_default_branch: ${{ steps.select.outputs.is_default_branch }}
       matrix: ${{ steps.select.outputs.matrix }}
     steps:
-      - name: Determine image matrix
+      - name: Checkout tested commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+
+      - name: Determine whether images need publishing
         id: select
         env:
           EVENT_NAME: ${{ github.event_name }}
           SELECTED_SERVICE: ${{ inputs.service || 'all' }}
+          WORKFLOW_RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          WORKFLOW_RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          GITHUB_SHA_VAL: ${{ github.sha }}
+          GITHUB_REF_NAME_VAL: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "workflow_run" ]]; then
+            TARGET_SHA="$WORKFLOW_RUN_SHA"
+            TARGET_BRANCH="$WORKFLOW_RUN_BRANCH"
+          else
+            TARGET_SHA="$GITHUB_SHA_VAL"
+            TARGET_BRANCH="$GITHUB_REF_NAME_VAL"
+          fi
+
+          SHORT_SHA="${TARGET_SHA:0:7}"
+          IS_DEFAULT_BRANCH="false"
+          if [[ "$TARGET_BRANCH" == "$DEFAULT_BRANCH" ]]; then
+            IS_DEFAULT_BRANCH="true"
+          fi
+
+          SHOULD_PUBLISH="true"
+          if [[ "$EVENT_NAME" == "workflow_run" ]]; then
+            if git rev-parse --verify --quiet HEAD~1 >/dev/null; then
+              CHANGED_FILES="$(git diff --name-only HEAD~1 HEAD)"
+              echo "Changed files in commit ${SHORT_SHA}:"
+              echo "$CHANGED_FILES"
+
+              SHOULD_PUBLISH="false"
+              while IFS= read -r file; do
+                [[ -z "$file" ]] && continue
+                case "$file" in
+                  services/api/*|server/*|web/*|docker-compose.yml|docker-compose.pi.yml|infrastructure/nginx/*|.github/workflows/cd-docker.yml)
+                    SHOULD_PUBLISH="true"
+                    break
+                    ;;
+                esac
+              done <<< "$CHANGED_FILES"
+            fi
+          fi
+
           case "$SELECTED_SERVICE" in
             api)
               MATRIX='[{"name":"api","context":"./services/api"}]'
@@ -63,12 +117,27 @@ jobs:
               MATRIX='[{"name":"api","context":"./services/api"},{"name":"image-server","context":"./server"},{"name":"web","context":"./web"}]'
               ;;
           esac
-          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+
+          echo "should_publish=${SHOULD_PUBLISH}"
+          echo "target_sha=${TARGET_SHA}"
+          echo "short_sha=${SHORT_SHA}"
+          echo "target_branch=${TARGET_BRANCH}"
+          echo "is_default_branch=${IS_DEFAULT_BRANCH}"
+
+          {
+            echo "should_publish=${SHOULD_PUBLISH}"
+            echo "target_sha=${TARGET_SHA}"
+            echo "short_sha=${SHORT_SHA}"
+            echo "target_branch=${TARGET_BRANCH}"
+            echo "is_default_branch=${IS_DEFAULT_BRANCH}"
+            echo "matrix=${MATRIX}"
+          } >> "$GITHUB_OUTPUT"
 
   publish:
-    name: Publish ${{ matrix.name }} to GHCR
+    name: Publish ${{ matrix.name }} (amd64 + arm64) to GHCR
     runs-on: ubuntu-latest
     needs: select-services
+    if: needs.select-services.outputs.should_publish == 'true'
     permissions:
       contents: read
       packages: write
@@ -77,8 +146,13 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.select-services.outputs.matrix) }}
     steps:
-      - name: Checkout repository
+      - name: Checkout tested commit
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.select-services.outputs.target_sha }}
+
+      - name: Set up QEMU for ARM64 builds
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -96,18 +170,19 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/shawarmas-${{ matrix.name }}
           tags: |
-            type=sha,prefix=sha-
-            type=ref,event=branch
+            type=raw,value=sha-${{ needs.select-services.outputs.short_sha }}
+            type=raw,value=${{ needs.select-services.outputs.target_branch }},enable=${{ github.event_name != 'release' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ needs.select-services.outputs.is_default_branch == 'true' }}
 
-      - name: Build and push image
+      - name: Build and push multi-arch image (linux/amd64, linux/arm64)
         uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=cd-${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=cd-${{ matrix.name }}
+          cache-from: type=gha,scope=cd-multiarch-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=cd-multiarch-${{ matrix.name }}

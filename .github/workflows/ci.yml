@@ -88,7 +88,7 @@ jobs:
               exit 0
             fi
 
-            if [[ "$file" == "docker-compose.yml" ]]; then
+            if [[ "$file" == "docker-compose.yml" || "$file" == "docker-compose.pi.yml" || "$file" == infrastructure/nginx/* ]]; then
               web_db=true
               docker_api=true
               docker_image_server=true
@@ -236,7 +236,7 @@ jobs:
       - name: Check database shell script syntax
         run: bash -n db/create-api-user.sh
 
-      - name: Validate Docker Compose configuration
+      - name: Validate Docker Compose configurations
         run: |
           set -euo pipefail
           cleanup() {
@@ -246,7 +246,8 @@ jobs:
           cp db/.env.example db/.env
           cp server/.env.example server/.env
           cp services/api/.env.example services/api/.env
-          docker compose config --quiet
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.pi.yml config --quiet
 
   java-client:
     name: Java Client (Maven build)

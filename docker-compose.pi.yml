@@ -1,0 +1,112 @@
+# Production Docker Compose configuration for Raspberry Pi 5 (64-bit / ARM64).
+#
+# Architecture:
+#   Cloudflare Tunnel (shawarmas.donivanovich.dev -> 127.0.0.1:3100)
+#     -> gateway (Nginx :8080, ONLY service exposing a host port)
+#          ├── /      -> web (Apache/PHP :80, internal only)
+#          └── /cdn/  -> image-server (Express :3000, internal only, /cdn/ stripped)
+#     -> web -> api (Node.js :3001, internal only)
+#     -> api -> image-server (http://image-server:3000, internal only)
+#     -> api -> external MySQL over Docker network `mysql_backend`
+#
+# Required private runtime files on the Raspberry Pi (never committed to Git):
+#   - ./.env               (optional overrides: IMAGE_BASE_URL, SESSION_COOKIE_SECURE, IMAGE_TAG)
+#   - ./server/.env        (UPLOAD_API_KEY, IMAGE_BASE_URL=https://shawarmas.donivanovich.dev/cdn, ...)
+#   - ./services/api/.env  (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, IMAGE_SERVER_API_KEY, ...)
+
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3100:8080"
+    volumes:
+      - ./infrastructure/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web:
+        condition: service_healthy
+      image-server:
+        condition: service_healthy
+    networks:
+      - shawarmas_internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/gateway-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+      image-server:
+        condition: service_healthy
+    environment:
+      API_BASE_URL: http://api:3001/api/v1
+      IMAGE_BASE_URL: ${IMAGE_BASE_URL:-https://shawarmas.donivanovich.dev/cdn}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+    networks:
+      - shawarmas_internal
+    healthcheck:
+      test: ["CMD", "php", "-r", "$$c=curl_init('http://127.0.0.1:80/'); curl_setopt_array($$c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5]); curl_exec($$c); $$code=curl_getinfo($$c,CURLINFO_HTTP_CODE); exit($$code>=200 && $$code<400 ? 0 : 1);"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  image-server:
+    image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-image-server:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      PORT: ${IMAGE_SERVER_PORT:-3000}
+      IMAGE_STORAGE_PATH: /app/storage
+    volumes:
+      - shawarmas-images:/app/storage
+    networks:
+      - shawarmas_internal
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - ./services/api/.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      API_PORT: 3001
+      IMAGE_SERVER_URL: http://image-server:3000
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    depends_on:
+      image-server:
+        condition: service_healthy
+    networks:
+      - shawarmas_internal
+      - mysql_backend
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health/ready').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  shawarmas_internal:
+    driver: bridge
+  mysql_backend:
+    external: true
+
+volumes:
+  shawarmas-images:
