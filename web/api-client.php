@@ -145,10 +145,15 @@ function render_social_meta(array $meta = []): string
     $description = function_exists('mb_strimwidth') ? mb_strimwidth((string) $rawDesc, 0, 200, '...', 'UTF-8') : substr((string) $rawDesc, 0, 200);
     $type = trim((string) ($meta['type'] ?? 'website'));
     $url = trim((string) ($meta['url'] ?? (public_base_url() . (string) ($_SERVER['REQUEST_URI'] ?? '/'))));
-    $defaultOgImage = public_base_url() . '/assets/og-image.png';
+    $ogImagePath = __DIR__ . '/assets/og-image.png';
+    $ogImageVersion = is_file($ogImagePath) ? (string) filemtime($ogImagePath) : '1';
+    $defaultOgImage = public_base_url() . '/assets/og-image.png?v=' . $ogImageVersion;
     $image = trim((string) ($meta['image'] ?? $defaultOgImage));
     if ($image !== '' && !preg_match('/^https?:\/\//i', $image)) {
         $image = public_base_url() . '/' . ltrim($image, '/');
+    }
+    if (preg_match('#/assets/og-image\.png$#', $image)) {
+        $image = $defaultOgImage;
     }
     $imageAlt = trim((string) ($meta['image_alt'] ?? $title));
     $siteName = 'Shawarmas';
