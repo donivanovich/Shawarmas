@@ -87,7 +87,7 @@ foreach ($variantes as $variante) {
             : $metaProductTitle . ' (' . (string) $producto['categoria'] . ') por ' . $metaProductPrice . ' en Shawarmas.';
         $metaProductImage = !empty($producto['imagen'])
             ? imagen_url((string) $producto['imagen'])
-            : imagen_url('/brand/logo.png');
+            : public_base_url() . '/assets/og-image.png';
     ?>
     <?= render_social_meta([
         'type' => 'product',

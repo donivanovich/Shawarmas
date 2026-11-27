@@ -145,7 +145,8 @@ function render_social_meta(array $meta = []): string
     $description = function_exists('mb_strimwidth') ? mb_strimwidth((string) $rawDesc, 0, 200, '...', 'UTF-8') : substr((string) $rawDesc, 0, 200);
     $type = trim((string) ($meta['type'] ?? 'website'));
     $url = trim((string) ($meta['url'] ?? (public_base_url() . (string) ($_SERVER['REQUEST_URI'] ?? '/'))));
-    $image = trim((string) ($meta['image'] ?? imagen_url('/brand/logo.png')));
+    $defaultOgImage = public_base_url() . '/assets/og-image.png';
+    $image = trim((string) ($meta['image'] ?? $defaultOgImage));
     if ($image !== '' && !preg_match('/^https?:\/\//i', $image)) {
         $image = public_base_url() . '/' . ltrim($image, '/');
     }
@@ -166,6 +167,11 @@ function render_social_meta(array $meta = []): string
     if ($image !== '') {
         $tags[] = '<meta property="og:image" content="' . escapar($image) . '">';
         $tags[] = '<meta property="og:image:alt" content="' . escapar($imageAlt) . '">';
+        if ($image === $defaultOgImage) {
+            $tags[] = '<meta property="og:image:type" content="image/png">';
+            $tags[] = '<meta property="og:image:width" content="1200">';
+            $tags[] = '<meta property="og:image:height" content="630">';
+        }
     }
     if (isset($meta['price']) && is_numeric($meta['price'])) {
         $tags[] = '<meta property="product:price:amount" content="' . escapar(number_format((float) $meta['price'], 2, '.', '')) . '">';

@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'title' => 'Crear cuenta | Shawarmas',
         'description' => 'Crea tu cuenta en Shawarmas para comprar moda urbana y seguir tus pedidos.',
         'url' => public_base_url() . '/register.php',
-        'image' => imagen_url('/brand/logo.png'),
+        'image' => public_base_url() . '/assets/og-image.png',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">

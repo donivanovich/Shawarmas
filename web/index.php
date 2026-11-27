@@ -28,7 +28,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'title' => 'Shawarmas — Moda urbana y streetwear',
         'description' => 'Descubre la colección de ropa urbana, zapatillas, sudaderas, camisetas, pantalones y accesorios en Shawarmas.',
         'url' => public_base_url() . '/',
-        'image' => imagen_url('/brand/logo.png'),
+        'image' => public_base_url() . '/assets/og-image.png',
         'image_alt' => 'Shawarmas — Tienda de moda urbana',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">

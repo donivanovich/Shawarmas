@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'title' => 'Iniciar sesión | Shawarmas',
         'description' => 'Accede a tu cuenta de Shawarmas para gestionar tu perfil, carrito y pedidos.',
         'url' => public_base_url() . '/login.php',
-        'image' => imagen_url('/brand/logo.png'),
+        'image' => public_base_url() . '/assets/og-image.png',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">

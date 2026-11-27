@@ -81,7 +81,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             : ($marca !== '' ? $marca . ' — Colección | Shawarmas' : 'Colección | Shawarmas'),
         'description' => 'Explora el catálogo completo de Shawarmas: zapatillas, sudaderas, camisetas, pantalones, abrigos y accesorios de estilo urbano.',
         'url' => public_base_url() . '/' . $urlColeccionFiltrada,
-        'image' => imagen_url('/brand/logo.png'),
+        'image' => public_base_url() . '/assets/og-image.png',
         'image_alt' => 'Catálogo de productos Shawarmas',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
