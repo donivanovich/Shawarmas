@@ -1,17 +1,25 @@
 # Shawarmas Web Store
 
-The PHP storefront uses the TypeScript REST API for account, catalog, cart and order operations. It does not connect directly to MySQL. In Docker Compose, Apache reaches the API at `http://api:3001/api/v1`; `API_BASE_URL` is set in both the Compose service and the web image.
+The PHP 8.3 storefront uses the TypeScript REST API for account, catalog, cart, and order operations. It does not connect directly to MySQL.
 
-## Run
+## Runtime communication
 
-Configure `db/.env`, `server/.env` and `services/api/.env` from their examples, using matching API database credentials and image server API key, then rebuild and start the stack:
+- **API:** `API_BASE_URL=http://api:3001/api/v1` over the internal Docker network (`shawarmas_internal` in production, default Compose network locally).
+- **Images (browser URLs):** `IMAGE_BASE_URL` is joined to relative paths stored in MySQL (`/products/...`, `/colors/...`, `/brand/...`):
+  - **Production (Raspberry Pi 5):** `https://shawarmas.donivanovich.dev/cdn` (routed through the Nginx `gateway` container which strips `/cdn/` before forwarding to `image-server:3000`).
+  - **Local development:** `http://localhost:3000`.
+- **Sessions & security:** `web/api-client.php` sets UTF-8 headers (`Content-Type: text/html; charset=UTF-8`), CSRF tokens on state-changing forms, and `HttpOnly` / `SameSite=Lax` / `Secure` cookies (detecting `SESSION_COOKIE_SECURE=true` or `X-Forwarded-Proto: https`). `web/Dockerfile` enables UTF-8 charset and disables `expose_php` and Apache version banners.
+
+## Local development
+
+Configure `db/.env`, `server/.env`, and `services/api/.env` from their `.env.example` templates, then start the local stack:
 
 ```sh
-docker compose up -d --build --force-recreate web api
+docker compose up -d --build
 ```
 
-Open <http://localhost:8080>. MySQL is exposed only on `127.0.0.1:3307`. The API is exposed on `127.0.0.1:3001` for desktop clients; the PHP container uses the internal Compose hostname `api`.
+Open <http://localhost:8080>.
 
-For PHP development outside Docker, set `API_BASE_URL=http://127.0.0.1:3001/api/v1` in the PHP process environment. The image URL used in browser links is configured separately with `IMAGE_BASE_URL`.
+## Production (Raspberry Pi 5)
 
-The storefront provides registration and login, catalog and product details, variant selection, cart, checkout and order pages. Checkout pricing and inventory changes are validated by the API. PHP session authentication and CSRF protection apply to storefront forms.
+In `docker-compose.pi.yml`, `web` publishes **no host ports** and is exposed solely through the Nginx `gateway` (`127.0.0.1:3100:8080` -> Cloudflare Tunnel `shawarmas.donivanovich.dev`). Health is checked inside the container via PHP cURL against `http://127.0.0.1:80/`.

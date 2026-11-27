@@ -3,8 +3,15 @@
 ## Requirements
 
 - Windows and .NET 8 SDK with WPF targeting support.
-- The Shawarmas API running at `http://127.0.0.1:3001/api/v1`, or set `API_BASE_URL` to another API URL.
+- Access to the Shawarmas REST API (`API_BASE_URL`, default `http://127.0.0.1:3001/api/v1`).
+- Access to the Shawarmas image origin (`IMAGE_BASE_URL`, default `http://localhost:3000`; set `https://shawarmas.donivanovich.dev/cdn` to load brand and product assets from the production CDN).
 
-Build with `dotnet build wpf/Shawarmas.csproj` and run from Visual Studio or the build output. The client authenticates employee accounts through the REST API and keeps the bearer token in process memory. Employee accounts are created by an administrator; public employee registration is disabled.
+Build in Release mode with:
 
-Product lookups, order listing and delivery status, and employee preferences use the API. Catalog creation requires an employee role. The client does not need MySQL credentials or a MySQL connector.
+```powershell
+dotnet build wpf/Shawarmas.sln --configuration Release
+```
+
+The client authenticates employee accounts through the REST API, keeps the bearer token in process memory, uploads product images via `POST /api/v1/admin/images/products` (which forwards internally to `image-server:3000`), and creates products using `/categories`, `/colors`, `/sizes`, and `/products`. Public employee registration is disabled; employee accounts are managed by an administrator.
+
+The WPF client has no MySQL connector or database credentials. See [Architecture](../docs/ARCHITECTURE.md) and [Deployment](../docs/DEPLOYMENT.md).

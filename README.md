@@ -1,163 +1,176 @@
 # Shawarmas
 
-Shawarmas is a clothing store monorepo with a PHP storefront, a MySQL database, a shared Express image service, and optional Java and WPF desktop clients. This repository keeps the existing applications and their database/image interfaces together.
+Shawarmas is a clothing store monorepo with a PHP storefront, a shared TypeScript/Node.js REST API, a centralized Express image service, an Nginx production gateway, a MySQL 8.4 database, and optional Java and WPF desktop clients.
 
 ## Features
 
 - Product catalog, product variants, customer accounts, cart and order flows in the PHP storefront.
-- MySQL persistence for products, size/color inventory, customers, employees and orders.
-- Shared product, color-swatch and brand image delivery for all three clients.
-- Java and WPF desktop clients for employee workflows.
+- Centralized REST API (`services/api`) handling authentication, RBAC, catalog, inventory, orders, and internal image management.
+- MySQL 8.4 persistence (`utf8mb4_unicode_ci`) for products, size/color inventory, customers, employees, orders, and API sessions.
+- Shared product, color-swatch, and brand image delivery served publicly through the `/cdn/` gateway path in production (`https://shawarmas.donivanovich.dev/cdn`) and `http://localhost:3000` locally.
+- Java Swing and .NET 8 WPF desktop clients communicating exclusively with the REST API and image service.
 
 ## Technology
 
 | Area | Technology |
 | --- | --- |
-| Storefront | PHP 8.3, Apache, MySQLi |
-| Database | MySQL 8.4 |
-| Image service | Node.js 20+, Express 5, Multer |
+| Production Gateway | Nginx 1.27 Alpine (`127.0.0.1:3100:8080`, fronted by Cloudflare Tunnel) |
+| Storefront | PHP 8.3, Apache, cURL |
+| REST API | Node.js 22, TypeScript 5.9, Express 5, Zod, mysql2 |
+| Database | MySQL 8.4 (`utf8mb4_unicode_ci`, external `mysql_backend` in production) |
+| Image service | Node.js 22, Express 5, Multer |
 | Desktop clients | Java 17+, Maven, Swing; .NET 8 WPF |
-| Local services | Docker Compose v2 |
+| Orchestration | Docker Compose v2 (`docker-compose.yml` dev / `docker-compose.pi.yml` Raspberry Pi 5 prod) |
 
 ## Repository layout
 
 ```text
-web/       PHP storefront, styles, fonts, scripts, Dockerfile
-app/       Java/Maven desktop client and Eclipse project metadata
-wpf/       WPF solution, MVVM views, services and visual/audio resources
-server/    Express image API, tests, Dockerfile and image assets
-db/        Initial schema, ordered incremental SQL migrations, DB env example
-docs/      Architecture, database, deployment and security guides
+infrastructure/  Nginx production gateway configuration (infrastructure/nginx/default.conf)
+services/api/    TypeScript REST API, UTF-8 and smoke tests, Dockerfile
+web/             PHP storefront, styles, fonts, scripts, Dockerfile
+server/          Express image API, tests, Dockerfile, and seeded image assets
+app/             Java/Maven desktop client
+wpf/             .NET 8 WPF solution, MVVM views, services, and resources
+db/              Initial schema, incremental SQL migrations, UTF-8 mojibake repair script
+docs/            Architecture, database, deployment, and security guides
+.github/         GitHub Actions CI/CD workflows and Dependabot config
 ```
-
-Existing directory names and image paths are retained so local IDE projects, Docker build contexts, and database references continue to work.
 
 ## Architecture
 
-See [Architecture](docs/ARCHITECTURE.md) for the component diagram and client connections. See [Database](docs/DATABASE.md), [Deployment](docs/DEPLOYMENT.md), and [Security](docs/SECURITY.md) for operational details.
+- **Production (Raspberry Pi 5, `/opt/docker/apps/Shawarmas`, `docker-compose.pi.yml`):** Cloudflare Tunnel maps `shawarmas.donivanovich.dev` -> `localhost:3100` (`gateway`). Nginx forwards `/` to `http://web:80` and `/cdn/` to `http://image-server:3000/` (stripping the `/cdn/` prefix and blocking `/cdn/api/*`). `web`, `api`, and `image-server` publish no host ports. `api` talks internally to `IMAGE_SERVER_URL=http://image-server:3000` and connects to external MySQL via the `mysql_backend` Docker network.
+- See [Architecture](docs/ARCHITECTURE.md), [Database](docs/DATABASE.md), [Deployment](docs/DEPLOYMENT.md), and [Security](docs/SECURITY.md) for diagrams, routing, backups, and UTF-8 troubleshooting.
 
 ## Requirements
 
-- Git and Docker Desktop with Docker Compose v2 for the complete local stack.
+- Git and Docker with Docker Compose v2 for local or production stacks.
 - JDK 17 and Maven to build the Java client.
 - Windows with .NET 8 SDK and WPF targeting support to build the WPF client.
-- Node.js 20+ to run image-server tests outside Docker.
+- Node.js 20+ (22 recommended) to run `services/api` and `server` tests outside Docker.
 
-## Configure and start
+## Configure and start (local development)
 
-Copy the examples and set private values before starting. Do not reuse the example passwords or upload key for a shared or public deployment.
+Copy the examples and set private values before starting. Never reuse example passwords or API keys in production.
 
 ```powershell
 Copy-Item db\.env.example db\.env
 Copy-Item server\.env.example server\.env
-# Edit db/.env and server/.env; use unique values for all secrets.
+Copy-Item services\api\.env.example services\api\.env
+# Edit db/.env, server/.env, and services/api/.env so DB credentials and UPLOAD_API_KEY/IMAGE_SERVER_API_KEY match.
 docker compose up --build -d
 docker compose ps
 ```
 
-Services are available at:
+Local development services are available at:
 
 - Storefront: <http://localhost:8080>
 - Catalog: <http://localhost:8080/products.php>
-- Image health: <http://localhost:3000/health>
-- MySQL from desktop clients: `127.0.0.1:3307`
+- REST API readiness: <http://127.0.0.1:3001/health/ready>
+- Image service health: <http://localhost:3000/health>
+- Local MySQL (loopback only): `127.0.0.1:3307`
 
-Compose binds MySQL to loopback only. Containers use the internal hostname `db:3306`; host applications use `127.0.0.1:3307`. `db/schema.sql` initializes a new, empty database volume only. It contains destructive reset statements and must not be run against an existing database. Apply only the migration(s) appropriate to the database's current state; see [Database](docs/DATABASE.md).
+`db/schema.sql` initializes a new, empty database volume only—never run it against an existing database. `docker compose down` preserves named volumes (`shawarmas-db`, `shawarmas-images`); never use `docker compose down -v` on data you want to keep.
 
-The images under `server/storage/` are preserved in source control. On image-server startup, repository product images seed only missing files in the named image volume. Existing volume files are retained. Color swatches and brand assets remain at their established routes. `docker compose down` preserves both named volumes; `docker compose down -v` deletes database and image data.
+For Raspberry Pi 5 production deployment (`docker-compose.pi.yml`), see [Deployment](docs/DEPLOYMENT.md).
 
 ## Run the clients
 
-Start MySQL with `docker compose up -d db` first. Set `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` and `DB_PASSWORD` in the client process environment. Set `IMAGE_BASE_URL` when the default `http://localhost:3000` is not suitable.
+Both desktop clients authenticate and operate through the REST API (`API_BASE_URL`, default `http://127.0.0.1:3001/api/v1`) and load images from `IMAGE_BASE_URL` (default `http://localhost:3000`; set `https://shawarmas.donivanovich.dev/cdn` for the production CDN). Neither desktop client connects directly to MySQL.
 
 ### Java
 
-Open `app/` as an existing Maven project in Eclipse and run `com.shawarmas.Login`, or build with `mvn -f app/pom.xml package`. Details: [Java client guide](app/README.md).
+Open `app/` as a Maven project and run `com.shawarmas.Login`, or build with `mvn -f app/pom.xml -B clean package`. Details: [Java client guide](app/README.md).
 
 ### WPF
 
-Open `wpf/Shawarmas.sln` in Visual Studio, or run `dotnet build wpf/Shawarmas.csproj` and `dotnet run --project wpf/Shawarmas.csproj`. Details: [WPF client guide](wpf/README.md).
+Open `wpf/Shawarmas.sln` in Visual Studio, or run `dotnet build wpf/Shawarmas.sln --configuration Release`. Details: [WPF client guide](wpf/README.md).
 
 ### Web and image service
 
-The storefront and image service run through Compose. Their guides are [web/README.md](web/README.md) and [server/README.md](server/README.md). The image API preserves `/products/`, `/colors/`, `/brand/`, `POST /api/products` and `DELETE /api/products/:filename`; database rows continue storing relative paths.
+Guides: [web/README.md](web/README.md) and [server/README.md](server/README.md). Database rows continue storing relative image paths (`/products/<filename>`, `/colors/<filename>`); clients prepend `IMAGE_BASE_URL` at runtime.
 
 ## Security and credentials
 
-Runtime `.env` files are ignored by Git. Desktop clients require `DB_PASSWORD` and no longer fall back to a source-coded password. PHP receives the database password from its Compose environment. Keep `UPLOAD_API_KEY` private, use HTTPS and a trusted reverse proxy outside local development, and back up the database and image volume. See [Security](docs/SECURITY.md).
+Runtime `.env` files are ignored by Git. `UPLOAD_API_KEY` and `IMAGE_SERVER_API_KEY` stay strictly server-side; `/cdn/api/*` is blocked at the Nginx gateway. Session cookies enforce `HttpOnly`, `SameSite=Lax`, and `Secure` behind HTTPS/Cloudflare. See [Security](docs/SECURITY.md).
 
 ## Validation
 
-The image-server automated suite can be run with `cd server; npm ci; npm test`, and the REST API build and test suite with `cd services/api; npm ci; npm test`. Java and WPF build commands are above. Validation depends on Docker, Maven and the Windows WPF toolchain being available; see the final change report for the commands actually run.
+Run automated test suites locally with:
+
+```powershell
+npm --prefix services/api ci; npm --prefix services/api test
+npm --prefix server ci; npm --prefix server test
+```
+
+`services/api` tests include TypeScript compilation, API smoke checks, UTF-8 / mojibake regression checks, and production gateway/Compose contract checks.
 
 ## CI/CD (GitHub Actions)
 
-This repository uses GitHub Actions to automate continuous integration, container image delivery, security checks, and optional VPS deployment across all monorepo components (`services/api`, `server`, `web`, `db`, `app`, and `wpf`).
+This repository uses GitHub Actions to automate continuous integration, multi-arch container delivery, security checks, and Raspberry Pi 5 deployment across all monorepo components (`services/api`, `server`, `web`, `db`, `app`, `wpf`, and `infrastructure/nginx`).
 
 ### Workflows overview
 
 | Workflow | File | Purpose |
 | --- | --- | --- |
-| **CI** | `.github/workflows/ci.yml` | Builds, lints, and tests affected monorepo services and desktop clients, validates `docker-compose.yml` and Docker builds, and exposes a single `CI Gate` check for branch protection. |
-| **CD - Publish Docker Images** | `.github/workflows/cd-docker.yml` | Builds and publishes `api`, `image-server`, and `web` images to GitHub Container Registry (`ghcr.io`) with immutable SHA, branch, and semantic release tags. |
-| **CD - Deploy to VPS** | `.github/workflows/cd-deploy-vps.yml` | Manual, environment-gated SSH deployment to a self-hosted Docker Compose server with pre-flight checks, post-deploy health verification, and automatic rollback on failure. |
+| **CI** | `.github/workflows/ci.yml` | Builds, lints, and tests affected monorepo services and desktop clients, validates `docker-compose.yml` and `docker-compose.pi.yml`, validates Docker builds, and exposes a single `CI Gate` check for branch protection. |
+| **CD - Publish Docker Images** | `.github/workflows/cd-docker.yml` | Runs only after **CI** succeeds on `master` (or on Releases / manual dispatch), building and publishing multi-architecture (`linux/amd64`, `linux/arm64`) images for `api`, `image-server`, and `web` to GitHub Container Registry (`ghcr.io`). |
+| **CD - Deploy to Raspberry Pi** | `.github/workflows/cd-deploy-rpi.yml` | Runs automatically on `master` only after **CI** and **CD - Publish Docker Images** succeed (or via manual `workflow_dispatch`), verifies `linux/arm64` manifests in GHCR, connects to the Raspberry Pi 5 over SSH, pulls new images, updates containers with `docker compose -f docker-compose.pi.yml up -d`, verifies health/readiness probes (including `gateway`), and rolls back automatically on failure. |
 | **Security Audit** | `.github/workflows/security.yml` | Checks that no runtime `.env` files are tracked in Git and runs `npm audit --omit=dev --audit-level=high` on `services/api` and `server`. |
 | **Dependabot** | `.github/dependabot.yml` | Opens weekly dependency update PRs for GitHub Actions, npm (`services/api`, `server`), Maven (`app`), and Dockerfiles (`services/api`, `server`, `web`). |
 
 ### When workflows run
 
-- **CI (`ci.yml`)**: Runs on every `push` and `pull_request` targeting `master` (and `main` if renamed), plus manual `workflow_dispatch`.
-  - On **pull requests**, a `detect-changes` job inspects the PR diff so only affected components run (saving runner minutes, especially on `windows-latest` for WPF). Because `services/api`'s UTF-8 test scans repository text files, the `api` job runs whenever text/code/SQL/web files change. Stale PR runs are automatically cancelled via `concurrency`.
-  - On **pushes to `master`/`main`** and **manual runs**, all jobs execute for full-stack verification.
-- **CD - Publish Docker Images (`cd-docker.yml`)**: Runs on `push` to `master`/`main` when `services/api/**`, `server/**`, `web/**`, `docker-compose.yml`, or the workflow file change; on published GitHub Releases (`release: published`); and via manual `workflow_dispatch` (with a service selector). It never runs on pull requests.
-- **CD - Deploy to VPS (`cd-deploy-vps.yml`)**: Runs only on manual `workflow_dispatch` inside the `production` GitHub Environment.
-- **Security Audit (`security.yml`)**: Runs weekly (Mondays at 06:00 UTC), manually via `workflow_dispatch`, and on `push`/`pull_request` when `services/api/package-lock.json`, `server/package-lock.json`, or the workflow file change.
+- **CI (`ci.yml`)**: Runs on every `push` and `pull_request` targeting `master` (and `main` if renamed), plus manual `workflow_dispatch`. On PRs, `detect-changes` runs only affected components and cancels stale runs; on pushes to `master`/`main` and manual runs, the full suite executes.
+- **CD - Publish Docker Images (`cd-docker.yml`)**: Triggered via `workflow_run` only after **CI** finishes with `conclusion == success` on a `push` to `master`/`main` (skipping non-container commits), on published Releases, or via `workflow_dispatch`. Never runs on PRs.
+- **CD - Deploy to Raspberry Pi (`cd-deploy-rpi.yml`)**: Triggered via `workflow_run` only after **CD - Publish Docker Images** finishes with `conclusion == success` on `master`, or via manual `workflow_dispatch` on `master`. Never deploys from PRs.
+- **Security Audit (`security.yml`)**: Runs weekly (Mondays 06:00 UTC), manually, and on lockfile changes.
 
 ### Validations performed by CI
 
 | Job | Runner | Validations |
 | --- | --- | --- |
-| `api` | `ubuntu-latest` (Node 22) | Reproducible `npm ci`, TypeScript strict compilation (`tsc -p tsconfig.json`), API smoke tests, and repo-wide UTF-8 / SQL / HTML charset verification (`npm test`). |
+| `api` | `ubuntu-latest` (Node 22) | Reproducible `npm ci`, TypeScript compilation (`tsc -p tsconfig.json`), API smoke tests, UTF-8 / mojibake repair regression tests, and production gateway/Compose contract checks (`npm test`). |
 | `image-server` | `ubuntu-latest` (Node 22) | Reproducible `npm ci` and automated image API suite (`npm test` via `node --test` + Supertest). |
-| `web-db-compose` | `ubuntu-latest` (PHP 8.3) | PHP syntax check (`php -l`) on all `web/*.php`, JS syntax check (`node --check`) on `web/**/*.js`, shell syntax check (`bash -n db/create-api-user.sh`), and `docker compose config --quiet` using ephemeral copies of `.env.example`. |
-| `java-client` | `ubuntu-latest` (JDK 17) | Maven build and packaging (`mvn -f app/pom.xml -B clean package`). *Note: the Java client currently has no unit tests.* |
-| `wpf-client` | `windows-latest` (.NET 8) | Solution restore and Release compilation (`dotnet build wpf/Shawarmas.sln --configuration Release --no-restore`). *Note: the WPF client currently has no unit tests.* |
-| `docker-build` | `ubuntu-latest` (Buildx) | Validates `Dockerfile` builds for `services/api`, `server`, and `web` (`push: false`) with GitHub Actions cache. |
-| `ci-gate` | `ubuntu-latest` | Aggregates every CI job result (`success` or `skipped` allowed; fails on any `failure` or `cancelled`). Configure **`CI Gate`** as the required status check in branch protection rules. |
-
-### How deployment works
-
-1. **Container delivery (GHCR)**: `cd-docker.yml` authenticates to `ghcr.io` using the scoped built-in `GITHUB_TOKEN` (`packages: write` on the publish job only) and pushes:
-   - `ghcr.io/<owner>/shawarmas-api`
-   - `ghcr.io/<owner>/shawarmas-image-server`
-   - `ghcr.io/<owner>/shawarmas-web`
-   Each build receives traceable tags (`sha-<commit>`, branch name, semantic version on GitHub Releases, and `latest` only on the default branch).
-2. **VPS deployment (`cd-deploy-vps.yml`)**: Connects to the target Linux server over SSH using `StrictHostKeyChecking=yes`, verifies that private runtime files (`db/.env`, `server/.env`, `services/api/.env`) exist on the host, records the previous commit SHA, checks out the requested Git ref, builds the updated Docker images before recreating containers (`docker compose up -d --remove-orphans`, never touching named volumes `shawarmas-db` or `shawarmas-images`), and verifies loopback health endpoints (`/health`, `/health/ready`, and storefront `/`). If build, startup, or health checks fail, it automatically checks out the previous commit and restores the stack.
+| `web-db-compose` | `ubuntu-latest` (PHP 8.3) | PHP syntax check (`php -l`), JS syntax check (`node --check`), shell syntax check (`bash -n db/create-api-user.sh`), and `docker compose config --quiet` on both `docker-compose.yml` and `docker-compose.pi.yml`. |
+| `java-client` | `ubuntu-latest` (JDK 17) | Maven build and packaging (`mvn -f app/pom.xml -B clean package`). *No Java unit tests exist yet.* |
+| `wpf-client` | `windows-latest` (.NET 8) | Solution restore and Release compilation (`dotnet build wpf/Shawarmas.sln --configuration Release --no-restore`). *No WPF unit tests exist yet.* |
+| `docker-build` | `ubuntu-latest` (Buildx) | Validates `Dockerfile` builds for `services/api`, `server`, and `web` (`push: false`) with GHA cache. |
+| `ci-gate` | `ubuntu-latest` | Aggregates all CI job results. Configure **`CI Gate`** as the required status check in branch protection rules. |
 
 ### Required secrets and GitHub settings
 
-- **CI, Security Audit, and GHCR publishing (`ci.yml`, `security.yml`, `cd-docker.yml`)**: No manual secrets required; they use the default `GITHUB_TOKEN` with least-privilege `permissions`. Ensure **Settings -> Actions -> General -> Workflow permissions** allows workflows to declare `packages: write` (or keep default read permissions, since `cd-docker.yml` explicitly requests `packages: write` at the job level).
-- **VPS deployment (`cd-deploy-vps.yml`)**: Create a GitHub Environment named **`production`** under **Settings -> Environments** (optionally with required reviewers and deployment branch restrictions) and add these environment secrets:
+- **CI, Security Audit, and GHCR publishing (`ci.yml`, `security.yml`, `cd-docker.yml`)**: Use the scoped built-in `GITHUB_TOKEN`; no manual secrets required.
+- **Raspberry Pi 5 deployment (`cd-deploy-rpi.yml`)**: Create a GitHub Environment named **`production`** under **Settings -> Environments** (restrict **Deployment branches** to `master` only) and configure:
+
+#### Required Environment Secrets (`production`)
 
 | Secret | Required | Description |
 | --- | --- | --- |
-| `VPS_HOST` | Yes | Public hostname or IP address of the VPS. |
-| `VPS_USER` | Yes | Non-root SSH user with permission to run `git` and `docker compose`. |
-| `VPS_SSH_KEY` | Yes | Private SSH key authorized on the VPS (`~/.ssh/authorized_keys`). |
-| `VPS_SSH_KNOWN_HOSTS` | Yes | Verified SSH host key line from `ssh-keyscan -p <port> <host>`. |
-| `VPS_DEPLOY_PATH` | Yes | Absolute path to the cloned repository on the VPS containing `db/.env`, `server/.env`, and `services/api/.env`. |
-| `VPS_PORT` | No | Custom SSH port (defaults to `22`). |
+| `RPI_HOST` | Yes | Reachable hostname, DDNS, Tailscale/VPN IP, or IP of the Raspberry Pi 5. |
+| `RPI_USER` | Yes | Non-root SSH user on the Raspberry Pi with permission to run `docker` and `docker compose`. |
+| `RPI_SSH_KEY` | Yes | Private SSH key authorized on the Raspberry Pi (`~/.ssh/authorized_keys`). |
+| `RPI_SSH_KNOWN_HOSTS` | Yes | Verified SSH host key entry from `ssh-keyscan -p <port> <host>`. |
+| `RPI_DEPLOY_PATH` | Yes | Absolute production path on the Raspberry Pi (e.g. `/opt/docker/apps/Shawarmas`). |
+| `RPI_PORT` | No | Custom SSH port (defaults to `22`). |
+| `GHCR_PULL_TOKEN` | No | Token with `read:packages` (only needed if GHCR packages are private). |
+| `GHCR_PULL_USER` | No | GitHub username paired with `GHCR_PULL_TOKEN` (defaults to repository owner). |
+
+#### Optional Environment Variables (`production`)
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `RPI_COMPOSE_FILE` | `docker-compose.pi.yml` | Compose filename inside `RPI_DEPLOY_PATH`. |
+| `RPI_SERVICES` | `api image-server web` | Space-separated application services to pull and verify image updates for. |
+| `RPI_HEALTH_WAIT_SECONDS` | `90` | Maximum seconds to wait for container health checks after `docker compose up -d`. |
 
 ### Viewing results and troubleshooting failures
 
-1. Open the **Actions** tab in GitHub to inspect workflow runs, filter by workflow or branch, and view per-job logs. On Pull Requests, check the **Checks** tab and the required **`CI Gate`** status.
+1. Open the **Actions** tab in GitHub to inspect workflow runs and per-job logs. On Pull Requests, check the **`CI Gate`** status.
 2. When a job fails:
-   - **`api` / `image-server`**: Reproduce locally with `npm --prefix services/api ci && npm --prefix services/api test` or `npm --prefix server ci && npm --prefix server test`. If `utf8.test.ts` fails, check the reported file for non-UTF-8 encoding, BOM, or missing `accept-charset="UTF-8"` / `SET NAMES utf8mb4`.
-   - **`web-db-compose`**: Run `php -l` on modified PHP files, `node --check` on JS files, `bash -n db/create-api-user.sh`, and `docker compose config --quiet` (with local `.env` files).
-   - **`java-client` / `wpf-client`**: Reproduce with `mvn -f app/pom.xml -B clean package` or `dotnet build wpf/Shawarmas.sln --configuration Release` on Windows.
-   - **`docker-build` / `cd-docker`**: Reproduce with `docker build ./services/api`, `docker build ./server`, or `docker build ./web`.
-   - **`security`**: Run `npm audit --omit=dev --audit-level=high` inside `services/api` or `server` and update vulnerable lockfile entries, or remove accidentally staged `.env` files from Git history.
-   - **`cd-deploy-vps`**: Check whether required `production` environment secrets are set, verify SSH connectivity and `known_hosts`, and inspect `docker compose logs` on the VPS if health checks triggered a rollback.
+   - **`api` / `image-server`**: Reproduce locally with `npm --prefix services/api ci && npm --prefix services/api test` or `npm --prefix server ci && npm --prefix server test`.
+   - **`web-db-compose`**: Run `php -l`, `node --check`, `bash -n db/create-api-user.sh`, and `docker compose -f docker-compose.yml config --quiet` / `docker compose -f docker-compose.pi.yml config --quiet`.
+   - **`java-client` / `wpf-client`**: Reproduce with `mvn -f app/pom.xml -B clean package` or `dotnet build wpf/Shawarmas.sln --configuration Release`.
+   - **`cd-deploy-rpi`**: Inspect `verify-release` logs (CI status and `linux/arm64` manifests), verify `production` environment secrets, and check `docker compose -f docker-compose.pi.yml logs` on the Raspberry Pi if automatic rollback triggered. Manual rollback is always available via **Actions -> `CD - Deploy to Raspberry Pi` -> Run workflow** with a previous `sha-<commit>` tag.
 
 ## License
 
