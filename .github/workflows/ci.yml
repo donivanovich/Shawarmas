@@ -1,0 +1,343 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  detect-changes:
+    name: Detect affected components
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.changes.outputs.api }}
+      image_server: ${{ steps.changes.outputs.image_server }}
+      web_db: ${{ steps.changes.outputs.web_db }}
+      java_client: ${{ steps.changes.outputs.java_client }}
+      wpf_client: ${{ steps.changes.outputs.wpf_client }}
+      has_docker_changes: ${{ steps.changes.outputs.has_docker_changes }}
+      docker_matrix: ${{ steps.changes.outputs.docker_matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Compute affected scopes
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+
+          run_all() {
+            {
+              echo "api=true"
+              echo "image_server=true"
+              echo "web_db=true"
+              echo "java_client=true"
+              echo "wpf_client=true"
+              echo "has_docker_changes=true"
+              echo 'docker_matrix=[{"name":"api","context":"./services/api"},{"name":"image-server","context":"./server"},{"name":"web","context":"./web"}]'
+            } >> "$GITHUB_OUTPUT"
+          }
+
+          if [[ "$EVENT_NAME" != "pull_request" || -z "${BASE_SHA:-}" ]]; then
+            run_all
+            exit 0
+          fi
+
+          if ! CHANGED_FILES=$(git diff --name-only "${BASE_SHA}...HEAD" 2>/dev/null); then
+            echo "Warning: unable to compute PR diff; running full CI suite."
+            run_all
+            exit 0
+          fi
+
+          echo "Changed files in PR:"
+          echo "$CHANGED_FILES"
+
+          api=false
+          image_server=false
+          web_db=false
+          java_client=false
+          wpf_client=false
+          docker_api=false
+          docker_image_server=false
+          docker_web=false
+
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+
+            # Workflow or root compose changes trigger full validation
+            if [[ "$file" == ".github/workflows/ci.yml" ]]; then
+              run_all
+              exit 0
+            fi
+
+            if [[ "$file" == "docker-compose.yml" ]]; then
+              web_db=true
+              docker_api=true
+              docker_image_server=true
+              docker_web=true
+            fi
+
+            if [[ "$file" == services/api/* ]]; then
+              api=true
+              docker_api=true
+            fi
+
+            if [[ "$file" == server/* ]]; then
+              image_server=true
+              docker_image_server=true
+            fi
+
+            if [[ "$file" == web/* ]]; then
+              web_db=true
+              api=true
+              docker_web=true
+            fi
+
+            if [[ "$file" == db/* ]]; then
+              web_db=true
+              api=true
+            fi
+
+            if [[ "$file" == app/* ]]; then
+              java_client=true
+            fi
+
+            if [[ "$file" == wpf/* ]]; then
+              wpf_client=true
+            fi
+
+            # services/api utf8.test.ts scans tracked text files across the repository for UTF-8 and mojibake
+            if [[ "$file" =~ \.(php|ts|js|json|html|sql|css|scss|md|sh|yml|yaml|java|cs|xaml)$ ]]; then
+              api=true
+            fi
+          done <<< "$CHANGED_FILES"
+
+          docker_entries=()
+          if [[ "$docker_api" == "true" ]]; then
+            docker_entries+=('{"name":"api","context":"./services/api"}')
+          fi
+          if [[ "$docker_image_server" == "true" ]]; then
+            docker_entries+=('{"name":"image-server","context":"./server"}')
+          fi
+          if [[ "$docker_web" == "true" ]]; then
+            docker_entries+=('{"name":"web","context":"./web"}')
+          fi
+
+          if [[ ${#docker_entries[@]} -gt 0 ]]; then
+            has_docker_changes=true
+            docker_matrix="[$(IFS=,; echo "${docker_entries[*]}")]"
+          else
+            has_docker_changes=false
+            docker_matrix='[{"name":"api","context":"./services/api"}]'
+          fi
+
+          {
+            echo "api=${api}"
+            echo "image_server=${image_server}"
+            echo "web_db=${web_db}"
+            echo "java_client=${java_client}"
+            echo "wpf_client=${wpf_client}"
+            echo "has_docker_changes=${has_docker_changes}"
+            echo "docker_matrix=${docker_matrix}"
+          } >> "$GITHUB_OUTPUT"
+
+  api:
+    name: API (TypeScript build & tests)
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: services/api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/api
+        run: npm ci
+
+      - name: Type-check, build and run tests
+        working-directory: services/api
+        run: npm test
+
+  image-server:
+    name: Image Server (Node.js tests)
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.image_server == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Run tests
+        working-directory: server
+        run: npm test
+
+  web-db-compose:
+    name: Web (PHP/JS), DB & Compose validation
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web_db == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: none
+          coverage: none
+
+      - name: Lint PHP syntax
+        run: |
+          set -euo pipefail
+          find web -type f -name '*.php' -print0 | xargs -0 -r -n1 php -l
+
+      - name: Check frontend JavaScript syntax
+        run: |
+          set -euo pipefail
+          find web -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+
+      - name: Check database shell script syntax
+        run: bash -n db/create-api-user.sh
+
+      - name: Validate Docker Compose configuration
+        run: |
+          set -euo pipefail
+          cleanup() {
+            rm -f db/.env server/.env services/api/.env
+          }
+          trap cleanup EXIT
+          cp db/.env.example db/.env
+          cp server/.env.example server/.env
+          cp services/api/.env.example services/api/.env
+          docker compose config --quiet
+
+  java-client:
+    name: Java Client (Maven build)
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.java_client == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+          cache-dependency-path: app/pom.xml
+
+      - name: Compile and package Java client
+        run: mvn -f app/pom.xml -B clean package
+
+  wpf-client:
+    name: WPF Client (.NET 8 Windows build)
+    runs-on: windows-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.wpf_client == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 8 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore WPF solution
+        run: dotnet restore wpf/Shawarmas.sln
+
+      - name: Build WPF solution (Release)
+        run: dotnet build wpf/Shawarmas.sln --configuration Release --no-restore
+
+  docker-build:
+    name: Docker Build (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_docker_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.detect-changes.outputs.docker_matrix || '[{"name":"api","context":"./services/api"}]') }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Validate Docker image build
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          push: false
+          cache-from: type=gha,scope=ci-${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=ci-${{ matrix.name }}
+
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - detect-changes
+      - api
+      - image-server
+      - web-db-compose
+      - java-client
+      - wpf-client
+      - docker-build
+    steps:
+      - name: Evaluate CI job outcomes
+        env:
+          RESULTS_JSON: ${{ toJson(needs) }}
+        run: |
+          node -e '
+            const results = JSON.parse(process.env.RESULTS_JSON);
+            const entries = Object.entries(results);
+            for (const [job, info] of entries) {
+              console.log(`${job}: ${info.result}`);
+            }
+            const failed = entries.filter(([, info]) => !["success", "skipped"].includes(info.result));
+            if (failed.length > 0) {
+              console.error("Blocking CI failures:", failed.map(([j, i]) => `${j} (${i.result})`).join(", "));
+              process.exit(1);
+            }
+          '

@@ -1,0 +1,171 @@
+name: CD - Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: 'Branch, tag, or commit SHA to deploy'
+        required: true
+        default: 'master'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-deploy-vps-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Docker Compose stack to VPS
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Validate deployment configuration and inputs
+        env:
+          DEPLOY_REF: ${{ inputs.git_ref }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+          VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$DEPLOY_REF" =~ ^[a-zA-Z0-9._/-]+$ ]]; then
+            echo "::error::Invalid git_ref input. Only alphanumeric characters, '.', '_', '/', and '-' are allowed."
+            exit 1
+          fi
+
+          missing=()
+          [[ -z "${VPS_HOST:-}" ]] && missing+=("VPS_HOST")
+          [[ -z "${VPS_USER:-}" ]] && missing+=("VPS_USER")
+          [[ -z "${VPS_SSH_KEY:-}" ]] && missing+=("VPS_SSH_KEY")
+          [[ -z "${VPS_SSH_KNOWN_HOSTS:-}" ]] && missing+=("VPS_SSH_KNOWN_HOSTS")
+          [[ -z "${VPS_DEPLOY_PATH:-}" ]] && missing+=("VPS_DEPLOY_PATH")
+
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "::error::Missing required GitHub Secrets in the 'production' environment: ${missing[*]}"
+            echo "Configure these secrets under Settings -> Environments -> production before running this deployment."
+            exit 1
+          fi
+
+      - name: Configure ephemeral SSH credentials
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          mkdir -p "$SSH_DIR"
+          chmod 700 "$SSH_DIR"
+          printf '%s\n' "$VPS_SSH_KEY" > "${SSH_DIR}/deploy_key"
+          chmod 600 "${SSH_DIR}/deploy_key"
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" > "${SSH_DIR}/known_hosts"
+          chmod 600 "${SSH_DIR}/known_hosts"
+
+      - name: Deploy and verify services over SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+          DEPLOY_REF: ${{ inputs.git_ref }}
+        run: |
+          set -euo pipefail
+          SSH_DIR="${RUNNER_TEMP}/ssh"
+          PORT="${VPS_PORT:-22}"
+
+          ssh \
+            -i "${SSH_DIR}/deploy_key" \
+            -o UserKnownHostsFile="${SSH_DIR}/known_hosts" \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
+            -p "$PORT" \
+            "${VPS_USER}@${VPS_HOST}" \
+            bash -s -- "$VPS_DEPLOY_PATH" "$DEPLOY_REF" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          DEPLOY_PATH="$1"
+          TARGET_REF="$2"
+
+          if [[ ! -d "$DEPLOY_PATH/.git" ]]; then
+            echo "Deployment directory '$DEPLOY_PATH' is not a Git repository." >&2
+            exit 1
+          fi
+
+          cd "$DEPLOY_PATH"
+
+          for env_file in db/.env server/.env services/api/.env; do
+            if [[ ! -f "$env_file" ]]; then
+              echo "Missing required runtime environment file on VPS: $env_file" >&2
+              exit 1
+            fi
+          done
+
+          PREVIOUS_SHA="$(git rev-parse HEAD)"
+          echo "Current deployed commit: $PREVIOUS_SHA"
+
+          verify_stack() {
+            local max_attempts=30
+            local attempt=1
+            while (( attempt <= max_attempts )); do
+              if curl -fsS "http://127.0.0.1:${IMAGE_SERVER_PORT:-3000}/health" >/dev/null \
+                && curl -fsS "http://127.0.0.1:${API_EXTERNAL_PORT:-3001}/health/ready" >/dev/null \
+                && curl -fsS -o /dev/null "http://127.0.0.1:8080/"; then
+                echo "Health checks passed (image-server, api, web)."
+                return 0
+              fi
+              echo "Waiting for services to become healthy (${attempt}/${max_attempts})..."
+              sleep 3
+              attempt=$((attempt + 1))
+            done
+            return 1
+          }
+
+          rollback() {
+            echo "Deployment failed. Attempting rollback to ${PREVIOUS_SHA}..." >&2
+            git checkout --force "$PREVIOUS_SHA"
+            docker compose build api image-server web
+            docker compose up -d --remove-orphans
+            if verify_stack; then
+              echo "Rollback to ${PREVIOUS_SHA} succeeded." >&2
+            else
+              echo "CRITICAL: Rollback health checks failed. Manual intervention required." >&2
+            fi
+          }
+
+          git fetch --prune origin
+          if git rev-parse --verify --quiet "origin/${TARGET_REF}" >/dev/null; then
+            git checkout --force "origin/${TARGET_REF}"
+          else
+            git checkout --force "$TARGET_REF"
+          fi
+
+          NEW_SHA="$(git rev-parse HEAD)"
+          echo "Deploying commit: $NEW_SHA"
+
+          if ! docker compose build api image-server web; then
+            rollback
+            exit 1
+          fi
+
+          if ! docker compose up -d --remove-orphans; then
+            rollback
+            exit 1
+          fi
+
+          if ! verify_stack; then
+            rollback
+            exit 1
+          fi
+
+          docker compose ps
+          echo "Deployment of ${NEW_SHA} completed successfully."
+          REMOTE_SCRIPT
+
+      - name: Clean up ephemeral SSH credentials
+        if: always()
+        run: rm -rf "${RUNNER_TEMP}/ssh"

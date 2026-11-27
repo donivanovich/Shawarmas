@@ -1,0 +1,74 @@
+name: Security Audit
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'services/api/package-lock.json'
+      - 'server/package-lock.json'
+      - '.github/workflows/security.yml'
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - 'services/api/package-lock.json'
+      - 'server/package-lock.json'
+      - '.github/workflows/security.yml'
+  schedule:
+    # Weekly audit every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  secret-hygiene:
+    name: Check tracked environment files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Verify no runtime .env files are committed
+        run: |
+          set -euo pipefail
+          tracked_env=$(git ls-files | grep -E '(^|/)\.env(\.[^/]+)?$' | grep -vE '\.env\.example$' || true)
+          if [[ -n "$tracked_env" ]]; then
+            echo "::error::Tracked runtime .env file(s) detected:"
+            echo "$tracked_env"
+            exit 1
+          fi
+          echo "No runtime .env files are tracked by Git."
+
+  npm-audit:
+    name: npm audit (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            path: services/api
+          - name: image-server
+            path: server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Audit production dependencies (high and critical)
+        working-directory: ${{ matrix.path }}
+        run: npm audit --omit=dev --audit-level=high
