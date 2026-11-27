@@ -74,7 +74,16 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Productos</title>
+    <title>Productos | Shawarmas</title>
+    <?= render_social_meta([
+        'title' => $busqueda !== ''
+            ? 'Buscar "' . $busqueda . '" | Shawarmas'
+            : ($marca !== '' ? $marca . ' — Colección | Shawarmas' : 'Colección | Shawarmas'),
+        'description' => 'Explora el catálogo completo de Shawarmas: zapatillas, sudaderas, camisetas, pantalones, abrigos y accesorios de estilo urbano.',
+        'url' => public_base_url() . '/' . $urlColeccionFiltrada,
+        'image' => imagen_url('/brand/logo.png'),
+        'image_alt' => 'Catálogo de productos Shawarmas',
+    ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="products.css?v=20261110-6">

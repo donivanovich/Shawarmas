@@ -47,7 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión</title>
+    <title>Iniciar sesión | Shawarmas</title>
+    <?= render_social_meta([
+        'title' => 'Iniciar sesión | Shawarmas',
+        'description' => 'Accede a tu cuenta de Shawarmas para gestionar tu perfil, carrito y pedidos.',
+        'url' => public_base_url() . '/login.php',
+        'image' => imagen_url('/brand/logo.png'),
+    ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

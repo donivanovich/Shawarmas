@@ -1052,7 +1052,17 @@ test('8. Prueba de coherencia de arquitectura de producción (gateway Nginx, CDN
   assert.match(javaEmployee, /get\("\/stores"\)/);
   assert.match(javaEmployee, /post\("\/stores"/);
 
-  // Validar detección de HTTPS detrás de proxy en PHP
+  // Validar detección de HTTPS detrás de proxy y metadatos Open Graph / Twitter Cards en PHP
   const apiClientPhp = readFileSync(path.join(repoRoot, 'web', 'api-client.php'), 'utf8');
   assert.match(apiClientPhp, /HTTP_X_FORWARDED_PROTO/);
+  assert.match(apiClientPhp, /function render_social_meta/);
+  assert.match(apiClientPhp, /property="og:title"/);
+  assert.match(apiClientPhp, /property="og:description"/);
+  assert.match(apiClientPhp, /property="og:image"/);
+  assert.match(apiClientPhp, /name="twitter:card"/);
+
+  for (const page of ['index.php', 'products.php', 'product.php']) {
+    const html = readFileSync(path.join(repoRoot, 'web', page), 'utf8');
+    assert.match(html, /render_social_meta\(/, `web/${page} must emit Open Graph / Twitter Card metadata`);
+  }
 });

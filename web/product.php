@@ -77,7 +77,27 @@ foreach ($variantes as $variante) {
     <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="cart.css?v=20261110-1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <title><?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?></title>
+    <title><?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?> | Shawarmas</title>
+    <?php
+        $metaProductTitle = trim((string) $producto['marca'] . ' ' . (string) $producto['modelo']);
+        $metaProductPrice = number_format((float) $producto['precio'], 2, ',', '.') . ' €';
+        $metaProductDescRaw = trim((string) ($producto['descripcion'] ?? ''));
+        $metaProductDesc = $metaProductDescRaw !== ''
+            ? $metaProductPrice . ' — ' . $metaProductDescRaw
+            : $metaProductTitle . ' (' . (string) $producto['categoria'] . ') por ' . $metaProductPrice . ' en Shawarmas.';
+        $metaProductImage = !empty($producto['imagen'])
+            ? imagen_url((string) $producto['imagen'])
+            : imagen_url('/brand/logo.png');
+    ?>
+    <?= render_social_meta([
+        'type' => 'product',
+        'title' => $metaProductTitle . ' | Shawarmas',
+        'description' => $metaProductDesc,
+        'url' => public_base_url() . '/product.php?id=' . (int) $producto['id_producto'],
+        'image' => $metaProductImage,
+        'image_alt' => $metaProductTitle,
+        'price' => (float) $producto['precio'],
+    ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
 </head>
 <body>

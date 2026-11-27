@@ -124,6 +124,64 @@ function escapar(string $valor): string
     return htmlspecialchars($valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function public_base_url(): string
+{
+    $configured = trim((string) (getenv('PUBLIC_BASE_URL') ?: ''));
+    if ($configured !== '' && preg_match('/^https?:\/\//i', $configured)) {
+        return rtrim($configured, '/');
+    }
+    $forwardedProto = strtolower(trim(explode(',', (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))[0]));
+    $isHttps = $forwardedProto === 'https' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $scheme = $isHttps ? 'https' : 'http';
+    $rawHost = trim((string) ($_SERVER['HTTP_HOST'] ?? 'localhost:8080'));
+    $host = preg_replace('/[^a-zA-Z0-9.\-:]/', '', $rawHost) ?: 'localhost:8080';
+    return $scheme . '://' . $host;
+}
+
+function render_social_meta(array $meta = []): string
+{
+    $title = trim((string) ($meta['title'] ?? 'Shawarmas — Moda urbana y streetwear'));
+    $rawDesc = preg_replace('/\s+/u', ' ', trim((string) ($meta['description'] ?? 'Descubre moda urbana, zapatillas, sudaderas, camisetas, pantalones y accesorios en Shawarmas.')));
+    $description = function_exists('mb_strimwidth') ? mb_strimwidth((string) $rawDesc, 0, 200, '...', 'UTF-8') : substr((string) $rawDesc, 0, 200);
+    $type = trim((string) ($meta['type'] ?? 'website'));
+    $url = trim((string) ($meta['url'] ?? (public_base_url() . (string) ($_SERVER['REQUEST_URI'] ?? '/'))));
+    $image = trim((string) ($meta['image'] ?? imagen_url('/brand/logo.png')));
+    if ($image !== '' && !preg_match('/^https?:\/\//i', $image)) {
+        $image = public_base_url() . '/' . ltrim($image, '/');
+    }
+    $imageAlt = trim((string) ($meta['image_alt'] ?? $title));
+    $siteName = 'Shawarmas';
+
+    $tags = [
+        '<meta name="description" content="' . escapar($description) . '">',
+        '<meta name="theme-color" content="#111111">',
+        '<link rel="canonical" href="' . escapar($url) . '">',
+        '<meta property="og:site_name" content="' . escapar($siteName) . '">',
+        '<meta property="og:locale" content="es_ES">',
+        '<meta property="og:type" content="' . escapar($type) . '">',
+        '<meta property="og:title" content="' . escapar($title) . '">',
+        '<meta property="og:description" content="' . escapar($description) . '">',
+        '<meta property="og:url" content="' . escapar($url) . '">',
+    ];
+    if ($image !== '') {
+        $tags[] = '<meta property="og:image" content="' . escapar($image) . '">';
+        $tags[] = '<meta property="og:image:alt" content="' . escapar($imageAlt) . '">';
+    }
+    if (isset($meta['price']) && is_numeric($meta['price'])) {
+        $tags[] = '<meta property="product:price:amount" content="' . escapar(number_format((float) $meta['price'], 2, '.', '')) . '">';
+        $tags[] = '<meta property="product:price:currency" content="EUR">';
+    }
+    $tags[] = '<meta name="twitter:card" content="summary_large_image">';
+    $tags[] = '<meta name="twitter:title" content="' . escapar($title) . '">';
+    $tags[] = '<meta name="twitter:description" content="' . escapar($description) . '">';
+    if ($image !== '') {
+        $tags[] = '<meta name="twitter:image" content="' . escapar($image) . '">';
+        $tags[] = '<meta name="twitter:image:alt" content="' . escapar($imageAlt) . '">';
+    }
+
+    return implode("\n    ", $tags);
+}
+
 function token_csrf(): string
 {
     if (empty($_SESSION['token_csrf'])) {

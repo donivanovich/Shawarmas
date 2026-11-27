@@ -33,7 +33,13 @@ if ($carrito) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Carrito</title>
+    <title>Carrito | Shawarmas</title>
+    <?= render_social_meta([
+        'title' => 'Carrito | Shawarmas',
+        'description' => 'Revisa tus artículos en Shawarmas antes de finalizar tu compra.',
+        'url' => public_base_url() . '/cart-summary.php',
+        'image' => imagen_url('/brand/logo.png'),
+    ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="cart-summary.css?v=20261110-1">

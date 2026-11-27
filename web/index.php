@@ -24,6 +24,13 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shawarmas</title>
+    <?= render_social_meta([
+        'title' => 'Shawarmas — Moda urbana y streetwear',
+        'description' => 'Descubre la colección de ropa urbana, zapatillas, sudaderas, camisetas, pantalones y accesorios en Shawarmas.',
+        'url' => public_base_url() . '/',
+        'image' => imagen_url('/brand/logo.png'),
+        'image_alt' => 'Shawarmas — Tienda de moda urbana',
+    ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
     <link rel="stylesheet" href="alternative.css?v=20261110-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
