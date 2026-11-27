@@ -250,7 +250,7 @@ private void hacerPedido() {
             if (JOptionPane.showConfirmDialog(frmEmployee, "Add another product?", "Order", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) break;
         }
         if (items.isEmpty()) return;
-        List<JsonNode> stores = rows(get("/admin/stores"));
+        List<JsonNode> stores = rows(get("/stores"));
         if (stores.isEmpty()) throw new IllegalStateException("No store is configured.");
         String[] storeLabels = stores.stream().map(s -> s.path("id_tienda").asText() + " | " + s.path("calle").asText() + ", " + s.path("ciudad").asText()).toArray(String[]::new);
         int storeIndex = JOptionPane.showOptionDialog(frmEmployee, "Choose fulfillment store", "Store", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, storeLabels, storeLabels[0]);
@@ -299,7 +299,7 @@ private void addEmpleado() {
 
 private void addTalla() { String[] f = ask("Add size", "Size"); if (f == null) return; try { post("/sizes", api.object("talla", f[0])); success("Size added."); } catch (Exception error) { reportApiError(error); } }
 private void addColor() { String[] f = ask("Add color", "Color name", "Existing swatch path, e.g. /colors/black.png"); if (f == null) return; try { post("/colors", api.object("color", f[0], "imagen", f[1])); success("Color added."); } catch (Exception error) { reportApiError(error); } }
-private void addTienda() { String[] f = ask("Add store", "Country", "City", "Street", "Postal code"); if (f == null) return; try { post("/admin/stores", api.object("pais", f[0], "ciudad", f[1], "calle", f[2], "postal", f[3])); success("Store added."); } catch (Exception error) { reportApiError(error); } }
+private void addTienda() { String[] f = ask("Add store", "Country", "City", "Street", "Postal code"); if (f == null) return; try { post("/stores", api.object("pais", f[0], "ciudad", f[1], "calle", f[2], "postal", f[3])); success("Store added."); } catch (Exception error) { reportApiError(error); } }
 
 private void editEmpleado() {
     try {

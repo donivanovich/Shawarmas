@@ -17,7 +17,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 }
 
 $result = api_try('GET', '/orders');
-$pedidos = $result['data'] ?? $result;
+$pedidos = isset($result['_error']) ? [] : ($result['data'] ?? $result);
 $lineasPorPedido = [];
 foreach ($pedidos as &$pedido) {
     $details = api_try('GET', '/orders/' . (int) $pedido['id_pedido']);

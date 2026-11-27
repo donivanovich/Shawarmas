@@ -146,7 +146,12 @@ function start_store_session(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
-    $secureCookie = filter_var(getenv('SESSION_COOKIE_SECURE') ?: (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'), FILTER_VALIDATE_BOOLEAN);
+    $envSecure = getenv('SESSION_COOKIE_SECURE');
+    $forwardedHttps = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+    $directHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $secureCookie = $envSecure !== false && $envSecure !== ''
+        ? filter_var($envSecure, FILTER_VALIDATE_BOOLEAN)
+        : ($directHttps || $forwardedHttps);
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
     ini_set('session.gc_maxlifetime', '86400');

@@ -13,11 +13,11 @@ namespace Shawarmas.Services
         {
             try
             {
-                var data = await ApiClient.Get("/catalog/categories");
+                var data = await ApiClient.Get("/categories");
                 int categoryId = data.AsArray().First(x => string.Equals(x?["categoria"]?.GetValue<string>(), categoria, StringComparison.OrdinalIgnoreCase))!["id_categoria"]!.GetValue<int>();
-                var colors = await ApiClient.Get("/catalog/colors");
+                var colors = await ApiClient.Get("/colors");
                 int colorId = colors.AsArray().First(x => string.Equals(x?["color"]?.GetValue<string>(), color, StringComparison.OrdinalIgnoreCase))!["id_color"]!.GetValue<int>();
-                var sizes = await ApiClient.Get("/catalog/sizes");
+                var sizes = await ApiClient.Get("/sizes");
                 int sizeId = sizes.AsArray().First(x => string.Equals(x?["talla"]?.GetValue<string>(), talla, StringComparison.OrdinalIgnoreCase))!["id_talla"]!.GetValue<int>();
                 string? imagePath = null;
                 if (!string.IsNullOrWhiteSpace(rutaImagen)) imagePath = (await ApiClient.UploadImage(rutaImagen))["path"]?.GetValue<string>();

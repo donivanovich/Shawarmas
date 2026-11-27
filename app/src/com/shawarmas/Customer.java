@@ -230,8 +230,8 @@ private void principal() {
         lblPrecio.setText(String.format("%.2f €", product.path("precio").asDouble()));
         String imagePath = product.path("imagen").asText("");
         try {
-            String imageBase = System.getenv().getOrDefault("IMAGE_BASE_URL", "http://127.0.0.1:3000").replaceAll("/+$", "");
-            btnImagen.setIcon(imagePath.isBlank() ? null : new ImageIcon(new ImageIcon(new URL(imageBase + (imagePath.startsWith("/") ? imagePath : "/" + imagePath))).getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH)));
+            String resolvedImageUrl = BrandAssets.resolveUrl(imagePath);
+            btnImagen.setIcon(resolvedImageUrl.isBlank() ? null : new ImageIcon(new ImageIcon(java.net.URI.create(resolvedImageUrl).toURL()).getImage().getScaledInstance(176, 176, Image.SCALE_SMOOTH)));
         } catch (Exception ignored) { btnImagen.setIcon(null); }
     };
     comboModelo.addActionListener(event -> refreshVariants.run());

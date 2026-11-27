@@ -5,8 +5,9 @@ RUN apt-get update \
     && docker-php-ext-install curl \
     && apt-get purge -y --auto-remove libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && printf "default_charset = \"UTF-8\"\n" > "$PHP_INI_DIR/conf.d/charset.ini" \
-    && printf "AddDefaultCharset UTF-8\n" > /etc/apache2/conf-available/charset.conf
+    && printf "default_charset = \"UTF-8\"\nexpose_php = Off\n" > "$PHP_INI_DIR/conf.d/charset.ini" \
+    && printf "AddDefaultCharset UTF-8\nServerTokens Prod\nServerSignature Off\n" > /etc/apache2/conf-available/charset.conf \
+    && a2enconf charset
 
 ENV API_BASE_URL=http://api:3001/api/v1
 
