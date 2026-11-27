@@ -2,22 +2,29 @@
 #
 # Architecture:
 #   Cloudflare Tunnel (shawarmas.donivanovich.dev -> 127.0.0.1:3100)
-#     -> gateway (Nginx :8080, ONLY service exposing a host port)
+#     -> gateway (nginxinc/nginx-unprivileged :8080, ONLY service exposing a host port)
 #          ├── /      -> web (Apache/PHP :80, internal only)
 #          └── /cdn/  -> image-server (Express :3000, internal only, /cdn/ stripped)
 #     -> web -> api (Node.js :3001, internal only)
 #     -> api -> image-server (http://image-server:3000, internal only)
-#     -> api -> external MySQL over Docker network `mysql_backend`
+#     -> api -> external MySQL (`mysql` on Docker network `mysql_backend`)
 #
-# Required private runtime files on the Raspberry Pi (never committed to Git):
-#   - ./.env               (optional overrides: IMAGE_BASE_URL, SESSION_COOKIE_SECURE, IMAGE_TAG)
-#   - ./server/.env        (UPLOAD_API_KEY, IMAGE_BASE_URL=https://shawarmas.donivanovich.dev/cdn, ...)
-#   - ./services/api/.env  (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, IMAGE_SERVER_API_KEY, ...)
+# Supports both GHCR pulls (`docker compose -f docker-compose.pi.yml pull && up -d --no-build`)
+# and local builds (`docker compose -f docker-compose.pi.yml up -d --build`).
 
 services:
   gateway:
-    image: nginx:1.27-alpine
+    image: nginxinc/nginx-unprivileged:1.29-alpine
+    container_name: shawarmas-gateway
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+      - /var/cache/nginx:size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "127.0.0.1:3100:8080"
     volumes:
@@ -28,7 +35,7 @@ services:
       image-server:
         condition: service_healthy
     networks:
-      - shawarmas_internal
+      - shawarmas
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/gateway-health"]
       interval: 15s
@@ -38,6 +45,8 @@ services:
 
   web:
     image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-web:${IMAGE_TAG:-latest}
+    build:
+      context: ./web
     restart: unless-stopped
     depends_on:
       api:
@@ -49,7 +58,7 @@ services:
       IMAGE_BASE_URL: ${IMAGE_BASE_URL:-https://shawarmas.donivanovich.dev/cdn}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
     networks:
-      - shawarmas_internal
+      - shawarmas
     healthcheck:
       test: ["CMD", "php", "-r", "$$c=curl_init('http://127.0.0.1:80/'); curl_setopt_array($$c,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5]); curl_exec($$c); $$code=curl_getinfo($$c,CURLINFO_HTTP_CODE); exit($$code>=200 && $$code<400 ? 0 : 1);"]
       interval: 15s
@@ -59,6 +68,8 @@ services:
 
   image-server:
     image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-image-server:${IMAGE_TAG:-latest}
+    build:
+      context: ./server
     restart: unless-stopped
     env_file:
       - ./server/.env
@@ -67,8 +78,10 @@ services:
       IMAGE_STORAGE_PATH: /app/storage
     volumes:
       - shawarmas-images:/app/storage
+      - ./server/storage/brand:/app/storage/brand:ro
+      - ./server/storage/colors:/app/storage/colors:ro
     networks:
-      - shawarmas_internal
+      - shawarmas
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
       interval: 10s
@@ -77,12 +90,16 @@ services:
 
   api:
     image: ghcr.io/${GHCR_OWNER:-donivanovich}/shawarmas-api:${IMAGE_TAG:-latest}
+    build:
+      context: ./services/api
     restart: unless-stopped
     env_file:
       - ./services/api/.env
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       API_PORT: 3001
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
       IMAGE_SERVER_URL: http://image-server:3000
     read_only: true
     tmpfs:
@@ -93,7 +110,7 @@ services:
       image-server:
         condition: service_healthy
     networks:
-      - shawarmas_internal
+      - shawarmas
       - mysql_backend
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health/ready').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
@@ -103,7 +120,7 @@ services:
       start_period: 20s
 
 networks:
-  shawarmas_internal:
+  shawarmas:
     driver: bridge
   mysql_backend:
     external: true
