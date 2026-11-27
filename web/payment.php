@@ -53,6 +53,16 @@ if ($cartItems) {
     } else {
         $productosDetalle = $quote['items'] ?? [];
         $total = (float) ($quote['total'] ?? 0);
+
+        foreach ($productosDetalle as &$producto) {
+            foreach ($cartItems as $item) {
+                if ((int) $producto['id_variante'] === $item['variantId']) {
+                    $producto['cantidad'] = $item['quantity'];
+                    break;
+                }
+            }
+        }
+        unset($producto);
     }
 }
 
