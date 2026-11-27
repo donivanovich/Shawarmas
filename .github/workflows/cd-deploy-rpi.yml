@@ -224,7 +224,6 @@ jobs:
           chmod 600 "${SSH_DIR}/known_hosts"
 
       - name: Authenticate Raspberry Pi Docker client to GHCR (if private packages)
-        if: ${{ secrets.GHCR_PULL_TOKEN != '' }}
         env:
           RPI_HOST: ${{ secrets.RPI_HOST }}
           RPI_USER: ${{ secrets.RPI_USER }}
@@ -233,6 +232,10 @@ jobs:
           GHCR_PULL_USER: ${{ secrets.GHCR_PULL_USER || github.repository_owner }}
         run: |
           set -euo pipefail
+          if [[ -z "${GHCR_PULL_TOKEN:-}" ]]; then
+            echo "GHCR_PULL_TOKEN not configured; assuming public GHCR packages."
+            exit 0
+          fi
           if [[ ! "$GHCR_PULL_USER" =~ ^[a-zA-Z0-9-]+$ ]]; then
             echo "::error::Invalid GHCR_PULL_USER value."
             exit 1
@@ -545,14 +548,21 @@ jobs:
           REMOTE_SCRIPT
 
       - name: Log out Raspberry Pi Docker client from GHCR (if authenticated)
-        if: ${{ always() && secrets.GHCR_PULL_TOKEN != '' }}
+        if: always()
         env:
           RPI_HOST: ${{ secrets.RPI_HOST }}
           RPI_USER: ${{ secrets.RPI_USER }}
           RPI_PORT: ${{ secrets.RPI_PORT }}
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
         run: |
           set -euo pipefail
+          if [[ -z "${GHCR_PULL_TOKEN:-}" ]]; then
+            exit 0
+          fi
           SSH_DIR="${RUNNER_TEMP}/ssh"
+          if [[ ! -f "${SSH_DIR}/deploy_key" || ! -f "${SSH_DIR}/known_hosts" ]]; then
+            exit 0
+          fi
           PORT="${RPI_PORT:-22}"
           ssh \
             -i "${SSH_DIR}/deploy_key" \
