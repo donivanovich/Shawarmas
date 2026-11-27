@@ -8,7 +8,7 @@ export const pool = mysql.createPool({
   user: config.DB_USER,
   password: config.DB_PASSWORD,
   connectionLimit: config.DB_POOL_SIZE,
-  charset: 'utf8mb4',
+  charset: 'UTF8MB4_UNICODE_CI',
   decimalNumbers: true,
   enableKeepAlive: true,
   multipleStatements: false

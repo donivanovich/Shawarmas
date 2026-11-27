@@ -920,3 +920,139 @@ test('6. Comprobación de ausencia de mojibake en resultados y coherencia UTF-8 
     scanDir(repoRoot);
   }
 });
+
+test('7. Prueba de detección, reparación segura e idempotente de doble codificación UTF-8 (mojibake)', () => {
+  const doubleEncodedHexPattern = /C383C2|C382C2|C3A2E2809A|C3A2E282AC|C383E280/;
+  const cp1252ReverseMap = new Map<number, number>([
+    [0x20ac, 0x80], [0x201a, 0x82], [0x0192, 0x83], [0x201e, 0x84], [0x2026, 0x85],
+    [0x2020, 0x86], [0x2021, 0x87], [0x02c6, 0x88], [0x2030, 0x89], [0x0160, 0x8a],
+    [0x2039, 0x8b], [0x0152, 0x8c], [0x017d, 0x8e], [0x2018, 0x91], [0x2019, 0x92],
+    [0x201c, 0x93], [0x201d, 0x94], [0x2022, 0x95], [0x2013, 0x96], [0x2014, 0x97],
+    [0x02dc, 0x98], [0x2122, 0x99], [0x0161, 0x9a], [0x203a, 0x9b], [0x0153, 0x9c],
+    [0x017e, 0x9e], [0x0178, 0x9f]
+  ]);
+
+  const repairMojibakeLikeSql = (input: string): string => {
+    const hex = Buffer.from(input, 'utf8').toString('hex').toUpperCase();
+    if (!doubleEncodedHexPattern.test(hex)) return input;
+
+    const latin1Bytes: number[] = [];
+    for (const ch of input) {
+      const code = ch.codePointAt(0)!;
+      if (code <= 0xff) {
+        latin1Bytes.push(code);
+      } else if (cp1252ReverseMap.has(code)) {
+        latin1Bytes.push(cp1252ReverseMap.get(code)!);
+      } else {
+        return input;
+      }
+    }
+
+    let decoded: string;
+    try {
+      decoded = new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(latin1Bytes));
+    } catch {
+      return input;
+    }
+
+    const origQ = (input.match(/\?/g) ?? []).length;
+    const newQ = (decoded.match(/\?/g) ?? []).length;
+    if (Buffer.byteLength(decoded, 'utf8') < Buffer.byteLength(input, 'utf8') && origQ === newQ) {
+      return decoded;
+    }
+    return input;
+  };
+
+  // Casos reales detectados en producción
+  const corruptedCases: Array<[string, string]> = [
+    [
+      'Una sudadera de estilo relajado con el carÃ¡cter grÃ¡fico de Jordan. Ideal para sumar una capa cÃ³moda a tu look.',
+      'Una sudadera de estilo relajado con el carácter gráfico de Jordan. Ideal para sumar una capa cómoda a tu look.'
+    ],
+    [
+      'PantalÃ³n de inspiraciÃ³n deportiva con una silueta cÃ³moda y actual, ideal para moverte con libertad durante el dÃ­a.',
+      'Pantalón de inspiración deportiva con una silueta cómoda y actual, ideal para moverte con libertad durante el día.'
+    ],
+    [
+      'Un icono de perfil limpio y versÃ¡til. Su diseÃ±o combina con looks urbanos de diario.',
+      'Un icono de perfil limpio y versátil. Su diseño combina con looks urbanos de diario.'
+    ],
+    [
+      'Tarifa especial de 50 â‚¬ con espÃ­ritu urbano.',
+      'Tarifa especial de 50 € con espíritu urbano.'
+    ]
+  ];
+
+  for (const [corrupted, expected] of corruptedCases) {
+    const repaired = repairMojibakeLikeSql(corrupted);
+    assert.strictEqual(repaired, expected);
+    assertNoMojibake(repaired, 'repaired description');
+    // Idempotencia: volver a ejecutar no altera el texto reparado
+    assert.strictEqual(repairMojibakeLikeSql(repaired), expected);
+  }
+
+  // Textos ya válidos en español, símbolos, otros idiomas y signos '?' no deben corromperse
+  const validTexts = [
+    'Una sudadera de estilo relajado con el carácter gráfico de Jordan. Ideal para sumar una capa cómoda a tu look.',
+    '¿Camiseta edición especial pingüino? Precio: 29,99 € — diseño español.',
+    'Crème brûlée, München, 日本語テスト, 서울, 🚀',
+    'Una sudadera de aspecto relajado que suma comodidad y una silueta desenfadada a tus capas de diario.'
+  ];
+  for (const valid of validTexts) {
+    assert.strictEqual(repairMojibakeLikeSql(valid), valid);
+  }
+
+  // Verificar script SQL seguro de reparación, configuración MySQL y cliente Java
+  const repairSql = readFileSync(path.join(repoRoot, 'db', 'repair-utf8-mojibake.sql'), 'utf8');
+  assert.match(repairSql, /SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;/);
+  assert.match(repairSql, /START TRANSACTION;/);
+  assert.match(repairSql, /COMMIT;/);
+  assert.match(repairSql, /HEX\(/);
+  assert.match(repairSql, /OCTET_LENGTH\(/);
+  assert.equal(/DROP\s+TABLE|TRUNCATE\s+TABLE/i.test(repairSql), false);
+
+  const dbTs = readFileSync(path.join(repoRoot, 'services', 'api', 'src', 'database.ts'), 'utf8');
+  assert.match(dbTs, /charset:\s*'UTF8MB4_UNICODE_CI'/);
+
+  const javaApiClient = readFileSync(path.join(repoRoot, 'app', 'src', 'com', 'shawarmas', 'ApiClient.java'), 'utf8');
+  assert.match(javaApiClient, /application\/json;\s*charset=utf-8/i);
+  assert.match(javaApiClient, /StandardCharsets\.UTF_8/);
+});
+
+test('8. Prueba de coherencia de arquitectura de producción (gateway Nginx, CDN /cdn, Compose Pi y rutas de clientes)', () => {
+  const nginxConf = readFileSync(path.join(repoRoot, 'infrastructure', 'nginx', 'default.conf'), 'utf8');
+  assert.match(nginxConf, /listen\s+8080;/);
+  assert.match(nginxConf, /location\s+\/cdn\/\s*\{[\s\S]*proxy_pass\s+http:\/\/image-server:3000\/;/);
+  assert.match(nginxConf, /location\s+\^~\s+\/cdn\/api\/\s*\{[\s\S]*return\s+404;/);
+  assert.match(nginxConf, /location\s+\/\s*\{[\s\S]*proxy_pass\s+http:\/\/web:80;/);
+  assert.match(nginxConf, /X-Forwarded-Proto/);
+
+  const piCompose = readFileSync(path.join(repoRoot, 'docker-compose.pi.yml'), 'utf8');
+  assert.match(piCompose, /127\.0\.0\.1:3100:8080/);
+  assert.match(piCompose, /mysql_backend:\s*\r?\n\s*external:\s*true/);
+  assert.match(piCompose, /IMAGE_SERVER_URL:\s*http:\/\/image-server:3000/);
+  assert.match(piCompose, /shawarmas\.donivanovich\.dev\/cdn/);
+  assert.equal(piCompose.includes('shawarmas-cdn.donivanovich.dev'), false);
+  assert.equal(piCompose.includes('shawarmas-api.donivanovich.dev'), false);
+  // Solo el servicio gateway debe declarar la clave ports:
+  const portsMatches = piCompose.match(/^\s{4}ports:/gm) ?? [];
+  assert.equal(portsMatches.length, 1, 'Only gateway must publish a host port in docker-compose.pi.yml');
+
+  // Validar rutas reales usadas por clientes WPF y Java
+  const wpfProductService = readFileSync(path.join(repoRoot, 'wpf', 'Services', 'ServiceProduct.cs'), 'utf8');
+  assert.equal(wpfProductService.includes('/catalog/categories'), false);
+  assert.equal(wpfProductService.includes('/catalog/colors'), false);
+  assert.equal(wpfProductService.includes('/catalog/sizes'), false);
+  assert.match(wpfProductService, /ApiClient\.Get\("\/categories"\)/);
+  assert.match(wpfProductService, /ApiClient\.Get\("\/colors"\)/);
+  assert.match(wpfProductService, /ApiClient\.Get\("\/sizes"\)/);
+
+  const javaEmployee = readFileSync(path.join(repoRoot, 'app', 'src', 'com', 'shawarmas', 'Employee.java'), 'utf8');
+  assert.equal(javaEmployee.includes('/admin/stores'), false);
+  assert.match(javaEmployee, /get\("\/stores"\)/);
+  assert.match(javaEmployee, /post\("\/stores"/);
+
+  // Validar detección de HTTPS detrás de proxy en PHP
+  const apiClientPhp = readFileSync(path.join(repoRoot, 'web', 'api-client.php'), 'utf8');
+  assert.match(apiClientPhp, /HTTP_X_FORWARDED_PROTO/);
+});

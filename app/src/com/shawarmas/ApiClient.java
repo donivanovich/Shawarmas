@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 /** Shared HTTP-only client for the Shawarmas API. Session tokens remain in memory. */
@@ -84,9 +85,9 @@ public final class ApiClient {
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(baseUrl + (path.startsWith("/") ? path : "/" + path)))
             .timeout(Duration.ofSeconds(15)).header("Accept", "application/json");
         if (authenticated) builder.header("Authorization", "Bearer " + token);
-        if (payload != null) builder.header("Content-Type", "application/json");
-        HttpRequest.BodyPublisher body = payload == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(payload));
-        HttpResponse<String> response = http.send(builder.method(method, body).build(), HttpResponse.BodyHandlers.ofString());
+        if (payload != null) builder.header("Content-Type", "application/json; charset=utf-8");
+        HttpRequest.BodyPublisher body = payload == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(payload), StandardCharsets.UTF_8);
+        HttpResponse<String> response = http.send(builder.method(method, body).build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         if (response.statusCode() == 401 && authenticated) {
             token = null;
             expiresAt = 0;
