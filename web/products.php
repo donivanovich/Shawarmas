@@ -85,8 +85,8 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'image_alt' => 'Catálogo de productos Shawarmas',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-4">
-    <link rel="stylesheet" href="products.css?v=20261110-6">
+    <link rel="stylesheet" href="alternative.css?v=20261128-2">
+    <link rel="stylesheet" href="products.css?v=20261128-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -118,35 +118,47 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             <div class="filtro-titulo"><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button><h2>Filtrar productos</h2><button class="filtro-cerrar" type="button" aria-label="Ocultar filtros"><i class="bi bi-chevron-up"></i></button></div>
             <form method="get" accept-charset="UTF-8">
                 <input type="hidden" name="por_pagina" value="<?= $porPagina ?>">
-                <label for="buscar">Buscar</label>
-                <input id="buscar" name="buscar" value="<?= escapar($busqueda) ?>" maxlength="100">
-                <label for="categoria">Categoría</label>
-                <select id="categoria" name="categoria">
-                    <option value="">Todas</option>
-                    <?php foreach ($categorias as $item): ?>
-                        <option value="<?= (int) $item['id_categoria'] ?>" <?= $categoria === (int) $item['id_categoria'] ? 'selected' : '' ?>>
-                            <?= escapar((string) $item['categoria']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="marca">Marca</label>
-                <select id="marca" name="marca">
-                    <option value="">Todas</option>
-                    <?php foreach ($marcas as $item): ?>
-                        <option value="<?= escapar((string) $item['marca']) ?>" <?= $marca === (string) $item['marca'] ? 'selected' : '' ?>><?= escapar((string) $item['marca']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="color">Color</label>
-                <select id="color" name="color">
-                    <option value="">Todos</option>
-                    <?php foreach ($colores as $item): ?>
-                        <option value="<?= (int) $item['id_color'] ?>" <?= $colorId === (int) $item['id_color'] ? 'selected' : '' ?>><?= escapar((string) $item['color']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="maximo">Precio máximo</label>
-                <input id="maximo" name="maximo" type="number" min="0" step="0.01" value="<?= $maximo !== false && $maximo !== null ? escapar((string) $maximo) : '' ?>">
-                <button type="submit">Aplicar filtros</button>
-                <a class="filtros-reset" href="products.php">Restablecer filtros</a>
+                <div class="filtro-campo filtro-campo--buscar">
+                    <label for="buscar">Buscar</label>
+                    <input id="buscar" name="buscar" value="<?= escapar($busqueda) ?>" maxlength="100">
+                </div>
+                <div class="filtro-campo">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Todas</option>
+                        <?php foreach ($categorias as $item): ?>
+                            <option value="<?= (int) $item['id_categoria'] ?>" <?= $categoria === (int) $item['id_categoria'] ? 'selected' : '' ?>>
+                                <?= escapar((string) $item['categoria']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filtro-campo">
+                    <label for="marca">Marca</label>
+                    <select id="marca" name="marca">
+                        <option value="">Todas</option>
+                        <?php foreach ($marcas as $item): ?>
+                            <option value="<?= escapar((string) $item['marca']) ?>" <?= $marca === (string) $item['marca'] ? 'selected' : '' ?>><?= escapar((string) $item['marca']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filtro-campo">
+                    <label for="color">Color</label>
+                    <select id="color" name="color">
+                        <option value="">Todos</option>
+                        <?php foreach ($colores as $item): ?>
+                            <option value="<?= (int) $item['id_color'] ?>" <?= $colorId === (int) $item['id_color'] ? 'selected' : '' ?>><?= escapar((string) $item['color']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filtro-campo">
+                    <label for="maximo">Precio máximo</label>
+                    <input id="maximo" name="maximo" type="number" min="0" step="0.01" value="<?= $maximo !== false && $maximo !== null ? escapar((string) $maximo) : '' ?>">
+                </div>
+                <div class="filtro-acciones">
+                    <button type="submit">Aplicar filtros</button>
+                    <a class="filtros-reset" href="products.php">Restablecer filtros</a>
+                </div>
             </form>
         </aside>
 
@@ -225,6 +237,9 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             filterToggle.setAttribute('aria-expanded', String(!hidden));
             filterToggle.querySelector('i').className = hidden ? 'bi bi-chevron-down' : 'bi bi-sliders';
         };
+        const collapsibleFilters = window.matchMedia('(max-width: 1024px)');
+        if (collapsibleFilters.matches) setFilters(true);
+        collapsibleFilters.addEventListener('change', event => setFilters(event.matches));
         filterToggle.addEventListener('click', () => setFilters(!filterPanel.classList.contains('is-hidden')));
         filterClose.addEventListener('click', () => setFilters(true));
         document.querySelectorAll('.tarjeta-producto').forEach(card => {

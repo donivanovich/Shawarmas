@@ -3,6 +3,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/api-client.php';
 start_store_session();
 $mensaje = "";
+$redirectTarget = (string) ($_POST['redirect'] ?? $_GET['redirect'] ?? ($_SESSION['login_redirect'] ?? ''));
+if (!preg_match('/^[a-zA-Z0-9_-]+\.php$/', $redirectTarget)) {
+    $redirectTarget = '';
+}
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     foreach ((array) $sizes as $quantity) {
@@ -47,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'image' => public_base_url() . '/assets/og-image.png',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-4">
+    <link rel="stylesheet" href="alternative.css?v=20261128-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         <?php include "register.css"; ?>
@@ -73,8 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php echo escapar($mensaje); ?>
                 </div>
             <?php endif; ?>
-            <form action="register.php" method="post" accept-charset="UTF-8">
+            <form action="register.php<?= $redirectTarget !== '' ? '?redirect=' . rawurlencode($redirectTarget) : '' ?>" method="post" accept-charset="UTF-8">
         <input type="hidden" name="token_csrf" value="<?php echo escapar(token_csrf()); ?>">
+        <input type="hidden" name="redirect" value="<?= escapar($redirectTarget) ?>">
         <div class="form-group">
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" name="nombre" required>
@@ -102,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <div class="form-group botones">
             <button type="submit">Crear cuenta</button>
-            <a href="login.php" class="volver-btn">Ya tengo una cuenta</a>
+            <a href="login.php<?= $redirectTarget !== '' ? '?redirect=' . rawurlencode($redirectTarget) : '' ?>" class="volver-btn">Ya tengo una cuenta</a>
         </div>
             </form>
         </section>

@@ -4,6 +4,16 @@ require_once __DIR__ . '/api-client.php';
 start_store_session();
 
 $mensaje = '';
+$requestedRedirect = (string) ($_POST['redirect'] ?? $_GET['redirect'] ?? '');
+if ($requestedRedirect !== '' && preg_match('/^[a-zA-Z0-9_-]+\.php$/', $requestedRedirect)) {
+    $_SESSION['login_redirect'] = $requestedRedirect;
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['redirect'])) {
+    unset($_SESSION['login_redirect']);
+}
+$redirectTarget = (string) ($_SESSION['login_redirect'] ?? '');
+if (!preg_match('/^[a-zA-Z0-9_-]+\.php$/', $redirectTarget)) {
+    $redirectTarget = '';
+}
 $cartCount = 0;
 foreach ($_SESSION['carrito'] ?? [] as $sizes) {
     foreach ((array) $sizes as $quantity) {
@@ -32,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['apellido2'] = (string) ($cliente['apellido2'] ?? '');
         $_SESSION['mail'] = (string) $cliente['email'];
         $_SESSION['nombre_completo'] = trim($_SESSION['nombre'] . ' ' . $_SESSION['apellido1'] . ' ' . $_SESSION['apellido2']);
-        $redirect = (string) ($_POST['redirect'] ?? '');
-        $redirect = preg_match('/^[a-zA-Z0-9_-]+\.php$/', $redirect) ? $redirect : 'index.php';
+        $redirect = $redirectTarget !== '' ? $redirectTarget : 'index.php';
+        unset($_SESSION['login_redirect']);
         header('Location: ' . $redirect);
         exit;
     }
@@ -55,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'image' => public_base_url() . '/assets/og-image.png',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-4">
+    <link rel="stylesheet" href="alternative.css?v=20261128-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         <?php include "register.css"; ?>
@@ -77,9 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Accede a tu cuenta para continuar.</p>
             </div>
             <?php if ($mensaje !== ''): ?><div class="mensaje error"><?= escapar($mensaje) ?></div><?php endif; ?>
-            <form action="login.php" method="post" accept-charset="UTF-8">
+            <form action="login.php<?= $redirectTarget !== '' ? '?redirect=' . rawurlencode($redirectTarget) : '' ?>" method="post" accept-charset="UTF-8">
                 <input type="hidden" name="token_csrf" value="<?= escapar(token_csrf()) ?>">
-                <input type="hidden" name="redirect" value="<?= escapar((string) ($_GET['redirect'] ?? '')) ?>">
+                <input type="hidden" name="redirect" value="<?= escapar($redirectTarget) ?>">
                 <div class="form-group">
                     <label for="usuario">Correo electrónico</label>
                     <input type="email" id="usuario" name="usuario" autocomplete="email" required>
@@ -90,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="form-group botones">
                     <button type="submit">Iniciar sesión</button>
-                    <a href="register.php" class="volver-btn">Crear una cuenta</a>
+                    <a href="register.php<?= $redirectTarget !== '' ? '?redirect=' . rawurlencode($redirectTarget) : '' ?>" class="volver-btn">Crear una cuenta</a>
                 </div>
             </form>
         </section>

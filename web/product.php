@@ -74,8 +74,8 @@ foreach ($variantes as $variante) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="alternative.css?v=20261110-4">
-    <link rel="stylesheet" href="cart.css?v=20261110-1">
+    <link rel="stylesheet" href="alternative.css?v=20261128-2">
+    <link rel="stylesheet" href="cart.css?v=20261128-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <title><?= escapar($producto['marca'] . ' ' . $producto['modelo']) ?> | Shawarmas</title>
     <?php
@@ -122,11 +122,6 @@ foreach ($variantes as $variante) {
                 <h1><?= escapar((string) $producto['modelo']) ?></h1>
                 <p class="product-price"><?= number_format((float) $producto['precio'], 2, ',', '.') ?> €</p>
                 <p class="product-intro"><?= escapar((string) ($producto['descripcion'] ?? '')) ?></p>
-
-                        <div class="product-details">
-                            <div><span>Marca</span><strong><?= escapar((string) $producto['marca']) ?></strong></div>
-                            <div><span>Categoría</span><strong><?= escapar((string) $producto['categoria']) ?></strong></div>
-                        </div>
 
                 <?php if ($agotado): ?>
                     <p class="stock-message">Este producto está fuera de stock.</p>

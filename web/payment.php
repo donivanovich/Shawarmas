@@ -110,8 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pago</title>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261110-4">
-    <link rel="stylesheet" href="checkout.css?v=20261110-2">
+    <link rel="stylesheet" href="alternative.css?v=20261128-2">
+    <link rel="stylesheet" href="checkout.css?v=20261128-2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -122,8 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="alternative-actions"><a href="products.php?buscar=" aria-label="Buscar productos"><i class="bi bi-search"></i></a><button class="user-trigger" type="button" aria-expanded="false" aria-controls="perfil" aria-label="Abrir perfil"><i class="bi bi-person"></i></button><a class="cart-link" href="cart-summary.php" aria-label="Ver carrito"><i class="bi bi-bag"></i><span><?= $cartCount ?></span></a><div id="perfil" class="user-panel"><strong><?= escapar((string) $_SESSION['nombre_completo']) ?></strong><span><?= escapar((string) $_SESSION['mail']) ?></span><a href="account.php">Cuenta</a><a href="logout.php">Cerrar sesión</a></div></div>
     </header>
     <main class="contenedor">
+        <a class="page-return" href="checkout.php"><i class="bi bi-arrow-left"></i> Volver a datos de envío</a>
         <section class="panel-izquierdo">
-            <a class="page-return" href="checkout.php"><i class="bi bi-arrow-left"></i> Volver a datos de envío</a>
             <h1>Pago</h1>
             <p class="ayuda-pago">Introduce los datos de tu tarjeta. No se almacenan.</p>
             <?php if ($mensaje !== ''): ?><p class="mensaje"><?= escapar($mensaje) ?></p><?php endif; ?>
