@@ -85,8 +85,8 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'image_alt' => 'Catálogo de productos Shawarmas',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-4">
-    <link rel="stylesheet" href="products.css?v=20261128-4">
+    <link rel="stylesheet" href="alternative.css?v=20261128-5">
+    <link rel="stylesheet" href="products.css?v=20261128-5">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -115,7 +115,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
 
     <main class="contenedor-principal">
         <aside class="filtro-lateral">
-            <div class="filtro-titulo"><a class="page-return filtro-return" href="index.php"><i class="bi bi-arrow-left"></i> Volver al inicio</a><h2>Filtrar productos</h2><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button></div>
+            <div class="filtro-titulo"><a class="page-return filtro-return" href="index.php"><i class="bi bi-arrow-left"></i> Volver al inicio</a><button class="filtro-toggle" type="button" aria-expanded="true"><i class="bi bi-sliders"></i><span>Filtros</span></button></div>
             <form method="get" accept-charset="UTF-8">
                 <input type="hidden" name="por_pagina" value="<?= $porPagina ?>">
                 <div class="filtro-campo filtro-campo--buscar">
