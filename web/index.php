@@ -32,7 +32,7 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'image_alt' => 'Shawarmas — Tienda de moda urbana',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-3">
+    <link rel="stylesheet" href="alternative.css?v=20261128-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
@@ -79,7 +79,12 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
             </div>
             <div class="hero-art" aria-label="Selección de zapatillas y ropa">
                 <span class="hero-index">01 / 04</span>
-                <?php if ($heroProducto): ?><img src="<?= escapar(imagen_url($heroProducto['imagen'])) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>"><?php endif; ?>
+                <?php if ($heroProducto): ?>
+                    <?php $heroColor = (int) ($heroProducto['id_color'] ?? 0); ?>
+                    <a class="hero-product-link" href="product.php?id=<?= (int) $heroProducto['id_producto'] ?><?= $heroColor ? '&color=' . $heroColor : '' ?>" aria-label="Ver <?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>">
+                        <img src="<?= escapar(imagen_url($heroProducto['imagen'])) ?>" alt="<?= escapar($heroProducto['marca'] . ' ' . $heroProducto['modelo']) ?>">
+                    </a>
+                <?php endif; ?>
                 <p>THE EVERYDAY<br><strong>UNIFORM</strong></p>
             </div>
         </section>

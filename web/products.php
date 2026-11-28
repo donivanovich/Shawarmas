@@ -85,8 +85,8 @@ foreach ($_SESSION['carrito'] ?? [] as $sizes) {
         'image_alt' => 'Catálogo de productos Shawarmas',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-3">
-    <link rel="stylesheet" href="products.css?v=20261128-3">
+    <link rel="stylesheet" href="alternative.css?v=20261128-4">
+    <link rel="stylesheet" href="products.css?v=20261128-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>

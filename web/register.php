@@ -26,9 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $registration = api_request('POST', '/auth/register', ['nombre' => $nombre, 'apellido1' => $apellido1, 'apellido2' => $apellido2 ?: null, 'email' => $mail, 'password' => $passwPlano], false);
-            $_SESSION['api_token'] = (string) ($registration['token'] ?? '');
-            api_request('POST', '/auth/logout');
-            unset($_SESSION['api_token']);
+            $cliente = $registration['user'] ?? [];
+            if (($cliente['type'] ?? '') === 'customer' && !empty($registration['token'])) {
+                session_regenerate_id(true);
+                $_SESSION['api_token'] = (string) $registration['token'];
+                $_SESSION['api_expires_at'] = time() + (int) ($registration['expiresIn'] ?? 0);
+                $_SESSION['id_user'] = (int) $cliente['id'];
+                $_SESSION['nombre'] = (string) $cliente['nombre'];
+                $_SESSION['apellido1'] = (string) $cliente['apellido1'];
+                $_SESSION['apellido2'] = (string) ($cliente['apellido2'] ?? '');
+                $_SESSION['mail'] = (string) $cliente['email'];
+                $_SESSION['nombre_completo'] = trim($_SESSION['nombre'] . ' ' . $_SESSION['apellido1'] . ' ' . $_SESSION['apellido2']);
+                $redirect = $redirectTarget !== '' ? $redirectTarget : 'index.php';
+                unset($_SESSION['login_redirect']);
+                header('Location: ' . $redirect);
+                exit;
+            }
             $mensaje = 'Registro realizado correctamente.';
         } catch (ApiClientException) {
             $mensaje = 'No se pudo completar el registro. Comprueba que el correo no esté registrado.';
@@ -51,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'image' => public_base_url() . '/assets/og-image.png',
     ]) ?>
     <link rel="icon" href="<?= escapar(imagen_url('/brand/favicon.ico')) ?>" type="image/x-icon">
-    <link rel="stylesheet" href="alternative.css?v=20261128-3">
+    <link rel="stylesheet" href="alternative.css?v=20261128-4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         <?php include "register.css"; ?>
